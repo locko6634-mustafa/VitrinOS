@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VitrinOS Giriş | Local ürün akışı</title>
+    <meta name="description" content="VitrinOS local ürün paneli için demo giriş ekranı.">
+    <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="14" fill="%23161512"/%3E%3Cpath d="M16 16h10l7 23 7-23h8L37 48h-9L16 16Z" fill="%23d9962a"/%3E%3C/svg%3E'>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/login.css">
+  </head>
+  <body class="app-body">
+    <a class="skip-link" href="#login-main">İçeriğe geç</a>
+
+    <main class="auth-screen" id="login-main" aria-labelledby="authTitle">
+      <div class="auth-panel">
+        <div class="auth-nav">
+          <a class="brand auth-brand" href="index.html" aria-label="VitrinOS ana sayfa">
+            <span class="brand-mark" aria-hidden="true">V</span>
+            <span>VitrinOS</span>
+          </a>
+          <a class="auth-back" href="index.html">Ana sayfaya dön</a>
+        </div>
+        <div class="auth-copy">
+          <p class="kicker">Local ürün akışı</p>
+          <h1 id="authTitle">Kreatif operasyon paneline gir.</h1>
+          <p>
+            Supabase Auth ile giriş yap. Admin hesabı admin paneline, diğer kullanıcılar ürün paneline yönlendirilir.
+          </p>
+        </div>
+        <form class="auth-form" id="loginForm" novalidate>
+          <div class="form-row">
+            <label for="loginEmail">E-posta veya kullanıcı adı</label>
+            <input id="loginEmail" name="email" type="text" autocomplete="username" value="locko6634admin" required>
+          </div>
+          <div class="form-row">
+            <label for="loginPassword">Şifre</label>
+            <input id="loginPassword" name="password" type="password" autocomplete="current-password" value="" required>
+          </div>
+          <button class="button primary" type="submit">Panele gir</button>
+          <p class="form-status" id="loginStatus" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+      <div class="auth-visual" aria-hidden="true">
+        <div class="auth-visual-card">
+          <span>NovaMarket</span>
+          <strong>18 job</strong>
+          <p>Brief, format, önizleme, onay ve revizyon tek panelde izlenir.</p>
+        </div>
+        <div class="auth-visual-stack">
+          <span>Banner 1600x600</span>
+          <span>Meta post 1080x1350</span>
+          <span>Story 1080x1920</span>
+        </div>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/login.js"></script>
+  </body>
+</html>

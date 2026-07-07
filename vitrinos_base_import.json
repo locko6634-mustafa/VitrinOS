@@ -1,0 +1,1010 @@
+{
+  "name": "VitrinOS_BASE",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vitrinos-brief",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -700,
+        150
+      ],
+      "id": "webhook-trigger-node",
+      "name": "Webhook_Trigger"
+    },
+    {
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.isRevision }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Revizyon"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Yeni Brief"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -480,
+        150
+      ],
+      "id": "is-revision-router-node",
+      "name": "Is_Revision_Router"
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "tableId": "jobs",
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Webhook_Trigger').item.json.body.jobId }}"
+            }
+          ]
+        },
+        "dataToSend": "defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "processing"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        280
+      ],
+      "id": "supabase-update-processing-node",
+      "name": "Supabase_Update_Processing"
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "tableId": "brands",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $('Webhook_Trigger').item.json.body.brandId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        20,
+        280
+      ],
+      "id": "supabase-get-brand-node",
+      "name": "Supabase_Get_Brand"
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "tableId": "brand_prompts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "brand_id",
+              "keyValue": "={{ $('Webhook_Trigger').item.json.body.brandId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        260,
+        280
+      ],
+      "id": "supabase-get-prompts-node",
+      "name": "Supabase_Get_Prompts"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Webhook_Trigger').item.json.body.briefText }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "={{ $node['Supabase_Get_Prompts'].json.base_prompt }}\n\nMarka Kuralları:\n- Ses Tonu: {{ $node['Supabase_Get_Brand'].json.tone_rules }}\n- Yasaklı Kelimeler: {{ $node['Supabase_Get_Brand'].json.banned_words.join(', ') }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        500,
+        280
+      ],
+      "id": "ai-agent-generic-node",
+      "name": "AI_Agent_Generic"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.4-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5.4-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        420,
+        480
+      ],
+      "id": "openai-chat-model-node",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"intent\": {\n      \"type\": \"string\",\n      \"enum\": [\"Meta Post\", \"Story\", \"Banner\"]\n    },\n    \"visual_details\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"product_name\": { \"type\": \"string\" },\n        \"category\": { \"type\": \"string\" },\n        \"slogan\": { \"type\": \"string\" },\n        \"image_url\": { \"type\": \"string\" },\n        \"width\": { \"type\": \"integer\", \"description\": \"Genişlik\" },\n        \"height\": { \"type\": \"integer\", \"description\": \"Yükseklik\" },\n        \"prices\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"old_price\": { \"type\": \"string\" },\n            \"new_price\": { \"type\": \"string\" },\n            \"discount_rate\": { \"type\": \"string\" }\n          }\n        },\n        \"campaign\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"campaign_name\": { \"type\": \"string\" },\n            \"campaign_code\": { \"type\": \"string\" }\n          }\n        }\n      },\n      \"required\": [\"product_name\", \"category\", \"slogan\"]\n    }\n  },\n  \"required\": [\"intent\", \"visual_details\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        580,
+        480
+      ],
+      "id": "structured-parser-node",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nlet payload = input.output ?? input.text ?? input;\n\nif (typeof payload === 'string') {\n  try {\n    const match = payload.match(/```(?:json)?\\s*\\n?([\\s\\S]*?)\\n?\\s*```/);\n    let cleanJson = match ? match[1].trim() : payload.trim();\n    const jsonMatch = cleanJson.match(/\\{[\\s\\S]*\\}/);\n    if (jsonMatch) {\n      cleanJson = jsonMatch[0];\n    }\n    payload = JSON.parse(cleanJson);\n  } catch (error) {\n    payload = {};\n  }\n}\n\nconst intent = ['Meta Post', 'Story', 'Banner'].includes(payload.intent)\n  ? payload.intent\n  : 'Meta Post';\n\nconst details = payload.visual_details ?? {};\nconst prices = details.prices ?? {};\nconst campaign = details.campaign ?? {};\n\nfunction defaultWidth(intentValue, value) {\n  const parsed = Number.parseInt(value, 10);\n  if (intentValue === 'Meta Post') return 1080;\n  if (intentValue === 'Story') return 1080;\n  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1600;\n}\n\nfunction defaultHeight(intentValue, value) {\n  const parsed = Number.parseInt(value, 10);\n  if (intentValue === 'Meta Post') return 1350;\n  if (intentValue === 'Story') return 1920;\n  return Number.isFinite(parsed) && parsed > 0 ? parsed : 600;\n}\n\nconst normalized = {\n  intent,\n  visual_details: {\n    product_name: String(details.product_name ?? '').trim(),\n    category: String(details.category ?? '').trim(),\n    slogan: String(details.slogan ?? '').trim(),\n    image_url: String(details.image_url ?? '').trim(),\n    width: defaultWidth(intent, details.width),\n    height: defaultHeight(intent, details.height),\n    prices: {\n      old_price: String(prices.old_price ?? '').trim(),\n      new_price: String(prices.new_price ?? '').trim(),\n      discount_rate: String(prices.discount_rate ?? '').trim(),\n    },\n    campaign: {\n      campaign_name: String(campaign.campaign_name ?? '').trim(),\n      campaign_code: String(campaign.campaign_code ?? '').trim(),\n    },\n  },\n};\n\nreturn [\n  {\n    json: {\n      output: normalized,\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        280
+      ],
+      "id": "normalize-base-json-node",
+      "name": "Normalize_BASE_JSON"
+    },
+    {
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ typeof $json.output === 'string' ? JSON.parse($json.output).intent : $json.output.intent }}",
+                    "rightValue": "Meta Post",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Meta Post"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ typeof $json.output === 'string' ? JSON.parse($json.output).intent : $json.output.intent }}",
+                    "rightValue": "Story",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Story"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ typeof $json.output === 'string' ? JSON.parse($json.output).intent : $json.output.intent }}",
+                    "rightValue": "Banner",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Banner"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1000,
+        280
+      ],
+      "id": "intent-switch-node",
+      "name": "Switch_Intent"
+    },
+    {
+      "parameters": {
+        "workflowId": "TjIBuLmyigpNjBnV",
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "a": "={{ $json.output }}",
+            "jobId": "={{ $('Webhook_Trigger').item.json.body.jobId }}",
+            "brandId": "={{ $('Webhook_Trigger').item.json.body.brandId }}",
+            "brand": "={{ $('Supabase_Get_Brand').item.json }}",
+            "prompts": "={{ $('Supabase_Get_Prompts').item.json }}"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1220,
+        140
+      ],
+      "id": "call-meta-post-node",
+      "name": "Call_VitrinOS_META_POST"
+    },
+    {
+      "parameters": {
+        "workflowId": "36iRYjVaLyqIdo6z",
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "a": "={{ $json.output }}",
+            "jobId": "={{ $('Webhook_Trigger').item.json.body.jobId }}",
+            "brandId": "={{ $('Webhook_Trigger').item.json.body.brandId }}",
+            "brand": "={{ $('Supabase_Get_Brand').item.json }}",
+            "prompts": "={{ $('Supabase_Get_Prompts').item.json }}"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1220,
+        280
+      ],
+      "id": "call-story-node",
+      "name": "Call_VitrinOS_STORY"
+    },
+    {
+      "parameters": {
+        "workflowId": "gjzjuE91iiU2Ew0G",
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "a": "={{ $json.output }}",
+            "jobId": "={{ $('Webhook_Trigger').item.json.body.jobId }}",
+            "brandId": "={{ $('Webhook_Trigger').item.json.body.brandId }}",
+            "brand": "={{ $('Supabase_Get_Brand').item.json }}",
+            "prompts": "={{ $('Supabase_Get_Prompts').item.json }}"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1220,
+        420
+      ],
+      "id": "call-banner-node",
+      "name": "Call_VitrinOS_BANNER"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1460,
+        280
+      ],
+      "id": "merge-outputs-node",
+      "name": "Merge_Format_Outputs"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://wrzalebhnlwppufdcmiz.supabase.co/storage/v1/object/generated-assets/{{ $('Webhook_Trigger').item.json.body.brandId }}/{{ $('Webhook_Trigger').item.json.body.jobId }}_rev0.png",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1680,
+        280
+      ],
+      "id": "upload-to-storage-node",
+      "name": "Upload_To_Supabase_Storage"
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "tableId": "jobs",
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Webhook_Trigger').item.json.body.jobId }}"
+            }
+          ]
+        },
+        "dataToSend": "defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "completed"
+            },
+            {
+              "fieldId": "image_url",
+              "fieldValue": "https://wrzalebhnlwppufdcmiz.supabase.co/storage/v1/object/public/generated-assets/{{ $('Webhook_Trigger').item.json.body.brandId }}/{{ $('Webhook_Trigger').item.json.body.jobId }}_rev0.png"
+            },
+            {
+              "fieldId": "brief_json",
+              "fieldValue": "={{ JSON.stringify($node['Normalize_BASE_JSON'].json.output) }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1900,
+        280
+      ],
+      "id": "supabase-update-completed-node",
+      "name": "Supabase_Update_Completed"
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "tableId": "jobs",
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Webhook_Trigger').item.json.body.jobId }}"
+            }
+          ]
+        },
+        "dataToSend": "defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "processing"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        -50
+      ],
+      "id": "supabase-update-processing-rev-node",
+      "name": "Supabase_Update_Processing_Rev"
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "tableId": "jobs",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $('Webhook_Trigger').item.json.body.jobId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -50
+      ],
+      "id": "supabase-get-job-details-node",
+      "name": "Supabase_Get_Job_Details"
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "tableId": "brands",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $('Webhook_Trigger').item.json.body.brandId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        220,
+        -50
+      ],
+      "id": "supabase-get-brand-rev-node",
+      "name": "Supabase_Get_Brand_Rev"
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "tableId": "brand_prompts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "brand_id",
+              "keyValue": "={{ $('Webhook_Trigger').item.json.body.brandId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        440,
+        -50
+      ],
+      "id": "supabase-get-prompts-rev-node",
+      "name": "Supabase_Get_Prompts_Rev"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {},
+          "conditions": [
+            {
+              "leftValue": "={{ Number($node['Supabase_Get_Job_Details'].json.revision_count || 0) }}",
+              "rightValue": 3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        660,
+        -50
+      ],
+      "id": "revize-limiti-kontrol-node",
+      "name": "Revize_Limiti_Kontrol"
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "tableId": "jobs",
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Webhook_Trigger').item.json.body.jobId }}"
+            }
+          ]
+        },
+        "dataToSend": "defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "failed"
+            },
+            {
+              "fieldId": "revision_note",
+              "fieldValue": "Maksimum revizyon limitine (3) ulaşıldı."
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        880,
+        -180
+      ],
+      "id": "supabase-update-failed-rev-node",
+      "name": "Supabase_Update_Failed_Rev"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $node['Supabase_Get_Job_Details'].json.image_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "product_image"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        880,
+        60
+      ],
+      "id": "download-previous-image-node",
+      "name": "Download_Previous_Image"
+    },
+    {
+      "parameters": {
+        "workflowId": "n3BDaxJj7FnIMCIq",
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "mode": "revision",
+            "jobId": "={{ $('Webhook_Trigger').item.json.body.jobId }}",
+            "brandId": "={{ $('Webhook_Trigger').item.json.body.brandId }}",
+            "intent": "={{ $node['Supabase_Get_Job_Details'].json.format }}",
+            "revision_text": "={{ $('Webhook_Trigger').item.json.body.revisionNote }}",
+            "original_brief": "={{ $node['Supabase_Get_Job_Details'].json.brief_text }}",
+            "revision_count": "={{ Number($node['Supabase_Get_Job_Details'].json.revision_count || 0) + 1 }}",
+            "brand": "={{ $('Supabase_Get_Brand_Rev').item.json }}",
+            "prompts": "={{ $('Supabase_Get_Prompts_Rev').item.json }}"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1100,
+        60
+      ],
+      "id": "call-revize-node",
+      "name": "Call_VitrinOS_REVIZE"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://wrzalebhnlwppufdcmiz.supabase.co/storage/v1/object/generated-assets/{{ $('Webhook_Trigger').item.json.body.brandId }}/{{ $('Webhook_Trigger').item.json.body.jobId }}_rev{{ Number($node['Supabase_Get_Job_Details'].json.revision_count || 0) + 1 }}.png",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1320,
+        60
+      ],
+      "id": "upload-revised-to-storage-node",
+      "name": "Upload_Revised_To_Storage"
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "tableId": "jobs",
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Webhook_Trigger').item.json.body.jobId }}"
+            }
+          ]
+        },
+        "dataToSend": "defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "completed"
+            },
+            {
+              "fieldId": "image_url",
+              "fieldValue": "https://wrzalebhnlwppufdcmiz.supabase.co/storage/v1/object/public/generated-assets/{{ $('Webhook_Trigger').item.json.body.brandId }}/{{ $('Webhook_Trigger').item.json.body.jobId }}_rev{{ Number($node['Supabase_Get_Job_Details'].json.revision_count || 0) + 1 }}.png"
+            },
+            {
+              "fieldId": "revision_count",
+              "fieldValue": "={{ Number($node['Supabase_Get_Job_Details'].json.revision_count || 0) + 1 }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        60
+      ],
+      "id": "supabase-update-completed-rev-node",
+      "name": "Supabase_Update_Completed_Rev"
+    }
+  ],
+  "connections": {
+    "Webhook_Trigger": {
+      "main": [
+        [
+          {
+            "node": "Is_Revision_Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is_Revision_Router": {
+      "main": [
+        [
+          {
+            "node": "Supabase_Update_Processing_Rev",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Supabase_Update_Processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase_Update_Processing": {
+      "main": [
+        [
+          {
+            "node": "Supabase_Get_Brand",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase_Get_Brand": {
+      "main": [
+        [
+          {
+            "node": "Supabase_Get_Prompts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase_Get_Prompts": {
+      "main": [
+        [
+          {
+            "node": "AI_Agent_Generic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI_Agent_Generic",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI_Agent_Generic",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI_Agent_Generic": {
+      "main": [
+        [
+          {
+            "node": "Normalize_BASE_JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize_BASE_JSON": {
+      "main": [
+        [
+          {
+            "node": "Switch_Intent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch_Intent": {
+      "main": [
+        [
+          {
+            "node": "Call_VitrinOS_META_POST",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call_VitrinOS_STORY",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call_VitrinOS_BANNER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call_VitrinOS_META_POST": {
+      "main": [
+        [
+          {
+            "node": "Merge_Format_Outputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call_VitrinOS_STORY": {
+      "main": [
+        [
+          {
+            "node": "Merge_Format_Outputs",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Call_VitrinOS_BANNER": {
+      "main": [
+        [
+          {
+            "node": "Merge_Format_Outputs",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Call_VitrinOS_BANNER": {
+      "main": [
+        [
+          {
+            "node": "Merge_Format_Outputs",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge_Format_Outputs": {
+      "main": [
+        [
+          {
+            "node": "Upload_To_Supabase_Storage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload_To_Supabase_Storage": {
+      "main": [
+        [
+          {
+            "node": "Supabase_Update_Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase_Update_Processing_Rev": {
+      "main": [
+        [
+          {
+            "node": "Supabase_Get_Job_Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase_Get_Job_Details": {
+      "main": [
+        [
+          {
+            "node": "Supabase_Get_Brand_Rev",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase_Get_Brand_Rev": {
+      "main": [
+        [
+          {
+            "node": "Supabase_Get_Prompts_Rev",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase_Get_Prompts_Rev": {
+      "main": [
+        [
+          {
+            "node": "Revize_Limiti_Kontrol",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revize_Limiti_Kontrol": {
+      "main": [
+        [
+          {
+            "node": "Supabase_Update_Failed_Rev",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download_Previous_Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download_Previous_Image": {
+      "main": [
+        [
+          {
+            "node": "Call_VitrinOS_REVIZE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call_VitrinOS_REVIZE": {
+      "main": [
+        [
+          {
+            "node": "Upload_Revised_To_Storage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload_Revised_To_Storage": {
+      "main": [
+        [
+          {
+            "node": "Supabase_Update_Completed_Rev",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
