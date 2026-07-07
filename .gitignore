@@ -1,0 +1,45 @@
+# IDEs and editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# AI and local metadata
+.codex/
+.gemini/
+antigravity/
+
+# Operating System files
+Thumbs.db
+db.properties
+Desktop.ini
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Node / Dependency directories
+node_modules/
+jspm_packages/
+web_modules/
+
+# Environment variables & secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+*.env.local
+
+# Supabase local files
+supabase/.temp/
