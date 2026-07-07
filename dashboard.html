@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VitrinOS Panel | Local ürün akışı</title>
+    <meta name="description" content="VitrinOS local ürün akışı; brief, görsel önizleme, onay, revizyon ve geçmiş ekranlarını gösterir.">
+    <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="14" fill="%23161512"/%3E%3Cpath d="M16 16h10l7 23 7-23h8L37 48h-9L16 16Z" fill="%23d9962a"/%3E%3C/svg%3E'>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+  </head>
+  <body class="app-body">
+    <a class="skip-link" href="#app-main">İçeriğe geç</a>
+
+    <div class="app-shell" id="appShell">
+      <header class="app-topbar">
+        <a class="brand" href="index.html" aria-label="VitrinOS ana sayfa">
+          <span class="brand-mark" aria-hidden="true">V</span>
+          <span>VitrinOS</span>
+        </a>
+        <div class="app-context">
+          <span>NovaMarket</span>
+          <strong>E-ticaret kreatif operasyonu</strong>
+        </div>
+        <div class="app-actions">
+          <button class="button secondary compact-button" id="logoutButton" type="button">Çıkış</button>
+        </div>
+      </header>
+
+      <main class="app-main" id="app-main">
+        <section class="app-hero-panel" aria-labelledby="appTitle">
+          <div>
+            <p class="kicker">Ürün paneli</p>
+            <h1 id="appTitle">Brief’ten onaya uzanan üretim hattı.</h1>
+            <p>
+              Bu local ekran otomasyon mantığını web ürün paneli gibi gösterir. Gerçek auth, webhook ve storage bu fazda kapalıdır.
+            </p>
+          </div>
+          <div class="app-hero-media">
+            <img src="assets/format-gallery.png" alt="Banner, sosyal post ve story formatlarından oluşan örnek çıktı kolajı">
+          </div>
+        </section>
+
+        <nav class="app-tabs" role="tablist" aria-label="Panel sekmeleri">
+          <button class="tab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-overview" data-tab="overview">Özet</button>
+          <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="panel-brief" data-tab="brief">Brief</button>
+          <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="panel-assets" data-tab="assets">Görseller</button>
+          <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="panel-history" data-tab="history">Geçmiş</button>
+          <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="panel-settings" data-tab="settings">Ayarlar</button>
+        </nav>
+
+        <section class="tab-panel is-active" id="panel-overview" role="tabpanel">
+          <div class="metric-grid">
+            <article class="metric-card">
+              <span>Bugünkü üretim</span>
+              <strong id="metricJobs">18</strong>
+              <p>3 format ailesi</p>
+            </article>
+            <article class="metric-card">
+              <span>Onay bekleyen</span>
+              <strong id="metricApprovals">7</strong>
+              <p>revizyon kuyruğu dahil</p>
+            </article>
+            <article class="metric-card">
+              <span>Ortalama süre</span>
+              <strong id="metricDuration">4.8 dk</strong>
+              <p>brief’ten önizlemeye</p>
+            </article>
+            <article class="metric-card">
+              <span>Marka uyumu</span>
+              <strong id="metricMatch">91%</strong>
+              <p>uyum skoru</p>
+            </article>
+          </div>
+
+          <div class="overview-grid">
+            <article class="work-panel">
+              <div class="panel-heading">
+                <span class="mini-label">Aktif üretim</span>
+                <strong id="activeJobTitle">Teknoloji haftası banner</strong>
+              </div>
+              <div class="pipeline-list" aria-label="Üretim adımları">
+                <span class="is-done">Brief ayrıştırıldı</span>
+                <span class="is-done">Format seçildi</span>
+                <span class="is-current" id="pipelineCurrent">Önizleme hazır</span>
+                <span>Onay bekliyor</span>
+              </div>
+            </article>
+            <article class="work-panel">
+              <div class="panel-heading">
+                <span class="mini-label">Kanal dağılımı</span>
+                <strong>Format kuyruğu</strong>
+              </div>
+              <div class="format-bars" aria-label="Format dağılımı">
+                <div><span>Banner</span><strong style="--bar: 76%"></strong></div>
+                <div><span>Meta post</span><strong style="--bar: 58%"></strong></div>
+                <div><span>Story</span><strong style="--bar: 44%"></strong></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="panel-brief" role="tabpanel" hidden>
+          <div class="brief-layout">
+            <form class="brief-composer" id="briefForm" novalidate>
+              <div class="panel-heading">
+                <span class="mini-label">Yeni brief</span>
+                <strong>Görsel önizlemesi üret</strong>
+              </div>
+              <div class="form-row">
+                <label for="briefText">Brief</label>
+                <textarea id="briefText" name="brief" rows="7" placeholder="Kampanya hedefinizi ve görsel gereksinimlerinizi buraya yazın (Örn: Elektronik kategorisi için 1600x600 banner hazırla...)" required></textarea>
+              </div>
+              <div class="brief-fields">
+                <div class="form-row">
+                  <label for="briefFormat">Format</label>
+                  <select id="briefFormat" name="format">
+                    <option value="auto">Otomatik seç</option>
+                    <option value="Banner">Banner</option>
+                    <option value="Meta Post">Meta post</option>
+                    <option value="Story">Story</option>
+                  </select>
+                </div>
+                <div class="form-row">
+                  <label for="briefBrand">Marka</label>
+                  <select id="briefBrand" name="brand">
+                    <option>NovaMarket</option>
+                    <option>ModaPazar</option>
+                    <option>Evora Home</option>
+                  </select>
+                </div>
+              </div>
+              <button class="button primary" id="briefSubmit" type="submit">Üretimi başlat</button>
+              <p class="form-status" id="briefStatus" role="status" aria-live="polite"></p>
+            </form>
+
+            <article class="brief-result" id="briefResult" aria-live="polite">
+              <div class="panel-heading">
+                <span class="mini-label">Çıktı önizleme</span>
+                <strong id="resultTitle">Teknoloji haftası</strong>
+              </div>
+              <div class="result-creative" id="resultCreative">
+                <span id="resultBrand">NovaMarket</span>
+                <strong id="resultHeadline">Koyu tema banner</strong>
+                <small id="resultMeta">Banner · 1600x600 · onay bekliyor</small>
+              </div>
+              <div class="result-actions">
+                <button class="button primary compact-button" id="approveButton" type="button">Onayla</button>
+                <button class="button secondary compact-button" id="reviseButton" type="button">Revize et</button>
+              </div>
+              <div class="revision-box" id="revisionBox" hidden>
+                <label for="revisionText">Revizyon notu</label>
+                <textarea id="revisionText" rows="3" placeholder="Fiyat alanını büyüt, ürünü sağa al, başlığı kısalt."></textarea>
+                <button class="button secondary compact-button" id="sendRevisionButton" type="button">Revizyonu çalıştır</button>
+              </div>
+              <div class="creative-details-box" id="creativeDetailsBox" style="border-top: 1px solid rgba(245, 239, 228, 0.12); padding-top: 1rem; margin-top: 1rem; display: flex; flex-direction: column; gap: 10px;" hidden></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="panel-assets" role="tabpanel" hidden>
+          <div class="panel-heading">
+            <span class="mini-label">Görsel arşivi</span>
+            <strong>Son üretimler</strong>
+          </div>
+          <div class="asset-grid" id="assetGrid" aria-live="polite"></div>
+        </section>
+
+        <section class="tab-panel" id="panel-history" role="tabpanel" hidden>
+          <div class="panel-heading">
+            <span class="mini-label">Geçmiş briefler</span>
+            <strong>İzlenebilir operasyon kaydı</strong>
+          </div>
+          <div class="history-list" id="historyList" aria-live="polite"></div>
+        </section>
+
+        <section class="tab-panel" id="panel-settings" role="tabpanel" hidden>
+          <div class="settings-grid">
+            <article class="work-panel">
+              <div class="panel-heading">
+                <span class="mini-label">Marka hafızası</span>
+                <strong>NovaMarket kuralları</strong>
+              </div>
+              <label class="check-row"><input type="checkbox" checked> Kurgusal marka dilini koru</label>
+              <label class="check-row"><input type="checkbox" checked> Ürün görseli geldiyse gerçek ürünü sahneye yerleştir</label>
+              <label class="check-row"><input type="checkbox" checked> Her çıktı için onay veya revizyon kaydı tut</label>
+            </article>
+            <article class="work-panel">
+              <div class="panel-heading">
+                <span class="mini-label">Canlı hazırlık</span>
+                <strong>Local demoda bilinçli olarak kapalı</strong>
+              </div>
+              <div class="readiness-list">
+                <span>Supabase Auth</span>
+                <span>Supabase Storage</span>
+                <span>n8n webhook tetikleme</span>
+                <span>Gerçek üretim job kuyruğu</span>
+              </div>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>

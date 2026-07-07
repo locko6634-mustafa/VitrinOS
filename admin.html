@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VitrinOS Admin | Operasyon paneli</title>
+    <meta name="description" content="VitrinOS admin paneli demo ekranı; marka, kullanıcı, başvuru ve job yönetimi için statik arayüz.">
+    <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="14" fill="%23161512"/%3E%3Cpath d="M16 16h10l7 23 7-23h8L37 48h-9L16 16Z" fill="%23d9962a"/%3E%3C/svg%3E'>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+  </head>
+  <body class="app-body admin-body">
+    <a class="skip-link" href="#admin-main">İçeriğe geç</a>
+
+    <div class="admin-shell">
+      <header class="admin-topbar">
+        <a class="brand" href="index.html" aria-label="VitrinOS ana sayfa">
+          <span class="brand-mark" aria-hidden="true">V</span>
+          <span>VitrinOS</span>
+        </a>
+        <div class="admin-context">
+          <span>Admin</span>
+          <strong>Operasyon kontrol merkezi</strong>
+        </div>
+        <div class="admin-topbar-actions">
+          <a class="admin-link-button" href="dashboard.html">Kullanıcı paneli</a>
+          <button class="button secondary compact-button" type="button" id="adminLogout">Çıkış</button>
+        </div>
+      </header>
+
+      <aside class="admin-sidebar" aria-label="Admin bölümleri">
+        <nav class="admin-nav">
+          <button class="admin-nav-button is-active" type="button" data-admin-tab="overview">Kontrol merkezi</button>
+          <button class="admin-nav-button" type="button" data-admin-tab="brands">Markalar</button>
+          <button class="admin-nav-button" type="button" data-admin-tab="users">Kullanıcılar</button>
+          <button class="admin-nav-button" type="button" data-admin-tab="leads">Başvurular</button>
+          <button class="admin-nav-button" type="button" data-admin-tab="jobs">Job izleme</button>
+        </nav>
+        <div class="admin-sidebar-note">
+          <span>Faz 0</span>
+          <p>Demo veri ile çalışan statik admin iskeleti. Supabase ve n8n bağlantıları bilinçli olarak kapalı.</p>
+        </div>
+      </aside>
+
+      <main class="admin-main" id="admin-main">
+        <section class="admin-page-head" aria-labelledby="adminTitle">
+          <div>
+            <p class="kicker">Faz 0 admin paneli</p>
+            <h1 id="adminTitle">Marka, kullanıcı, başvuru ve job akışı tek masada.</h1>
+          </div>
+          <p class="admin-note">Bu ekran gerçek veri yazmaz. Aksiyonlar tarayıcı içindeki demo state üzerinde simüle edilir.</p>
+        </section>
+
+        <section class="admin-panel is-active" id="admin-panel-overview" data-admin-panel="overview">
+          <div class="admin-metric-grid" id="adminMetrics"></div>
+          <div class="admin-split-grid">
+            <article class="admin-card">
+              <div class="admin-card-head">
+                <span>Son joblar</span>
+                <strong>Üretim kuyruğu</strong>
+              </div>
+              <div class="admin-list" id="recentJobs"></div>
+            </article>
+            <article class="admin-card">
+              <div class="admin-card-head">
+                <span>Son başvurular</span>
+                <strong>Lead akışı</strong>
+              </div>
+              <div class="admin-list" id="recentLeads"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="admin-panel" id="admin-panel-brands" data-admin-panel="brands" hidden>
+          <div class="admin-toolbar">
+            <label class="admin-search">
+              <span>Marka ara</span>
+              <input id="brandSearch" type="search" placeholder="NovaMarket, Evora...">
+            </label>
+            <label>
+              <span>Tema</span>
+              <select id="brandThemeFilter">
+                <option value="all">Tümü</option>
+                <option value="koyu">Koyu</option>
+                <option value="acik">Açık</option>
+              </select>
+            </label>
+            <button class="button secondary compact-button" type="button" id="newBrandButton">Yeni marka</button>
+          </div>
+          <div class="admin-grid-with-detail">
+            <article class="admin-card admin-table-card">
+              <div class="admin-card-head">
+                <span>Marka listesi</span>
+                <strong id="brandCount">0 marka</strong>
+              </div>
+              <div class="admin-table-wrap">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th><button type="button" data-sort-brands="name">Marka</button></th>
+                      <th>Kullanıcı</th>
+                      <th>Tema</th>
+                      <th><button type="button" data-sort-brands="formatCount">Format</button></th>
+                      <th>Güncelleme</th>
+                    </tr>
+                  </thead>
+                  <tbody id="brandRows"></tbody>
+                </table>
+              </div>
+            </article>
+
+            <form class="admin-card admin-form-card" id="brandForm" novalidate>
+              <div class="admin-card-head">
+                <span>Marka detayı</span>
+                <strong id="brandFormTitle">Marka seç</strong>
+              </div>
+              <input type="hidden" id="brandId">
+              <div class="admin-form-grid">
+                <label>Marka adı<input id="brandName" required></label>
+                <label>Logo URL<input id="brandLogo" type="url"></label>
+                <label>Web sitesi<input id="brandWebsite" type="url"></label>
+                <label>Tema<select id="brandTheme"><option value="koyu">Koyu</option><option value="acik">Açık</option></select></label>
+                <label>Birincil renk<input id="brandPrimary" type="color"></label>
+                <label>İkincil renk<input id="brandSecondary" type="color"></label>
+              </div>
+              <label>Marka tonu ve kuralları<textarea id="brandTone" rows="3"></textarea></label>
+              <label>Yasaklı kelimeler<input id="brandBanned" placeholder="virgül ile ayır"></label>
+
+              <div class="admin-prompt-grid" style="grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                <div style="grid-column: span 2;">
+                  <label>Base Prompt (Brief Analiz Ajanı)<textarea id="basePrompt" rows="4"></textarea><button type="button" data-copy-template="base_prompt">Şablonu Kopyala</button></label>
+                </div>
+                
+                <div style="border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
+                  <h4 style="margin: 0 0 10px 0; color: var(--accent);">Story (Dikey 9:16) Prompts</h4>
+                  <label>Story Metin Oluşturucu<textarea id="storyTextPrompt" rows="3"></textarea><button type="button" data-copy-template="story_text_prompt">Şablonu Kopyala</button></label>
+                  <label>Story Arka Plan Oluşturucu<textarea id="storyBgPrompt" rows="3"></textarea><button type="button" data-copy-template="story_bg_prompt">Şablonu Kopyala</button></label>
+                  <label>Story Görsel Entegrasyon<textarea id="storyImgPrompt" rows="3"></textarea><button type="button" data-copy-template="story_img_prompt">Şablonu Kopyala</button></label>
+                </div>
+
+                <div style="border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
+                  <h4 style="margin: 0 0 10px 0; color: var(--accent);">Banner (Yatay) Prompts</h4>
+                  <label>Banner Metin Oluşturucu<textarea id="bannerTextPrompt" rows="3"></textarea><button type="button" data-copy-template="banner_text_prompt">Şablonu Kopyala</button></label>
+                  <label>Banner Arka Plan Oluşturucu<textarea id="bannerBgPrompt" rows="3"></textarea><button type="button" data-copy-template="banner_bg_prompt">Şablonu Kopyala</button></label>
+                  <label>Banner Görsel Entegrasyon<textarea id="bannerImgPrompt" rows="3"></textarea><button type="button" data-copy-template="banner_img_prompt">Şablonu Kopyala</button></label>
+                </div>
+
+                <div style="border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
+                  <h4 style="margin: 0 0 10px 0; color: var(--accent);">Meta Post (Kare/Dikey) Prompts</h4>
+                  <label>Meta Post Metin Oluşturucu<textarea id="metaPostTextPrompt" rows="3"></textarea><button type="button" data-copy-template="meta_post_text_prompt">Şablonu Kopyala</button></label>
+                  <label>Meta Post Arka Plan Oluşturucu<textarea id="metaPostBgPrompt" rows="3"></textarea><button type="button" data-copy-template="meta_post_bg_prompt">Şablonu Kopyala</button></label>
+                  <label>Meta Post Görsel Entegrasyon<textarea id="metaPostImgPrompt" rows="3"></textarea><button type="button" data-copy-template="meta_post_img_prompt">Şablonu Kopyala</button></label>
+                </div>
+
+                <div style="border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 6px; display: flex; flex-direction: column; justify-content: space-between;">
+                  <div>
+                    <h4 style="margin: 0 0 10px 0; color: var(--accent);">Revizyon (Görsel Düzenleme) Prompt</h4>
+                    <label>Görsel Revize Ajanı<textarea id="revizePrompt" rows="5"></textarea><button type="button" data-copy-template="revize_prompt">Şablonu Kopyala</button></label>
+                  </div>
+                </div>
+              </div>
+              <button class="button primary" type="submit">Demo state'i güncelle</button>
+              <p class="form-status" id="brandStatus" role="status" aria-live="polite"></p>
+            </form>
+          </div>
+        </section>
+
+        <section class="admin-panel" id="admin-panel-users" data-admin-panel="users" hidden>
+          <div class="admin-toolbar">
+            <label class="admin-search"><span>Kullanıcı ara</span><input id="userSearch" type="search" placeholder="e-posta veya marka"></label>
+            <label><span>Durum</span><select id="userStatusFilter"><option value="all">Tümü</option><option value="active">Aktif</option><option value="inactive">Pasif</option></select></label>
+            <button class="button secondary compact-button" type="button" id="inviteUserButton">Davet simüle et</button>
+          </div>
+          <article class="admin-card admin-table-card">
+            <div class="admin-card-head"><span>Kullanıcı yönetimi</span><strong id="userCount">0 kullanıcı</strong></div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>E-posta</th><th>Marka</th><th>Job</th><th>Son giriş</th><th>Durum</th><th>Aksiyon</th></tr></thead>
+                <tbody id="userRows"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section class="admin-panel" id="admin-panel-leads" data-admin-panel="leads" hidden>
+          <div class="admin-toolbar">
+            <label class="admin-search"><span>Başvuru ara</span><input id="leadSearch" type="search" placeholder="ad, şirket veya e-posta"></label>
+            <label><span>Durum</span><select id="leadStatusFilter"><option value="all">Tümü</option><option value="new">Yeni</option><option value="reviewed">İncelendi</option><option value="approved">Onaylandı</option><option value="rejected">Reddedildi</option></select></label>
+          </div>
+          <article class="admin-card admin-table-card">
+            <div class="admin-card-head"><span>Başvuru yönetimi</span><strong id="leadCount">0 başvuru</strong></div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>Ad</th><th>Şirket</th><th>E-posta</th><th>İhtiyaç</th><th>Durum</th><th>Aksiyon</th></tr></thead>
+                <tbody id="leadRows"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section class="admin-panel" id="admin-panel-jobs" data-admin-panel="jobs" hidden>
+          <div class="admin-toolbar">
+            <label><span>Marka</span><select id="jobBrandFilter"><option value="all">Tümü</option></select></label>
+            <label><span>Format</span><select id="jobFormatFilter"><option value="all">Tümü</option><option value="Banner">Banner</option><option value="Meta Post">Meta Post</option><option value="Story">Story</option></select></label>
+            <label><span>Durum</span><select id="jobStatusFilter"><option value="all">Tümü</option><option value="pending">Pending</option><option value="processing">Processing</option><option value="completed">Completed</option><option value="failed">Failed</option><option value="approved">Approved</option><option value="revision_requested">Revision requested</option></select></label>
+          </div>
+          <div class="admin-grid-with-detail">
+            <article class="admin-card admin-table-card">
+              <div class="admin-card-head"><span>Job izleme</span><strong id="jobCount">0 job</strong></div>
+              <div class="admin-table-wrap">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th><button type="button" data-sort-jobs="id">Job ID</button></th>
+                      <th>Marka</th>
+                      <th>Format</th>
+                      <th><button type="button" data-sort-jobs="status">Durum</button></th>
+                      <th>Revizyon</th>
+                      <th>Tarih</th>
+                    </tr>
+                  </thead>
+                  <tbody id="jobRows"></tbody>
+                </table>
+              </div>
+            </article>
+            <aside class="admin-card admin-detail" id="jobDetail" aria-live="polite">
+              <div class="admin-card-head"><span>Job detayı</span><strong>Seçim bekliyor</strong></div>
+              <p class="admin-empty">Tablodan bir job seç.</p>
+            </aside>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/admin.js"></script>
+  </body>
+</html>
