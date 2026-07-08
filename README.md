@@ -100,7 +100,7 @@ VitrinOS/
 │   └── style.css            # Ortak CSS bileşenleri
 ├── js/                      # JavaScript Mantığı
 │   ├── admin.js             # Yönetici paneli DOM ve API işlemleri
-│   ├── config.js            # Supabase ve n8n webhook URL tanımları
+|   |-- config.js            # Supabase istemci ayarlari
 │   ├── dashboard.js         # Müşteri paneli DOM ve API işlemleri
 │   ├── lead-form.js         # Müşteri adayı formu gönderim tetikleyicisi
 │   ├── login.js             # Oturum açma mantığı
@@ -108,7 +108,8 @@ VitrinOS/
 │   ├── reveal.js            # Görsel geçiş efektleri
 │   └── supabase.js          # Supabase SDK sarmalayıcısı ve Auth yönetim kuralları
 ├── supabase/                # Supabase Yapılandırmaları
-│   └── migrations/          # SQL Veritabanı Şemaları & RLS Politikaları
+|   |-- functions/           # Edge Function kaynaklari
+|   `-- migrations/          # SQL Veritabani semalari ve RLS politikalari
 ├── admin.html               # Yönetici Paneli Arayüzü
 ├── dashboard.html           # Müşteri Kontrol Paneli Arayüzü
 ├── index.html               # Ana Sayfa / Landing Page
@@ -132,15 +133,21 @@ VitrinOS/
    * n8n arayüzünde yeni bir workflow oluşturup yukarıda detaylandırılan iş akışlarının JSON şablonlarını import edin. Webhook URL'lerini aktif hale getirin.
 
 4. **Arayüz Yapılandırması:**
-   * [js/config.js](file:///c:/Users/Mustafa/Desktop/VitrinOS/js/config.js) dosyasını açarak kendi Supabase URL'nizi, Publishable Key'inizi ve n8n Webhook URL'nizi girin:
+   * [js/config.js](file:///c:/Users/Mustafa/Desktop/VitrinOS/js/config.js) dosyasini acarak kendi Supabase URL'nizi ve Publishable Key'inizi girin. n8n webhook URL'sini frontend'e koymayin; Supabase secret olarak tanimlayin:
      ```javascript
      window.VitrinOS.config = {
        supabaseUrl: "https://<PROJE_ID>.supabase.co",
        supabasePublishableKey: "<PUBLISHABLE_KEY>",
-       n8nWebhookUrl: "https://<N8N_SUNUCUNUZ>/webhook/vitrinos-brief",
+       briefTriggerFunction: "trigger-brief",
        // ...
      };
      ```
+     ```bash
+     supabase secrets set N8N_WEBHOOK_URL="https://<N8N_SUNUCUNUZ>/webhook/vitrinos-brief"
+     supabase secrets set N8N_WEBHOOK_SECRET="<N8N_SHARED_SECRET>"
+     supabase functions deploy trigger-brief
+     ```
+     n8n `VitrinOS_BASE` webhook girisinde `x-vitrinos-webhook-secret` header degerini dogrulayin ve eski public webhook path'ini rotate edin.
 
 5. **Çalıştırma:**
-   * Projeyi yerel bir web sunucusunda (örneğin VS Code Live Server veya `npm run dev`) başlatarak [index.html](file:///c:/Users/Mustafa/Desktop/VitrinOS/index.html) üzerinden erişebilirsiniz.
+   * Projeyi yerelde `python -m http.server 8000` ile baslatip `http://localhost:8000/` adresinden erisebilirsiniz.

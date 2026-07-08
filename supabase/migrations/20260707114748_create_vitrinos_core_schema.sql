@@ -151,7 +151,7 @@ insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_typ
 values (
   'generated-assets',
   'generated-assets',
-  true,
+  false,
   10485760,
   array['image/png', 'image/jpeg', 'image/webp']
 )
@@ -160,21 +160,20 @@ on conflict (id) do update set
   file_size_limit = excluded.file_size_limit,
   allowed_mime_types = excluded.allowed_mime_types;
 
-create policy "Authenticated users can upload generated assets"
-on storage.objects
-for insert
-to authenticated
-with check (bucket_id = 'generated-assets');
-
-create policy "Authenticated users can update generated assets"
-on storage.objects
-for update
-to authenticated
-using (bucket_id = 'generated-assets' and owner_id = (select auth.uid()::text))
-with check (bucket_id = 'generated-assets' and owner_id = (select auth.uid()::text));
-
-create policy "Authenticated users can read generated assets metadata"
+create policy "Users can read own generated asset metadata"
 on storage.objects
 for select
 to authenticated
-using (bucket_id = 'generated-assets');
+using (
+  bucket_id = 'generated-assets'
+  and exists (
+    select 1
+    from public.jobs
+    where jobs.brand_id::text = split_part(storage.objects.name, '/', 1)
+      and jobs.id::text = split_part(split_part(storage.objects.name, '/', 2), '_', 1)
+      and (
+        jobs.user_id = (select auth.uid())
+        or ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin'
+      )
+  )
+);

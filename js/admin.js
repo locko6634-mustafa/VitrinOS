@@ -66,31 +66,41 @@
     try {
       const { data: dbBrands, error: bErr } = await client
         .from('brands')
-        .select('*, brand_prompts(*)');
+        .select('id,user_id,name,logo_url,website_url,color_palette,tone_rules,banned_words,updated_at, brand_prompts(brand_id,base_prompt,story_text_prompt,story_bg_prompt,story_img_prompt,banner_text_prompt,banner_bg_prompt,banner_img_prompt,meta_post_text_prompt,meta_post_bg_prompt,meta_post_img_prompt,revize_prompt)');
       if (bErr) throw bErr;
 
       const { data: dbUsers, error: uErr } = await client
         .from('users')
-        .select('*');
+        .select('id,email,last_sign_in_at,banned_until');
       if (uErr) throw uErr;
 
       const { data: dbLeads, error: lErr } = await client
         .from('leads')
-        .select('*')
+        .select('id,name,company,email,website,need,note,status,created_at')
         .order('created_at', { ascending: false });
       if (lErr) throw lErr;
 
       const { data: dbJobs, error: jErr } = await client
         .from('jobs')
-        .select('*')
+        .select('id,user_id,brand_id,brief_text,format,status,image_url,revision_count,brief_json,created_at')
         .order('created_at', { ascending: false });
       if (jErr) throw jErr;
+
+      const jobsWithAssetUrls = await Promise.all(dbJobs.map(async (job) => {
+        let signedImageUrl = "";
+        try {
+          signedImageUrl = await window.VitrinOS.storage.getGeneratedAssetUrl(job.image_url);
+        } catch (assetErr) {
+          console.error("GÃ¶rsel signed URL hatasÄ±:", assetErr);
+        }
+        return { ...job, signedImageUrl };
+      }));
 
       state.users = dbUsers.map(u => ({
         id: u.id,
         email: u.email,
         brandIds: dbBrands.filter(b => b.user_id === u.id).map(b => b.id),
-        jobCount: dbJobs.filter(j => j.user_id === u.id).length,
+        jobCount: jobsWithAssetUrls.filter(j => j.user_id === u.id).length,
         lastLogin: u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleString('tr-TR') : "Hiç giriş yapmadı",
         status: u.banned_until ? "inactive" : "active"
       }));
@@ -110,7 +120,7 @@
           theme: b.color_palette?.theme || "koyu",
           toneRules: b.tone_rules || "",
           bannedWords: b.banned_words || [],
-          formatCount: dbJobs.filter(j => j.brand_id === b.id).length,
+          formatCount: jobsWithAssetUrls.filter(j => j.brand_id === b.id).length,
           updatedAt: new Date(b.updated_at).toLocaleString('tr-TR'),
           prompts: {
             base_prompt: prompts.base_prompt || "",
@@ -140,7 +150,7 @@
         createdAt: new Date(l.created_at).toLocaleString('tr-TR')
       }));
 
-      state.jobs = dbJobs.map(j => {
+      state.jobs = jobsWithAssetUrls.map(j => {
         const owner = state.users.find(u => u.id === j.user_id);
         return {
           id: j.id,
@@ -149,7 +159,7 @@
           brief: j.brief_text,
           format: j.format,
           status: j.status,
-          imageUrl: j.image_url,
+          imageUrl: j.signedImageUrl,
           revisionCount: j.revision_count,
           createdAt: new Date(j.created_at).toLocaleString('tr-TR'),
           briefJson: j.brief_json || {},
@@ -186,7 +196,35 @@
   }
 
   function statusBadge(status) {
-    return `<span class="admin-status" data-status="${status}">${statusLabel(status)}</span>`;
+    const badge = document.createElement("span");
+    badge.className = "admin-status";
+    badge.dataset.status = status;
+    badge.textContent = statusLabel(status);
+    return badge;
+  }
+
+  function textElement(tagName, text, className) {
+    const element = document.createElement(tagName);
+    if (className) element.className = className;
+    element.textContent = text ?? "";
+    return element;
+  }
+
+  function createEmptyRow(colspan, message) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    const empty = textElement("p", message, "admin-empty");
+    cell.colSpan = colspan;
+    cell.append(empty);
+    row.append(cell);
+    return row;
+  }
+
+  function appendTextCell(row, text) {
+    const cell = document.createElement("td");
+    cell.textContent = text ?? "";
+    row.append(cell);
+    return cell;
   }
 
   function setStatus(element, message, kind) {
@@ -222,35 +260,42 @@
       ["Bekleyen lead", waitingLeads, "onay bekliyor"]
     ];
 
-    nodes.metrics.innerHTML = metrics.map(([label, value, note]) => `
-      <article class="admin-metric">
-        <span>${label}</span>
-        <strong>${value}</strong>
-        <em>${note}</em>
-      </article>
-    `).join("");
+    nodes.metrics.replaceChildren(...metrics.map(([label, value, note]) => {
+      const metric = document.createElement("article");
+      metric.className = "admin-metric";
+      metric.append(
+        textElement("span", label),
+        textElement("strong", value),
+        textElement("em", note)
+      );
+      return metric;
+    }));
   }
 
   function renderRecentLists() {
-    nodes.recentJobs.innerHTML = state.jobs.slice(0, 5).map((job) => `
-      <article class="admin-list-item">
-        <div>
-          <strong>${job.id.substring(0, 8)} · ${brandName(job.brandId)}</strong>
-          <span>${job.format} · ${job.createdAt}</span>
-        </div>
-        ${statusBadge(job.status)}
-      </article>
-    `).join("");
+    nodes.recentJobs.replaceChildren(...state.jobs.slice(0, 5).map((job) => {
+      const item = document.createElement("article");
+      item.className = "admin-list-item";
+      const content = document.createElement("div");
+      content.append(
+        textElement("strong", `${job.id.substring(0, 8)} · ${brandName(job.brandId)}`),
+        textElement("span", `${job.format} · ${job.createdAt}`)
+      );
+      item.append(content, statusBadge(job.status));
+      return item;
+    }));
 
-    nodes.recentLeads.innerHTML = state.leads.slice(0, 5).map((lead) => `
-      <article class="admin-list-item">
-        <div>
-          <strong>${lead.name} · ${lead.company}</strong>
-          <span>${lead.need} · ${lead.createdAt}</span>
-        </div>
-        ${statusBadge(lead.status)}
-      </article>
-    `).join("");
+    nodes.recentLeads.replaceChildren(...state.leads.slice(0, 5).map((lead) => {
+      const item = document.createElement("article");
+      item.className = "admin-list-item";
+      const content = document.createElement("div");
+      content.append(
+        textElement("strong", `${lead.name} · ${lead.company}`),
+        textElement("span", `${lead.need} · ${lead.createdAt}`)
+      );
+      item.append(content, statusBadge(lead.status));
+      return item;
+    }));
   }
 
   function filteredBrands() {
@@ -271,19 +316,30 @@
   function renderBrands() {
     const brands = filteredBrands();
     nodes.brandCount.textContent = `${brands.length} marka`;
-    nodes.brandRows.innerHTML = brands.map((brand) => `
-      <tr data-brand-id="${brand.id}" class="${brand.id === state.selectedBrandId ? "is-selected" : ""}">
-        <td><strong>${brand.name}</strong><small>${brand.websiteUrl || "web sitesi yok"}</small></td>
-        <td>${brand.userEmail}</td>
-        <td>${brand.theme === "koyu" ? "Koyu" : "Açık"}</td>
-        <td>${brand.formatCount}</td>
-        <td>${brand.updatedAt}</td>
-      </tr>
-    `).join("");
 
     if (!brands.length) {
-      nodes.brandRows.innerHTML = `<tr><td colspan="5"><p class="admin-empty">Bu filtreye uyan marka yok.</p></td></tr>`;
+      nodes.brandRows.replaceChildren(createEmptyRow(5, "Bu filtreye uyan marka yok."));
+      return;
     }
+
+    nodes.brandRows.replaceChildren(...brands.map((brand) => {
+      const row = document.createElement("tr");
+      row.dataset.brandId = brand.id;
+      row.classList.toggle("is-selected", brand.id === state.selectedBrandId);
+
+      const nameCell = document.createElement("td");
+      nameCell.append(
+        textElement("strong", brand.name),
+        textElement("small", brand.websiteUrl || "web sitesi yok")
+      );
+
+      row.append(nameCell);
+      appendTextCell(row, brand.userEmail);
+      appendTextCell(row, brand.theme === "koyu" ? "Koyu" : "Açık");
+      appendTextCell(row, brand.formatCount);
+      appendTextCell(row, brand.updatedAt);
+      return row;
+    }));
   }
 
   function fillBrandForm(id) {
@@ -407,20 +463,36 @@
   function renderUsers() {
     const users = filteredUsers();
     nodes.userCount.textContent = `${users.length} kullanıcı`;
-    nodes.userRows.innerHTML = users.map((user) => `
-      <tr>
-        <td><strong>${user.email}</strong><small>${user.brandIds.length} marka bağlı</small></td>
-        <td>${user.brandIds.map(brandName).join(", ") || "Marka yok"}</td>
-        <td>${user.jobCount}</td>
-        <td>${user.lastLogin}</td>
-        <td>${statusBadge(user.status)}</td>
-        <td><button class="admin-row-button" type="button" data-toggle-user="${user.id}">${user.status === "active" ? "Pasifleştir" : "Aktifleştir"}</button></td>
-      </tr>
-    `).join("");
 
     if (!users.length) {
-      nodes.userRows.innerHTML = `<tr><td colspan="6"><p class="admin-empty">Bu filtreye uyan kullanıcı yok.</p></td></tr>`;
+      nodes.userRows.replaceChildren(createEmptyRow(6, "Bu filtreye uyan kullanıcı yok."));
+      return;
     }
+
+    nodes.userRows.replaceChildren(...users.map((user) => {
+      const row = document.createElement("tr");
+      const userCell = document.createElement("td");
+      userCell.append(
+        textElement("strong", user.email),
+        textElement("small", `${user.brandIds.length} marka bağlı`)
+      );
+      row.append(userCell);
+      appendTextCell(row, user.brandIds.map(brandName).join(", ") || "Marka yok");
+      appendTextCell(row, user.jobCount);
+      appendTextCell(row, user.lastLogin);
+
+      const statusCell = document.createElement("td");
+      statusCell.append(statusBadge(user.status));
+      row.append(statusCell);
+
+      const actionCell = document.createElement("td");
+      const button = textElement("button", user.status === "active" ? "Pasifleştir" : "Aktifleştir", "admin-row-button");
+      button.type = "button";
+      button.dataset.toggleUser = user.id;
+      actionCell.append(button);
+      row.append(actionCell);
+      return row;
+    }));
   }
 
   function filteredLeads() {
@@ -436,29 +508,67 @@
   function renderLeads() {
     const leads = filteredLeads();
     nodes.leadCount.textContent = `${leads.length} başvuru`;
-    nodes.leadRows.innerHTML = leads.map((lead) => `
-      <tr>
-        <td><strong>${lead.name}</strong><small>${lead.createdAt}</small></td>
-        <td>${lead.company}</td>
-        <td><a href="mailto:${lead.email}">${lead.email}</a></td>
-        <td>${lead.need}</td>
-        <td>
-          <select data-lead-status="${lead.id}" aria-label="${lead.name} durumunu değiştir">
-            ${["new", "reviewed", "approved", "rejected"].map((status) => `<option value="${status}" ${lead.status === status ? "selected" : ""}>${statusLabel(status)}</option>`).join("")}
-          </select>
-        </td>
-        <td><button class="admin-row-button" type="button" data-invite-lead="${lead.id}">Davet gönder</button></td>
-      </tr>
-    `).join("");
 
     if (!leads.length) {
-      nodes.leadRows.innerHTML = `<tr><td colspan="6"><p class="admin-empty">Bu filtreye uyan başvuru yok.</p></td></tr>`;
+      nodes.leadRows.replaceChildren(createEmptyRow(6, "Bu filtreye uyan başvuru yok."));
+      return;
     }
+
+    nodes.leadRows.replaceChildren(...leads.map((lead) => {
+      const row = document.createElement("tr");
+      const nameCell = document.createElement("td");
+      nameCell.append(textElement("strong", lead.name), textElement("small", lead.createdAt));
+      row.append(nameCell);
+      appendTextCell(row, lead.company);
+
+      const emailCell = document.createElement("td");
+      const emailLink = textElement("a", lead.email);
+      emailLink.href = `mailto:${encodeURIComponent(lead.email)}`;
+      emailCell.append(emailLink);
+      row.append(emailCell);
+
+      appendTextCell(row, lead.need);
+
+      const statusCell = document.createElement("td");
+      const select = document.createElement("select");
+      select.dataset.leadStatus = lead.id;
+      select.setAttribute("aria-label", `${lead.name} durumunu değiştir`);
+      ["new", "reviewed", "approved", "rejected"].forEach((status) => {
+        const option = document.createElement("option");
+        option.value = status;
+        option.selected = lead.status === status;
+        option.textContent = statusLabel(status);
+        select.append(option);
+      });
+      statusCell.append(select);
+      row.append(statusCell);
+
+      const actionCell = document.createElement("td");
+      const button = textElement("button", "Davet gönder", "admin-row-button");
+      button.type = "button";
+      button.dataset.inviteLead = lead.id;
+      actionCell.append(button);
+      row.append(actionCell);
+      return row;
+    }));
   }
 
   function populateJobBrandFilter() {
     const current = nodes.jobBrandFilter.value || "all";
-    nodes.jobBrandFilter.innerHTML = `<option value="all">Tümü</option>${state.brands.map((brand) => `<option value="${brand.id}">${brand.name}</option>`).join("")}`;
+    nodes.jobBrandFilter.replaceChildren();
+
+    const allOption = document.createElement("option");
+    allOption.value = "all";
+    allOption.textContent = "Tümü";
+    nodes.jobBrandFilter.append(allOption);
+
+    state.brands.forEach((brand) => {
+      const option = document.createElement("option");
+      option.value = brand.id;
+      option.textContent = brand.name;
+      nodes.jobBrandFilter.append(option);
+    });
+
     nodes.jobBrandFilter.value = state.brands.some((brand) => brand.id === current) ? current : "all";
   }
 
@@ -480,54 +590,87 @@
   function renderJobs() {
     const jobs = filteredJobs();
     nodes.jobCount.textContent = `${jobs.length} job`;
-    nodes.jobRows.innerHTML = jobs.map((job) => `
-      <tr data-job-id="${job.id}" class="${job.id === state.selectedJobId ? "is-selected" : ""}">
-        <td><strong>${job.id.substring(0, 8)}</strong><small>${job.userEmail}</small></td>
-        <td>${brandName(job.brandId)}</td>
-        <td>${job.format}</td>
-        <td>${statusBadge(job.status)}</td>
-        <td>${job.revisionCount}</td>
-        <td>${job.createdAt}</td>
-      </tr>
-    `).join("");
 
     if (!jobs.length) {
-      nodes.jobRows.innerHTML = `<tr><td colspan="6"><p class="admin-empty">Bu filtreye uyan job yok.</p></td></tr>`;
+      nodes.jobRows.replaceChildren(createEmptyRow(6, "Bu filtreye uyan job yok."));
+      return;
     }
+
+    nodes.jobRows.replaceChildren(...jobs.map((job) => {
+      const row = document.createElement("tr");
+      row.dataset.jobId = job.id;
+      row.classList.toggle("is-selected", job.id === state.selectedJobId);
+
+      const idCell = document.createElement("td");
+      idCell.append(textElement("strong", job.id.substring(0, 8)), textElement("small", job.userEmail));
+      row.append(idCell);
+      appendTextCell(row, brandName(job.brandId));
+      appendTextCell(row, job.format);
+
+      const statusCell = document.createElement("td");
+      statusCell.append(statusBadge(job.status));
+      row.append(statusCell);
+
+      appendTextCell(row, job.revisionCount);
+      appendTextCell(row, job.createdAt);
+      return row;
+    }));
   }
 
   function renderJobDetail(id) {
     const job = state.jobs.find((item) => item.id === id);
     state.selectedJobId = id;
     if (!job) {
-      nodes.jobDetail.innerHTML = `
-        <div class="admin-card-head"><span>Job detayı</span><strong>Seçim bekliyor</strong></div>
-        <p class="admin-empty">Tablodan bir job seç.</p>
-      `;
+      const head = document.createElement("div");
+      head.className = "admin-card-head";
+      head.append(textElement("span", "Job detayı"), textElement("strong", "Seçim bekliyor"));
+      nodes.jobDetail.replaceChildren(head, textElement("p", "Tablodan bir job seç.", "admin-empty"));
       return;
     }
 
-    nodes.jobDetail.innerHTML = `
-      <div class="admin-card-head"><span>Job detayı</span><strong>${job.id.substring(0, 8)}</strong></div>
-      <div class="admin-preview">
-        <span>${brandName(job.brandId)}</span>
-        <strong>${job.format} önizleme</strong>
-        ${statusBadge(job.status)}
-        ${job.imageUrl ? `<img src="${job.imageUrl}" alt="${job.format} çıktısı" class="admin-preview-img" style="max-width: 100%; margin-top: 1rem; border-radius: 4px; border: 1px solid var(--border);" />` : '<p class="admin-empty" style="margin-top: 1rem;">Görsel henüz üretilmedi.</p>'}
-      </div>
-      <div class="admin-detail-block">
-        <strong>Tam brief</strong>
-        <p>${job.brief}</p>
-      </div>
-      <div class="admin-detail-block">
-        <strong>Brief JSON</strong>
-        <pre class="admin-code">${JSON.stringify(job.briefJson, null, 2)}</pre>
-      </div>
-      <div class="admin-detail-block">
-        <strong>Durum geçmişi</strong>
-        <p>${job.timeline.map(statusLabel).join(" → ")}</p>
-      </div>
-    `;
+    const head = document.createElement("div");
+    head.className = "admin-card-head";
+    head.append(textElement("span", "Job detayı"), textElement("strong", job.id.substring(0, 8)));
+
+    const preview = document.createElement("div");
+    preview.className = "admin-preview";
+    preview.append(
+      textElement("span", brandName(job.brandId)),
+      textElement("strong", `${job.format} önizleme`),
+      statusBadge(job.status)
+    );
+
+    if (job.imageUrl) {
+      const img = document.createElement("img");
+      img.src = job.imageUrl;
+      img.alt = `${job.format} çıktısı`;
+      img.className = "admin-preview-img";
+      img.style.maxWidth = "100%";
+      img.style.marginTop = "1rem";
+      img.style.borderRadius = "4px";
+      img.style.border = "1px solid var(--border)";
+      preview.append(img);
+    } else {
+      const empty = textElement("p", "Görsel henüz üretilmedi.", "admin-empty");
+      empty.style.marginTop = "1rem";
+      preview.append(empty);
+    }
+
+    const briefBlock = document.createElement("div");
+    briefBlock.className = "admin-detail-block";
+    briefBlock.append(textElement("strong", "Tam brief"), textElement("p", job.brief));
+
+    const jsonBlock = document.createElement("div");
+    jsonBlock.className = "admin-detail-block";
+    jsonBlock.append(textElement("strong", "Brief JSON"));
+    const code = textElement("pre", JSON.stringify(job.briefJson, null, 2), "admin-code");
+    jsonBlock.append(code);
+
+    const timelineBlock = document.createElement("div");
+    timelineBlock.className = "admin-detail-block";
+    timelineBlock.append(textElement("strong", "Durum geçmişi"), textElement("p", job.timeline.map(statusLabel).join(" → ")));
+
+    nodes.jobDetail.replaceChildren(head, preview, briefBlock, jsonBlock, timelineBlock);
     renderJobs();
   }
 

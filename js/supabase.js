@@ -97,6 +97,54 @@
     window.location.href = redirectTo;
   }
 
+  const generatedAssetBucket = "generated-assets";
+  const signedAssetUrlCache = new Map();
+
+  function getGeneratedAssetPath(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return "";
+
+    const publicMarker = `/storage/v1/object/public/${generatedAssetBucket}/`;
+    const publicIndex = raw.indexOf(publicMarker);
+    if (publicIndex >= 0) {
+      return decodeURIComponent(raw.slice(publicIndex + publicMarker.length).split("?")[0]);
+    }
+
+    const objectMarker = `/storage/v1/object/sign/${generatedAssetBucket}/`;
+    const objectIndex = raw.indexOf(objectMarker);
+    if (objectIndex >= 0) {
+      return decodeURIComponent(raw.slice(objectIndex + objectMarker.length).split("?")[0]);
+    }
+
+    if (/^https?:\/\//i.test(raw)) return "";
+    return raw.replace(/^\/+/, "").replace(new RegExp(`^${generatedAssetBucket}/`), "");
+  }
+
+  async function getGeneratedAssetUrl(value, expiresIn = 300) {
+    const path = getGeneratedAssetPath(value);
+    if (!path) return "";
+
+    const cached = signedAssetUrlCache.get(path);
+    if (cached && cached.expiresAt > Date.now()) return cached.url;
+
+    const { data, error } = await getClient()
+      .storage
+      .from(generatedAssetBucket)
+      .createSignedUrl(path, expiresIn);
+
+    if (error) throw error;
+
+    const url = data?.signedUrl || "";
+    if (url) {
+      signedAssetUrlCache.set(path, {
+        url,
+        expiresAt: Date.now() + Math.max(expiresIn - 30, 30) * 1000
+      });
+    }
+
+    return url;
+  }
+
   window.VitrinOS.auth = {
     getClient,
     getCurrentUser,
@@ -106,5 +154,11 @@
     requireAuthenticated,
     signInWithPassword,
     signOut
+  };
+
+  window.VitrinOS.storage = {
+    generatedAssetBucket,
+    getGeneratedAssetPath,
+    getGeneratedAssetUrl
   };
 })();
