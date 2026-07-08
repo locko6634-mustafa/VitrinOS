@@ -43,21 +43,83 @@
   const assetGrid = document.querySelector("#assetGrid");
   const historyList = document.querySelector("#historyList");
 
+  async function triggerBriefWorkflow(payload) {
+    const functionName = window.VitrinOS.config.briefTriggerFunction || "trigger-brief";
+    const { data, error } = await client.functions.invoke(functionName, { body: payload });
+
+    if (error) throw error;
+    if (!data?.ok) {
+      throw new Error(data?.message || "Uretim akisi baslatilamadi.");
+    }
+
+    return data;
+  }
+
+  function setStyles(element, styles) {
+    Object.assign(element.style, styles);
+    return element;
+  }
+
+  function createTextElement(tagName, text, styles = {}) {
+    const element = document.createElement(tagName);
+    element.textContent = text;
+    return setStyles(element, styles);
+  }
+
+  function createDetailItem(label, value, options = {}) {
+    const wrapper = document.createElement("div");
+    if (options.spanTwo) wrapper.style.gridColumn = "span 2";
+
+    const labelNode = createTextElement("span", label, { color: "var(--muted)" });
+    const valueNode = createTextElement("strong", value || "-", {
+      color: options.accent ? "var(--accent-soft)" : "var(--ink)",
+      display: "block",
+      marginTop: "2px"
+    });
+
+    wrapper.append(labelNode, valueNode);
+    return wrapper;
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[char]);
+  }
+
+  function escapeAttr(value) {
+    return escapeHtml(value);
+  }
+
   // Supabase'den verileri çeken fonksiyon
   async function fetchData() {
     try {
       // 1. Markaları çek
       const { data: dbBrands, error: bErr } = await client
         .from('brands')
-        .select('*');
+        .select('id,name,logo_url,website_url,color_palette,tone_rules,banned_words');
       if (bErr) throw bErr;
 
       // 2. Jobları çek (sadece kullanıcıya ait olanlar RLS ile gelir ama yine de filtreliyoruz)
       const { data: dbJobs, error: jErr } = await client
         .from('jobs')
-        .select('*')
+        .select('id,user_id,brand_id,brief_text,format,status,image_url,revision_count,revision_note,brief_json,created_at,updated_at')
         .order('created_at', { ascending: false });
       if (jErr) throw jErr;
+
+      const jobsWithAssetUrls = await Promise.all(dbJobs.map(async (job) => {
+        let signedImageUrl = "";
+        try {
+          signedImageUrl = await window.VitrinOS.storage.getGeneratedAssetUrl(job.image_url);
+        } catch (assetErr) {
+          console.error("GÃ¶rsel signed URL hatasÄ±:", assetErr);
+        }
+        return { ...job, signedImageUrl };
+      }));
 
       // State normalizasyonu
       state.brands = dbBrands.map(b => ({
@@ -74,13 +136,13 @@
 
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
-      state.jobsToday = dbJobs.filter(j => new Date(j.created_at) >= todayStart).length;
+      state.jobsToday = jobsWithAssetUrls.filter(j => new Date(j.created_at) >= todayStart).length;
 
       // Onay bekleyen metrikleri (approved veya failed olmayan, tamamlanmış veya işlenen işler)
-      state.approvals = dbJobs.filter(j => j.status !== 'approved' && j.status !== 'failed').length;
+      state.approvals = jobsWithAssetUrls.filter(j => j.status !== 'approved' && j.status !== 'failed').length;
 
       // Ortalama Süre hesaplama (completed veya approved olan işler için)
-      const completedJobs = dbJobs.filter(j => j.status === 'completed' || j.status === 'approved');
+      const completedJobs = jobsWithAssetUrls.filter(j => j.status === 'completed' || j.status === 'approved');
       if (completedJobs.length > 0) {
         const totalDuration = completedJobs.reduce((acc, j) => {
           const diff = new Date(j.updated_at) - new Date(j.created_at); // ms
@@ -93,15 +155,15 @@
       }
 
       // Marka Uyumu hesaplama (failed olmayanların oranı)
-      const totalJobsCount = dbJobs.length;
+      const totalJobsCount = jobsWithAssetUrls.length;
       if (totalJobsCount > 0) {
-        const successJobs = dbJobs.filter(j => j.status !== 'failed').length;
+        const successJobs = jobsWithAssetUrls.filter(j => j.status !== 'failed').length;
         state.brandMatch = `${Math.round((successJobs / totalJobsCount) * 100)}%`;
       } else {
         state.brandMatch = "-";
       }
 
-      const lastJob = dbJobs[0];
+      const lastJob = jobsWithAssetUrls[0];
       if (lastJob) {
         const brand = state.brands.find(b => b.id === lastJob.brand_id);
         state.currentJob = {
@@ -112,7 +174,7 @@
           format: lastJob.format,
           dimensions: dimensionsFor(lastJob.format),
           status: lastJob.status,
-          imageUrl: lastJob.image_url,
+          imageUrl: lastJob.signedImageUrl,
           brief: lastJob.brief_text,
           briefJson: lastJob.brief_json || {},
           timeline: lastJob.brief_json?.timeline || ["pending", lastJob.status].filter(Boolean),
@@ -122,7 +184,7 @@
         state.currentJob = null;
       }
 
-      state.assets = dbJobs.filter(j => j.status === 'approved' || j.status === 'completed').map(j => {
+      state.assets = jobsWithAssetUrls.filter(j => j.status === 'approved' || j.status === 'completed').map(j => {
         const brand = state.brands.find(b => b.id === j.brand_id);
         return {
           id: j.id,
@@ -131,11 +193,11 @@
           format: j.format,
           dimensions: dimensionsFor(j.format),
           status: j.status,
-          imageUrl: j.image_url
+          imageUrl: j.signedImageUrl
         };
       });
 
-      state.history = dbJobs.map(j => ({
+      state.history = jobsWithAssetUrls.map(j => ({
         id: j.id,
         brief: j.brief_text,
         format: j.format,
@@ -154,7 +216,13 @@
     const select = document.querySelector("#briefBrand");
     if (!select) return;
     const currentSelection = select.value;
-    select.innerHTML = state.brands.map(b => `<option value="${b.id}">${b.name}</option>`).join("");
+    select.replaceChildren();
+    state.brands.forEach((brand) => {
+      const option = document.createElement("option");
+      option.value = brand.id;
+      option.textContent = brand.name;
+      select.append(option);
+    });
     if (state.brands.some(b => b.id === currentSelection)) {
       select.value = currentSelection;
     }
@@ -264,11 +332,11 @@
       resultMeta.textContent = "Kreatif alan boş";
       resultCreative.removeAttribute("data-format");
       resultCreative.removeAttribute("data-status");
-      resultCreative.innerHTML = "";
+      resultCreative.replaceChildren();
       
       const creativeDetailsBox = document.querySelector("#creativeDetailsBox");
       if (creativeDetailsBox) {
-        creativeDetailsBox.innerHTML = "";
+        creativeDetailsBox.replaceChildren();
         creativeDetailsBox.hidden = true;
       }
       return;
@@ -282,18 +350,30 @@
     resultCreative.dataset.format = job.format.toLowerCase().replace(" ", "-");
     resultCreative.dataset.status = job.status;
 
-    // Görsel önizlemesini render et
+    resultCreative.replaceChildren();
     if (job.imageUrl) {
-      resultCreative.innerHTML = `
-        <span id="resultBrand" style="display:none;">${job.brand}</span>
-        <img src="${job.imageUrl}" alt="${job.format} önizlemesi" class="result-creative-img" style="max-width: 100%; height: 100%; object-fit: cover; border-radius: 6px;" />
-      `;
+      const hiddenBrand = document.createElement("span");
+      hiddenBrand.id = "resultBrand";
+      hiddenBrand.style.display = "none";
+      hiddenBrand.textContent = job.brand;
+
+      const img = document.createElement("img");
+      img.src = job.imageUrl;
+      img.alt = `${job.format} önizlemesi`;
+      img.className = "result-creative-img";
+      img.style.maxWidth = "100%";
+      img.style.height = "100%";
+      img.style.objectFit = "cover";
+      img.style.borderRadius = "6px";
+      resultCreative.append(hiddenBrand, img);
     } else {
-      resultCreative.innerHTML = `
-        <span id="resultBrand">${job.brand}</span>
-        <strong id="resultHeadline">${job.title}</strong>
-        <small id="resultMeta">${job.format} hazırlanıyor</small>
-      `;
+      const brand = textElement("span", job.brand);
+      brand.id = "resultBrand";
+      const headline = textElement("strong", job.title);
+      headline.id = "resultHeadline";
+      const meta = textElement("small", `${job.format} hazırlanıyor`);
+      meta.id = "resultMeta";
+      resultCreative.append(brand, headline, meta);
     }
 
     // Kreatif detay kutusunu güncelle
@@ -303,35 +383,45 @@
         const details = job.briefJson.visual_details;
         const prices = details.prices || {};
         const campaign = details.campaign || {};
-        
-        let pricesHtml = "";
+
+        const title = textElement("span", "Üretilen Kreatif Detayları");
+        title.style.color = "var(--accent-soft)";
+        title.style.fontFamily = "var(--font-mono)";
+        title.style.fontSize = "0.76rem";
+        title.style.fontWeight = "800";
+        title.style.letterSpacing = "0.12em";
+        title.style.textTransform = "uppercase";
+
+        const grid = document.createElement("div");
+        grid.style.display = "grid";
+        grid.style.gridTemplateColumns = "1fr 1fr";
+        grid.style.gap = "12px";
+        grid.style.fontSize = "0.9rem";
+        grid.style.marginTop = "8px";
+
+        grid.append(
+          createDetailItem("Ürün Adı:", details.product_name),
+          createDetailItem("Kategori:", details.category),
+          createDetailItem("Slogan:", details.slogan, { spanTwo: true })
+        );
+
         if (prices.new_price || prices.old_price) {
-          pricesHtml = `
-            <div><span style="color: var(--muted);">Eski Fiyat:</span> <strong style="color: var(--ink); display:block; margin-top: 2px;">${prices.old_price || '-'}</strong></div>
-            <div><span style="color: var(--muted);">Yeni Fiyat:</span> <strong style="color: var(--accent-soft); display:block; margin-top: 2px;">${prices.new_price || '-'} ${prices.discount_rate ? `(%${prices.discount_rate} İndirim)` : ''}</strong></div>
-          `;
-        }
-        
-        let campaignHtml = "";
-        if (campaign.campaign_name) {
-          campaignHtml = `
-            <div style="grid-column: span 2;"><span style="color: var(--muted);">Kampanya:</span> <strong style="color: var(--ink); display:block; margin-top: 2px;">${campaign.campaign_name} ${campaign.campaign_code ? `(Kod: ${campaign.campaign_code})` : ''}</strong></div>
-          `;
+          const discount = prices.discount_rate ? ` (%${prices.discount_rate} İndirim)` : "";
+          grid.append(
+            createDetailItem("Eski Fiyat:", prices.old_price),
+            createDetailItem("Yeni Fiyat:", `${prices.new_price || "-"}${discount}`, { accent: true })
+          );
         }
 
-        creativeDetailsBox.innerHTML = `
-          <span style="color: var(--accent-soft); font-family: var(--font-mono); font-size: 0.76rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;">Üretilen Kreatif Detayları</span>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.9rem; margin-top: 8px;">
-            <div><span style="color: var(--muted);">Ürün Adı:</span> <strong style="color: var(--ink); display:block; margin-top: 2px;">${details.product_name || '-'}</strong></div>
-            <div><span style="color: var(--muted);">Kategori:</span> <strong style="color: var(--ink); display:block; margin-top: 2px;">${details.category || '-'}</strong></div>
-            <div style="grid-column: span 2;"><span style="color: var(--muted);">Slogan:</span> <strong style="color: var(--ink); display:block; margin-top: 2px;">${details.slogan || '-'}</strong></div>
-            ${pricesHtml}
-            ${campaignHtml}
-          </div>
-        `;
+        if (campaign.campaign_name) {
+          const code = campaign.campaign_code ? ` (Kod: ${campaign.campaign_code})` : "";
+          grid.append(createDetailItem("Kampanya:", `${campaign.campaign_name}${code}`, { spanTwo: true }));
+        }
+
+        creativeDetailsBox.replaceChildren(title, grid);
         creativeDetailsBox.hidden = false;
       } else {
-        creativeDetailsBox.innerHTML = "";
+        creativeDetailsBox.replaceChildren();
         creativeDetailsBox.hidden = true;
       }
     }
@@ -494,21 +584,11 @@
 
       setStatus(briefStatus, "Kreatif üretim akışı (n8n) tetikleniyor...");
 
-      // 2. n8n generic workflow tetiklemesi için POST at (hata verirse catch ile yutacağız, lokal simülasyonu bozmamak için)
-      const webhookUrl = window.VitrinOS.config.n8nWebhookUrl;
-      fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jobId: newJob.id,
-          userId: newJob.user_id,
-          brandId: newJob.brand_id,
-          briefText: newJob.brief_text,
-          format: newJob.format,
-          isRevision: false
-        })
-      }).catch(err => console.log("n8n webhook bağlantısı kurulamadı:", err));
-
+      // 2. n8n yalnizca authenticated Supabase Edge Function uzerinden tetiklenir.
+      await triggerBriefWorkflow({
+        jobId: newJob.id,
+        isRevision: false
+      });
       // 3. Local state'i yenile
       await fetchData();
       setLoading(false);
@@ -530,10 +610,9 @@
     setStatus(briefStatus, "Onaylanıyor...");
 
     try {
-      const { error } = await client
-        .from('jobs')
-        .update({ status: 'approved' })
-        .eq('id', state.currentJob.id);
+      const { error } = await client.rpc('approve_job', {
+        target_job_id: state.currentJob.id
+      });
 
       if (error) throw error;
 
@@ -566,36 +645,20 @@
 
     try {
       // 1. Durumu revision_requested olarak güncelle ve revizyon sayısını artır
-      const { data: updatedJob, error: uErr } = await client
-        .from('jobs')
-        .update({
-          status: 'revision_requested',
-          revision_count: state.currentJob.revisionCount + 1,
-          revision_note: note
-        })
-        .eq('id', state.currentJob.id)
-        .select()
-        .single();
+      const { data: updatedJob, error: uErr } = await client.rpc('request_job_revision', {
+        target_job_id: state.currentJob.id,
+        revision_note: note
+      });
 
       if (uErr) throw uErr;
 
       setStatus(briefStatus, "Revizyon akışı (n8n) tetikleniyor...");
 
-      // 2. n8n revize webhook POST tetikleme (HB_REVIZE benzeri generic)
-      const webhookUrl = window.VitrinOS.config.n8nWebhookUrl;
-      fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jobId: updatedJob.id,
-          userId: updatedJob.user_id,
-          brandId: updatedJob.brand_id,
-          briefText: updatedJob.brief_text,
-          format: updatedJob.format,
-          revisionNote: note,
-          isRevision: true
-        })
-      }).catch(err => console.log("n8n revize webhook bağlantısı kurulamadı:", err));
+      // 2. Revizyon tetigi de public webhook yerine authenticated Edge Function'dan gecer.
+      await triggerBriefWorkflow({
+        jobId: updatedJob.id,
+        isRevision: true
+      });
 
       await fetchData();
       setLoading(false);

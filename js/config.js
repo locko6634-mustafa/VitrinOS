@@ -7,7 +7,7 @@
     supabaseUrl: "https://wrzalebhnlwppufdcmiz.supabase.co",
     supabasePublishableKey: "sb_publishable_VqmAXSH5VRyyUBERRaUMEg_GQkuBgun",
     supabaseProjectRef: "wrzalebhnlwppufdcmiz",
-    n8nWebhookUrl: "https://server.n8n-mustafa.me/webhook/vitrinos-brief",
+    briefTriggerFunction: "trigger-brief",
     authUsernameDomain: "vitrinos.local"
   };
 })();
