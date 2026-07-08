@@ -84,6 +84,36 @@ Deno.serve(async (req) => {
     );
   }
 
+  const hmacSecret = Deno.env.get("N8N_API_SALT") || Deno.env.get("HMAC_SECRET");
+  const timestamp = Date.now().toString();
+  const payloadBody = {
+    jobId: job.id,
+    userId: job.user_id,
+    brandId: job.brand_id,
+    briefText: job.brief_text,
+    format: job.format,
+    revisionNote: payload.isRevision ? job.revision_note : null,
+    isRevision: Boolean(payload.isRevision)
+  };
+  const payloadString = JSON.stringify(payloadBody);
+
+  let signature = "";
+  if (hmacSecret) {
+    const encoder = new TextEncoder();
+    const keyData = encoder.encode(hmacSecret);
+    const key = await crypto.subtle.importKey(
+      "raw",
+      keyData,
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"]
+    );
+    const dataToSign = encoder.encode(`${timestamp}.${payloadString}`);
+    const signatureBuffer = await crypto.subtle.sign("HMAC", key, dataToSign);
+    const hashArray = Array.from(new Uint8Array(signatureBuffer));
+    signature = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
   const headers: Record<string, string> = {
     "Content-Type": "application/json"
   };
@@ -91,19 +121,15 @@ Deno.serve(async (req) => {
   if (n8nWebhookSecret) {
     headers["x-vitrinos-webhook-secret"] = n8nWebhookSecret;
   }
+  if (signature) {
+    headers["x-vitrinos-signature"] = signature;
+    headers["x-vitrinos-timestamp"] = timestamp;
+  }
 
   const response = await fetch(n8nWebhookUrl, {
     method: "POST",
     headers,
-    body: JSON.stringify({
-      jobId: job.id,
-      userId: job.user_id,
-      brandId: job.brand_id,
-      briefText: job.brief_text,
-      format: job.format,
-      revisionNote: payload.isRevision ? job.revision_note : null,
-      isRevision: Boolean(payload.isRevision)
-    })
+    body: payloadString
   });
 
   if (!response.ok) {
