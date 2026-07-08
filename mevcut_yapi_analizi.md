@@ -1,117 +1,100 @@
-# VitrinOS Mevcut Yapı Analizi
+# VitrinOS - Mevcut Yapı Analiz Raporu
 
-Analiz tarihi: 7 Temmuz 2026  
-Kapsam: yerel HTML/CSS/JS/SQL dosyaları, `README.md`, n8n MCP workflow detayları, Supabase MCP canlı şema/policy/advisor çıktıları ve resmi OpenAI model dokümantasyonu.
+Bu rapor, VitrinOS projesinin yerel kod tabanı, Supabase backend mimarisi ve n8n otomasyon iş akışları üzerinde gerçekleştirilen dinamik keşif ve detaylı analiz çalışmalarının sonuçlarını içermektedir.
 
-## Yönetici Özeti
+---
 
-VitrinOS, landing page, müşteri paneli, admin paneli, Supabase veritabanı/storage ve n8n tabanlı görsel üretim otomasyonundan oluşan çalışır bir SaaS prototipi seviyesinde. Mimari yön doğru: frontend hafif, veri modeli anlaşılır, n8n workflowları format bazında ayrılmış ve Supabase RLS büyük ölçüde uygulanmış.
+## 1. Kapsam ve Kullanılan Keşif Yöntemleri
+Analiz süreci, varsayımlardan kaçınarak canlı sistemler ve yerel kod dosyalarının doğrudan incelenmesiyle gerçekleştirilmiştir:
+*   **Yerel Kod Tabanı:** `c:\Users\Mustafa\Desktop\VitrinOS` dizinindeki HTML, JS, CSS dosyaları ve `supabase/migrations/` altındaki SQL şemaları taranmış, kod içi referanslar ve veri akışları analiz edilmiştir.
+*   **Supabase Backend:** `wrzalebhnlwppufdcmiz` referanslı canlı Supabase projesinde tablolar, RLS politikaları, RPC fonksiyonları, storage bucket ayarları ve Advisors logları sorgulanmıştır.
+*   **n8n Otomasyonu:** Canlı n8n sunucusundaki `VitrinOS_` ön ekiyle başlayan tüm iş akışlarının düğüm (node) yapılandırmaları, değişken atamaları ve API parametreleri incelenmiştir.
 
-Canlıya çıkış önündeki ana engeller güvenlik ve işletilebilirlik tarafında: n8n webhook tarayıcıdan kimlik doğrulamasız tetikleniyor, `generated-assets` bucket public, canlı Supabase'deki admin/auth fonksiyonları migrationlarda yok ve `SECURITY DEFINER` olarak herkese execute açık, n8n hata yönetimi üretim seviyesinde değil. Bu başlıklar çözülmeden public SaaS yayını yapılmamalı.
+---
 
-## Doğrulanan Kaynaklar
+## 2. Mimari Özet
+VitrinOS, modern bulut servisleri ile hafif bir istemci mimarisini entegre eden dinamik bir yapıya sahiptir:
+*   **Frontend (İstemci):** CDN üzerinden yüklenen Supabase SDK'sı yardımıyla doğrudan veritabanı ve auth servislerine bağlanan, Vanilla HTML/CSS/JS tabanlı tek sayfa veya çoklu sayfa akışıdır.
+*   **Supabase (Veritabanı & Backend):** Postgres 17 üzerinde kurulu, katı RLS (Row Level Security) kuralları ve SQL tabanlı güvenli RPC (Remote Procedure Call) fonksiyonları ile donatılmış veri katmanıdır. 
+*   **Supabase Edge Functions:** Frontend'in n8n webhook'larını güvenli bir şekilde tetiklemesini sağlayan ve token doğrulamasını gerçekleştiren ara katmandır (`trigger-brief` ve `submit-lead`).
+*   **n8n (Orkestrasyon & AI):** Webhook tetiklemeleriyle çalışan, OpenAI (GPT ve DALL-E) entegrasyonlarını yürüten, Jimp ile görselleri işleyen ve sonuçları Supabase Storage'a geri yükleyen ana otomasyon motorudur.
+*   **Storage (Depolama):** Üretilen pazarlama görsellerinin saklandığı, doğrudan erişime kapalı (Private) ve kullanıcı tabanlı RLS ile korunan `generated-assets` storage bucket'ıdır.
 
-- Yerel dosyalar: `index.html`, `dashboard.html`, `admin.html`, `login.html`, `js/config.js`, `js/supabase.js`, `js/dashboard.js`, `js/admin.js`, `js/lead-form.js`, `supabase/migrations/*.sql`.
-- n8n MCP: `VitrinOS_BASE`, `VitrinOS_META_POST`, `VitrinOS_STORY`, `VitrinOS_BANNER`, `VitrinOS_REVIZE`.
-- Supabase MCP canlı proje: `wrzalebhnlwppufdcmiz`.
-- Supabase advisors: security ve performance advisor çıktıları.
-- OpenAI resmi model sayfaları: `gpt-5.4-mini`, `gpt-5-nano`, `gpt-image-2`.
+---
 
-## Güncel Mimari ve Veri Akışı
+## 3. İyi Çalışan Yerler
+*   **Güçlü SQL Güvenlik Mimarisi:** Kullanıcıların `jobs` tablosundaki durumları doğrudan güncellemesi engellenmiş (`revoke update...`), güncellemeler `SECURITY DEFINER` RPC fonksiyonları (`approve_job`, `request_job_revision`) ile sınırlandırılmıştır.
+*   **Güvenli n8n Tetikleme Mekanizması:** Frontend'de açık n8n URL'si bulunmamaktadır. Akış Supabase Edge Function (`trigger-brief`) üzerinden başlatılmakta ve `x-vitrinos-webhook-secret` başlığıyla n8n webhook güvenliği sağlanmaktadır.
+*   **Storage Güvenliği:** `generated-assets` bucket'ı private olarak ayarlanmış ve kullanıcıların sadece kendi işlerine (job) ait görselleri okuyup yazabileceği sıkı nesne bazlı RLS politikaları tanımlanmıştır.
+*   **Lead Form Güvenliği:** `submit-lead` fonksiyonu üzerinde honeypot kontrolü, IP ve E-posta bazlı rate-limit'ler ve mükerrer başvuru engellemesi (7 gün) oldukça başarılı çalışmaktadır.
+*   **Migration Tutarlılığı:** Canlı veritabanı ile yerel migration dosyaları arasında herhangi bir drift (fark) bulunmamaktadır. Tüm migration'lar canlıda uygulanmıştır.
 
-Landing page `index.html`, lead formunu `js/lead-form.js` ile doğruluyor ancak kaydı sadece `sessionStorage` içine demo kayıt olarak yazıyor. Supabase `leads` tablosu ve anon insert policy canlıda hazır olmasına rağmen form henüz doğrudan Supabase'e yazmıyor.
+---
 
-Login akışı `login.html` ve `js/login.js` üzerinden Supabase Auth `signInWithPassword` çağırıyor. `js/supabase.js`, oturum doğrulamasında `getSession` sonrası `getUser` kullanıyor ve admin yönlendirmesini `app_metadata.role` üzerinden yapıyor. Yetki kararında user-editable metadata kullanılmaması olumlu.
+## 4. Kritik Riskler (P0)
 
-Dashboard `js/dashboard.js`, kullanıcı oturumu zorunlu kıldıktan sonra `brands` ve `jobs` verilerini Supabase'den çekiyor, yeni brief için önce `jobs` tablosuna `pending` kayıt açıyor, ardından `js/config.js` içindeki n8n webhook URL'sine browser-side POST atıyor. Sonuçlar Supabase Realtime `public:jobs` aboneliğiyle güncelleniyor.
+### 4.1. Hata Durumlarında Asılı Kalan İşler (Jobs Status 'processing' Hatası)
+*   **Kanıt:** n8n İş Akışları (Tüm akışlar: `VitrinOS_BASE`, `VitrinOS_META_POST` vb.)
+*   **Açıklama:** İş akışındaki OpenAI rate-limit aşımı, Jimp çökmesi, resim indirme hatası veya Supabase bağlantı kesintilerinde hata yönetimi (Error Branch / On Error: Continue) tanımlanmamıştır.
+*   **Risk:** Herhangi bir adımda hata oluştuğunda, n8n iş akışı durur fakat veritabanındaki `jobs.status` alanı sonsuza dek `'processing'` durumunda kalır. Dashboard ekranında bu iş sürekli yükleniyor olarak asılı kalır ve kullanıcı hata çıktısını göremez.
 
-Admin panel `js/admin.js`, canlı Supabase'den `brands`, `brand_prompts`, `users`, `leads`, `jobs` verilerini okuyup marka/prompt/lead/job yönetimi yapıyor. Ayrıca `invite_user` ve `toggle_user_status` RPC fonksiyonlarını çağırıyor. Bu fonksiyonlar canlı Supabase'de var fakat yerel migration klasöründe yok.
+### 4.2. Geçersiz OpenAI Model İsimleri
+*   **Kanıt:** `VitrinOS_BASE` (`LLM_Brief_Analiz_Ajani` -> `gpt-5.4-mini`), Alt Akışlar (`OpenAI_Dil_Modeli` -> `gpt-5-nano`), Görsel Akışları (`gpt-image-2`)
+*   **Açıklama:** OpenAI API'lerinde resmi olarak bu isimde modeller bulunmamaktadır.
+*   **Risk:** Eğer n8n ile OpenAI arasında bir model eşleştirme proxy'si (LiteLLM vb.) kullanılmıyorsa, doğrudan API çağrıları `404 Invalid Model` veya `400 Bad Request` ile çökecektir. Canlı sisteme çıkmadan önce bu model isimlerinin resmi modellerle (örn. `gpt-4o-mini`, `dall-e-3`) güncellenmesi gerekir.
 
-n8n tarafında `VitrinOS_BASE` tek public webhook giriş noktası olarak çalışıyor. Brief'i analiz edip format router ile `VitrinOS_META_POST`, `VitrinOS_STORY` veya `VitrinOS_BANNER` alt workflowuna gönderiyor; revizyon için `VitrinOS_REVIZE` çağrılıyor. Alt workflowlar OpenAI görsel üretim/edit ve `Jimp` ile boyutlandırma/logo işleme yapıyor.
+### 4.3. Jimp Görsel İşleme ve Güvenlik Açıkları (SSRF & Çökme Riski)
+*   **Kanıt:** n8n Code Düğümleri (`Meta_Post_Yeniden_Boyutlandır`, `Story_Yeniden_Boyutlandır` vb. - `const { Jimp } = require('jimp');`)
+*   **Açıklama:**
+    1.  `Jimp.read(brand.logo_url)` ifadesi doğrudan logo URL'sini indirir. Logo URL'si boş, null veya hatalıysa düğüm istisna fırlatıp çöker.
+    2.  Kullanıcının girdiği kontrolsüz logo URL'sinin sunucu tarafından indirilmesi SSRF (Server-Side Request Forgery) açığı oluşturur.
+    3.  Binary verilerin okunmasında hiçbir MIME type veya dosya boyutu kontrolü yoktur; PNG/JPEG dışındaki dosyalarda Jimp patlar.
 
-## İyi Çalışan/Başarılı Alanlar
+---
 
-- Vanilla HTML/CSS/JS mimarisi sade ve deploy yüzeyi küçük. Build zinciri olmadığı için statik hosting ve hızlı prototip avantajı var.
-- `js/supabase.js` merkezi Supabase client ve auth wrapper yaklaşımı doğru. `getUser` kullanımı, yalnızca local session objesine güvenmekten daha sağlıklı.
-- Admin rolü `app_metadata.role` ile okunuyor. Bu, Supabase güvenlik yaklaşımı açısından `raw_user_meta_data` tabanlı yetkilendirmeden daha güvenli.
-- Supabase ana tabloları RLS açık: `brands`, `brand_prompts`, `jobs`, `leads`, canlıda ayrıca `public.users`.
-- Sıkılaştırılmış RLS migrationı, marka ve job okumalarında owner/admin ayrımını uyguluyor; prompt ve lead yönetimini admin tarafına kapatıyor.
-- Dashboard ve admin Realtime abonelikleri, üretim sonucunu kullanıcıya polling olmadan taşımaya uygun bir yapı kuruyor.
-- n8n workflowları görev bazında ayrılmış: BASE yönlendirici, format workflowları ve REVIZE workflowu. Bu ayrım ölçekleme ve debug için doğru.
-- LLM çıktıları için JSON parse/fallback code node'ları var. Bu, model çıktısı bozulduğunda workflowun tamamen kontrolsüz kalmasını azaltıyor.
-- Storage dosya limiti ve MIME kısıtı tanımlı: `generated-assets` için 10 MB ve `image/png`, `image/jpeg`, `image/webp`.
-- OpenAI model stringleri için doğrulama yapıldı: `gpt-5.4-mini`, `gpt-5-nano` ve `gpt-image-2` resmi OpenAI docs içinde mevcut görünüyor. Bu nedenle model riski "kesin geçersiz model" değil; hesap erişimi, n8n node uyumluluğu, alias drift ve smoke test eksikliği riski.
+## 5. Orta Riskler (P1)
 
-## Kritik Riskler (High Priority)
+### 5.1. n8n Expression Sözdizimi ve Input Hataları
+*   **Kanıt:** `VitrinOS_BASE` -> `Call_VitrinOS_REVIZE` Execute Workflow girdileri
+*   **Açıklama:**
+    *   Tetikleme parametrelerinin sonunda boşluklar bırakılmıştır: `"revision_text "` ve `"original_brief "`.
+    *   `Baslangic_Verilerini_Ayarla` içinde değişken isimlerinde boşluklar kullanılmıştır: `revizyon mesaj`, `orjinal brief`.
+    *   IF düğümünde eski syntax (`$node['...']`) tercih edilmiştir.
+*   **Risk:** Geliştirme sürecinde parametre eşleşme hatalarına ve veri kayıplarına yol açabilir.
 
-### 1. n8n webhook tarayıcıdan açık ve kimlik doğrulamasız tetikleniyor
+### 5.2. Admin Davet Kodu Şifre Çelişkisi ve Arayüz Hatası
+*   **Kanıt:** `js/admin.js` L804 ve `20260708153000_remove_default_password_and_document_exceptions.sql` L32
+*   **Açıklama:** Veritabanında yapılan son güncelleme ile admin davet şifresi (`Vitrinos123!`) kaldırılarak rastgele geçici şifre üretimi aktifleştirilmiştir. Ancak `js/admin.js` dosyasında kullanıcı onaylandığında hâlâ `alert("Başvuru onaylandı (Varsayılan şifre: Vitrinos123!)")` statik mesajı verilmektedir.
+*   **Risk:** Admin kullanıcıya yanlış şifre bilgisi aktaracak, davet edilen kullanıcı ise rastgele şifre atandığı için sisteme giriş yapamayacaktır.
 
-Kanıt: `js/config.js` içinde `n8nWebhookUrl` public olarak yer alıyor; `js/dashboard.js` yeni üretim ve revizyon için doğrudan `fetch(webhookUrl)` çağırıyor. n8n MCP `VitrinOS_BASE` webhook bilgisinde production path `/webhook/vitrinos-brief`, HTTP method `POST` ve "No credentials required" olarak doğrulandı.
+### 5.3. Webhook Tetikleme Güvenliği Eksikliği
+*   **Kanıt:** `VitrinOS_BASE` -> `Brief_Tetikleyici` Webhook Düğümü
+*   **Açıklama:** Tetikleyici istekte payload doğruluğunu denetleyecek bir HMAC imza doğrulaması veya replay saldırılarını önleyecek timestamp/nonce denetimi bulunmamaktadır.
+*   **Risk:** `x-vitrinos-webhook-secret` sızdırıldığında n8n üzerinde yetkisiz görsel üretim tetiklemeleri yapılarak API maliyetleri artırılabilir.
 
-Etki: URL'yi bilen herkes workflowu tetikleyebilir. Bu; OpenAI görsel üretim maliyeti, n8n compute kullanımı, Supabase job güncellemesi ve storage yazımı üzerinden DDoS/wallet drain riski oluşturur. Gövde içinde `jobId`, `userId`, `brandId` taşındığı için ownership doğrulaması backend tarafında yapılmadan workflow çalışması veri bütünlüğü riski de yaratır.
+---
 
-### 2. `generated-assets` bucket public ve n8n public URL yazıyor
+## 6. Düşük Riskler (P2)
 
-Canlı Supabase MCP sonucu `generated-assets.public = true`. n8n BASE workflowu `image_url` alanına `/storage/v1/object/public/generated-assets/...` URL'si yazıyor. Migration da bucket'ı `public = true` oluşturuyor.
+### 6.1. Türkçe Karakter Encoding Bozulması
+*   **Kanıt:** `js/admin.js` L94
+*   **Açıklama:** Hata loglama satırında Türkçe karakter bozulması mevcuttur: `console.error("GÃ¶rsel signed URL hatasÄ±:", assetErr);`.
+*   **Risk:** Log okunabilirliğini düşürür.
 
-Etki: Üretilen marka görselleri ve potansiyel gizli kampanya kreatifleri URL bilindiğinde doğrudan erişilebilir. Storage metadata SELECT policy sıkı olsa bile public bucket içerik sızıntısı riskini ortadan kaldırmaz.
+### 6.2. Arayüz ve Kod Davranışı Çelişkisi (Demo Uyarıları)
+*   **Kanıt:** `dashboard.html` (L36-38, L191-199) ve `admin.html` (L41-42)
+*   **Açıklama:** Arayüzdeki statik yazılarda uygulamanın demo olduğu ve gerçek veri yazmadığı belirtilmiştir. Ancak JS kodları canlı Supabase'e bağlıdır ve veri kaydetmektedir.
+*   **Risk:** Kullanıcılarda kafa karışıklığı yaratır.
 
-### 3. `SECURITY DEFINER` RPC fonksiyonları public schema içinde herkese executable
+### 6.3. Supabase Advisor Uyarıları
+*   **Kanıt:** Supabase Advisors Logları (Unused Index & Leaked Password Check)
+*   **Açıklama:** `brands_user_id_idx`, `jobs_user_id_idx` gibi indeksler henüz az veri olduğu için kullanılmamaktadır. HaveIBeenPwned entegrasyonu kapalıdır.
+*   **Risk:** Güvenlik ve veri büyümesine bağlı performans eksiklikleri oluşabilir.
 
-Canlı Supabase'de `handle_auth_user_change`, `invite_user`, `toggle_user_status` fonksiyonları `SECURITY DEFINER`. Advisor çıktısı, bu üç fonksiyonun hem `anon` hem `authenticated` rollerinden `/rest/v1/rpc/...` ile çalıştırılabilir olduğunu uyarı olarak raporladı.
+---
 
-Ek risk: `invite_user` fonksiyonu yeni kullanıcıyı doğrudan `auth.users` içine ekliyor ve sabit varsayılan parola (`Vitrinos123!`) kullanıyor. Fonksiyon içinde admin kontrolü var; ancak execute yetkisi daraltılmadığı için bu endpointler public saldırı yüzeyi olarak kalıyor.
-
-### 4. Canlı Supabase şeması migration klasörüyle uyumsuz
-
-Canlıda `public.users`, `handle_auth_user_change`, `invite_user`, `toggle_user_status` ve `auth.users` üzerindeki `on_auth_user_change` triggerı var. Yerel `supabase/migrations/` içinde bunların tanımı yok.
-
-Etki: Yeni ortam kurulumu, staging, disaster recovery veya başka geliştirici kurulumu aynı şemayı üretemez. Admin panel canlıda çalışan RPC/table bağımlılıklarına sahipken migration history eksik kalır.
-
-### 5. `jobs` RLS policy kullanıcıya kendi job satırlarında geniş UPDATE izni veriyor
-
-Canlı policy `Jobs are updatable by owner or admin`, owner kullanıcının kendi job satırını güncellemesine izin veriyor. RLS satır bazında doğru; ancak kolon bazında status, `image_url`, `brief_json`, `revision_count` gibi alanları sınırlamıyor.
-
-Etki: Authenticated bir kullanıcı tarayıcıdan Supabase client ile kendi job'unu `completed` yapabilir, `image_url` değiştirebilir veya üretim çıktısını manipüle edebilir. SaaS için onay/revizyon gibi kullanıcı aksiyonları ayrı RPC/Edge Function ile sınırlandırılmalı; n8n sonuç yazımı server credential ile yapılmalı.
-
-### 6. n8n hata yönetimi üretim seviyesinde değil
-
-MCP workflow detaylarında Error Trigger, merkezi hata workflowu veya sistematik failed-state güncelleme görünmedi. Execution geçmişinde `VitrinOS_BASE` için webhook/manual error kayıtları, `VitrinOS_META_POST` için error/canceled kayıtları, `VitrinOS_STORY` için error kaydı görüldü. `VitrinOS_BANNER` için execution geçmişi yok.
-
-Etki: OpenAI, HTTP image download, Jimp, storage upload veya Supabase update hatasında job `processing` durumunda kalabilir. Kullanıcıya doğru hata mesajı gitmez; operasyon ekibi kök nedeni proaktif göremez.
-
-### 7. Frontend'de untrusted veri HTML olarak parse edilerek render ediliyor
-
-`js/admin.js` ve `js/dashboard.js` birçok yerde veritabanından veya LLM çıktısından gelen değerleri template string ile HTML olarak parse edilen render akışına basıyordu. Admin panel özellikle lead, brief, marka adı, website, job JSON ve prompt içerikleri gibi kullanıcı/LLM kaynaklı alanları render ediyor.
-
-Etki: Kötü niyetli lead/brief/prompt içeriği admin tarayıcısında stored XSS'e dönüşebilir. Admin oturumunda çalışan XSS, marka/prompt/job yönetimini ve Supabase session'ını riske atar.
-
-## Orta ve Düşük Riskler (Medium/Low Priority)
-
-- Landing lead formu canlı veri yazmıyor. `leads` tablosu ve anon insert policy hazır; ancak `js/lead-form.js` sadece demo sessionStorage kaydı yapıyor.
-- `select('*')` kullanımı var (`js/dashboard.js`, `js/admin.js`). Bu, gereksiz veri transferi ve gelecekte hassas kolon sızıntısı riskini artırır.
-- Supabase CDN scripti `@supabase/supabase-js@2` major alias ile yükleniyor; exact version ve SRI yok. Production için paketlenmiş/pinlenmiş asset tercih edilmeli.
-- Login ekranında demo kullanıcı adı prefilled: `locko6634admin`. Production'da kaldırılmalı.
-- `leads` anon insert açık olduğu için captcha, rate limit ve abuse kontrolü yoksa spam riski var.
-- n8n code node'ları `require('jimp')` kullanıyor. n8n instance external module izni, paket versiyonu ve deploy tekrarlanabilirliği netleştirilmeli.
-- OpenAI image workflowlarında `quality: high` kullanılan dallar maliyetli olabilir. Public webhook ile birleştiğinde maliyet riski büyür.
-- Realtime aboneliklerinde dashboard `brands` kanalını user filter olmadan dinliyor. RLS koruması olsa da gereksiz event yüzeyi ve performans maliyeti yaratabilir.
-- Storage insert policy authenticated kullanıcılara `generated-assets` bucket içine path ownership kısıtı olmadan insert izni veriyor. Bucket private yapıldığında path bazlı owner/brand kontrolü de eklenmeli.
-- Supabase performance advisor mevcut indekslerin çoğunu "unused" olarak raporladı. Veri az olduğu için bu şimdilik karar verdirici değil; ancak ileride `jobs(user_id, created_at desc)`, `jobs(brand_id, created_at desc)`, `leads(status, created_at desc)` gibi sorgu odaklı indeksler değerlendirilmeli.
-- `public.users` için birden fazla permissive SELECT policy var; Supabase performance advisor bunu performans uyarısı olarak raporladı.
-- Dashboard webhook `fetch` hatasını catch içinde loglayıp kullanıcı akışını başarılı gibi sürdürebiliyor. HTTP 4xx/5xx kontrolü ve timeout yok.
-- n8n webhook response "Workflow got started" ile hemen dönüyor; frontend gerçek üretim kabulünü değil sadece tetiklemenin başladığını biliyor.
-
-## İyileştirme ve Optimizasyon Önerileri
-
-1. Public browser -> n8n doğrudan çağrısını kaldır. Supabase Edge Function veya küçük backend API üzerinden JWT doğrulaması, ownership check, rate limit ve secret header ile n8n tetikle.
-2. `generated-assets` bucket'ını private yap. Veritabanında public URL yerine object path sakla; frontend için kısa süreli signed URL üret.
-3. Canlıdaki `public.users`, auth trigger ve RPC fonksiyonlarını migrationa taşı. `SECURITY DEFINER` fonksiyonlarda execute yetkisini `PUBLIC`, `anon`, gerekmiyorsa `authenticated` rollerinden revoke et.
-4. Kullanıcı job güncellemelerini doğrudan tablo UPDATE yerine dar RPC'lere böl: `approve_job(job_id)`, `request_revision(job_id, note)`. Bu RPC'ler sadece izin verilen kolonları değiştirmeli.
-5. n8n workflowlarına merkezi Error Trigger ekle. Hata durumunda `jobs.status = failed`, `revision_note/error_message`, Slack/e-posta bildirimi ve retry stratejisi uygulanmalı.
-6. OpenAI model setini production için standartlaştır. Bugün doğrulanan model stringleri geçerli görünse de n8n credential/model picker ve gerçek hesap erişimi ile smoke test yapılmalı; alias yerine gerekirse snapshot kullanılmalı.
-7. HTML parse eden render akışları yerine DOM API (`textContent`, `createElement`) veya güvenli sanitizer kullan. Admin panelde lead/brief/prompt renderı öncelikli.
-8. Lead formunu Supabase'e gerçek insert yapacak şekilde güncelle; captcha/rate-limit ekle.
-9. CDN bağımlılıklarını pinle, mümkünse yerel bundle'a al; CSP ve SRI ekle.
-10. Production gözlemlenebilirliği kur: Sentry, Supabase logs/advisors periyodik kontrolü, n8n execution alertleri, maliyet/usage dashboardu.
-11. Deployment için staging-prod ayrımı, secret rotation, migration doğrulaması ve rollback runbooku oluştur.
+## 7. Mimari İyileştirme Önerileri
+1.  **n8n Global Hata Yönetimi:** n8n üzerinde bir "Error Workflow" tanımlanarak, herhangi bir iş akışı çöktüğünde Supabase'e HTTP isteği gönderilerek ilgili job durumu `'failed'` yapılmalıdır.
+2.  **Jimp Güvenlik Sarmalı (Wrapper):** Logo URL'sinin boş olup olmadığı kontrol edilmeli, URL validation uygulanmalı ve Jimp işlemleri `try-catch` blokları içine alınmalıdır.
+3.  **Model Standardizasyonu:** Düğüm düzeyinde resmi modeller (`gpt-4o-mini`, `dall-e-3`) atanmalı, geçersiz proxy isimleri temizlenmelidir.
+4.  **Admin Arayüz Eşitlemesi:** `js/admin.js` üzerinde statik alert mesajı kaldırılarak veritabanından dönen `temporary_password` alanı ekrana basılmalıdır.

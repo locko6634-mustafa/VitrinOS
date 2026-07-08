@@ -45,14 +45,29 @@
 
   async function triggerBriefWorkflow(payload) {
     const functionName = window.VitrinOS.config.briefTriggerFunction || "trigger-brief";
-    const { data, error } = await client.functions.invoke(functionName, { body: payload });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 saniye timeout
 
-    if (error) throw error;
-    if (!data?.ok) {
-      throw new Error(data?.message || "Uretim akisi baslatilamadi.");
+    try {
+      const { data, error } = await client.functions.invoke(functionName, { 
+        body: payload,
+        signal: controller.signal
+      });
+
+      if (error) throw error;
+      if (!data?.ok) {
+        throw new Error(data?.message || "Üretim akışı başlatılamadı.");
+      }
+
+      return data;
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        throw new Error("İstek zaman aşımına uğradı (15 saniye). Lütfen tekrar deneyin.");
+      }
+      throw err;
+    } finally {
+      clearTimeout(timeoutId);
     }
-
-    return data;
   }
 
   function setStyles(element, styles) {
@@ -95,6 +110,33 @@
     return escapeHtml(value);
   }
 
+  function getFriendlyErrorMessage(rawError) {
+    if (!rawError) return "Beklenmeyen bir hata oluştu. Lütfen briefinizi kontrol edip tekrar deneyin.";
+    
+    const err = String(rawError).toLowerCase();
+    
+    if (err.includes("rate_limit") || err.includes("rate limit") || err.includes("429")) {
+      return "Yapay zeka modelinin yoğunluğu nedeniyle geçici bir sınır aşımı oluştu. Lütfen birkaç dakika sonra tekrar deneyin.";
+    }
+    if (err.includes("quota") || err.includes("billing") || err.includes("insufficient_quota")) {
+      return "Yapay zeka servisinin kullanım limiti doldu. Lütfen sistem yöneticisiyle iletişime geçin.";
+    }
+    if (err.includes("policy") || err.includes("safety") || err.includes("content_policy") || err.includes("content_policy_violation")) {
+      return "Brief içeriği yapay zeka güvenlik kurallarına takıldı. Lütfen daha uygun ve genel kelimeler kullanarak tekrar deneyin.";
+    }
+    if (err.includes("jimp") || err.includes("resize") || err.includes("cover") || err.includes("composite")) {
+      return "Görsel işleme veya logo yerleştirme sırasında teknik bir hata oluştu. Lütfen marka logonuzun geçerli bir formatta olduğunu doğrulayın.";
+    }
+    if (err.includes("download") || err.includes("fetch") || err.includes("getaddrinfo") || err.includes("http request") || err.includes("404")) {
+      return "Belirttiğiniz ürün veya arka plan görseli indirilemedi. Lütfen girdiğiniz görsel URL'sinin geçerli ve erişilebilir olduğundan emin olun.";
+    }
+    if (err.includes("supabase") || err.includes("database") || err.includes("connection") || err.includes("timeout")) {
+      return "Sistem bağlantısında geçici bir kesinti oluştu. Lütfen kısa süre sonra tekrar deneyin.";
+    }
+    
+    return `Kreatif üretim sırasında hata oluştu: ${rawError}`;
+  }
+
   // Supabase'den verileri çeken fonksiyon
   async function fetchData() {
     try {
@@ -116,7 +158,7 @@
         try {
           signedImageUrl = await window.VitrinOS.storage.getGeneratedAssetUrl(job.image_url);
         } catch (assetErr) {
-          console.error("GÃ¶rsel signed URL hatasÄ±:", assetErr);
+          console.error("Görsel signed URL hatası:", assetErr);
         }
         return { ...job, signedImageUrl };
       }));
@@ -163,7 +205,7 @@
         state.brandMatch = "-";
       }
 
-      const lastJob = jobsWithAssetUrls[0];
+      const lastJob = jobsWithAssetUrls.find(j => j.status !== 'approved');
       if (lastJob) {
         const brand = state.brands.find(b => b.id === lastJob.brand_id);
         state.currentJob = {
@@ -178,7 +220,8 @@
           brief: lastJob.brief_text,
           briefJson: lastJob.brief_json || {},
           timeline: lastJob.brief_json?.timeline || ["pending", lastJob.status].filter(Boolean),
-          revisionCount: lastJob.revision_count || 0
+          revisionCount: lastJob.revision_count || 0,
+          revisionNote: lastJob.revision_note || ""
         };
       } else {
         state.currentJob = null;
@@ -255,6 +298,7 @@
     }
   }
 
+  // Arayüz sekmeleri
   function activateTab(tabName) {
     tabButtons.forEach((button) => {
       const isActive = button.dataset.tab === tabName;
@@ -324,6 +368,61 @@
       setLoading(false);
     }
 
+    if (job && job.status === 'failed') {
+      if (approveButton) approveButton.hidden = true;
+      if (reviseButton) reviseButton.hidden = true;
+      if (revisionBox) revisionBox.hidden = true;
+
+      if (resultPanel) resultPanel.style.opacity = "1";
+      resultTitle.textContent = job.title;
+      resultBrand.textContent = job.brand;
+      resultHeadline.textContent = "Üretim Başarısız Oldu";
+      resultMeta.textContent = `${job.format} · ${statusLabel(job.status)}`;
+      resultCreative.dataset.format = job.format.toLowerCase().replace(" ", "-");
+      resultCreative.dataset.status = job.status;
+
+      resultCreative.replaceChildren();
+
+      const errorContainer = document.createElement("div");
+      errorContainer.className = "creative-error-container";
+      errorContainer.style.display = "flex";
+      errorContainer.style.flexDirection = "column";
+      errorContainer.style.alignItems = "center";
+      errorContainer.style.justifyContent = "center";
+      errorContainer.style.height = "100%";
+      errorContainer.style.padding = "2rem";
+      errorContainer.style.textAlign = "center";
+      errorContainer.style.color = "var(--error, #e53e3e)";
+
+      const errorIcon = document.createElement("span");
+      errorIcon.textContent = "⚠️";
+      errorIcon.style.fontSize = "3rem";
+      errorIcon.style.marginBottom = "1rem";
+
+      const errorTitle = document.createElement("strong");
+      errorTitle.textContent = "Yapay Zeka Görsel Üretimi Sırasında Hata Oluştu";
+      errorTitle.style.display = "block";
+      errorTitle.style.fontSize = "1.1rem";
+      errorTitle.style.marginBottom = "0.5rem";
+
+      const errorMsg = document.createElement("p");
+      errorMsg.textContent = getFriendlyErrorMessage(job.revisionNote);
+      errorMsg.style.fontSize = "0.9rem";
+      errorMsg.style.color = "var(--muted)";
+      errorMsg.style.maxWidth = "80%";
+      errorMsg.style.margin = "0 auto";
+
+      errorContainer.append(errorIcon, errorTitle, errorMsg);
+      resultCreative.append(errorContainer);
+
+      const creativeDetailsBox = document.querySelector("#creativeDetailsBox");
+      if (creativeDetailsBox) {
+        creativeDetailsBox.replaceChildren();
+        creativeDetailsBox.hidden = true;
+      }
+      return;
+    }
+
     if (!job) {
       if (resultPanel) resultPanel.style.opacity = "0.5";
       resultTitle.textContent = "Kreatif Hazırlanıyor";
@@ -334,6 +433,10 @@
       resultCreative.removeAttribute("data-status");
       resultCreative.replaceChildren();
       
+      if (approveButton) approveButton.hidden = true;
+      if (reviseButton) reviseButton.hidden = true;
+      if (revisionBox) revisionBox.hidden = true;
+
       const creativeDetailsBox = document.querySelector("#creativeDetailsBox");
       if (creativeDetailsBox) {
         creativeDetailsBox.replaceChildren();
@@ -341,6 +444,9 @@
       }
       return;
     }
+
+    if (approveButton) approveButton.hidden = false;
+    if (reviseButton) reviseButton.hidden = false;
 
     if (resultPanel) resultPanel.style.opacity = "1";
     resultTitle.textContent = job.title;
@@ -367,11 +473,11 @@
       img.style.borderRadius = "6px";
       resultCreative.append(hiddenBrand, img);
     } else {
-      const brand = textElement("span", job.brand);
+      const brand = createTextElement("span", job.brand);
       brand.id = "resultBrand";
-      const headline = textElement("strong", job.title);
+      const headline = createTextElement("strong", job.title);
       headline.id = "resultHeadline";
-      const meta = textElement("small", `${job.format} hazırlanıyor`);
+      const meta = createTextElement("small", `${job.format} hazırlanıyor`);
       meta.id = "resultMeta";
       resultCreative.append(brand, headline, meta);
     }
@@ -384,7 +490,7 @@
         const prices = details.prices || {};
         const campaign = details.campaign || {};
 
-        const title = textElement("span", "Üretilen Kreatif Detayları");
+        const title = createTextElement("span", "Üretilen Kreatif Detayları");
         title.style.color = "var(--accent-soft)";
         title.style.fontFamily = "var(--font-mono)";
         title.style.fontSize = "0.76rem";
@@ -577,7 +683,7 @@
           format: format,
           status: 'pending'
         })
-        .select()
+        .select('id')
         .single();
 
       if (jErr) throw jErr;
@@ -675,9 +781,11 @@
   });
 
   function setupRealtime() {
+    const userFilter = `user_id=eq.${authContext.user.id}`;
+
     client
       .channel('public:jobs')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'jobs', filter: `user_id=eq.${authContext.user.id}` }, async (payload) => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'jobs', filter: userFilter }, async (payload) => {
         console.log("Realtime dashboard jobs güncellemesi alındı:", payload);
         await fetchData();
         renderAll();
@@ -686,7 +794,7 @@
 
     client
       .channel('public:brands')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'brands' }, async () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'brands', filter: userFilter }, async () => {
         await fetchData();
         renderAll();
       })

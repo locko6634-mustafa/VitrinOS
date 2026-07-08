@@ -1,5 +1,6 @@
 (function () {
   window.VitrinOS = window.VitrinOS || {};
+  const MIN_SUBMIT_SECONDS = 3;
 
   function setError(field, message) {
     const errorEl = document.querySelector(`[data-error-for="${field.id}"]`);
@@ -56,6 +57,19 @@
       if (!passes) valid = false;
     });
 
+    const startedAt = Number(formData.get("startedAt") || "0");
+    const startedAtValid = Number.isFinite(startedAt) && startedAt > 0;
+    const elapsedSeconds = startedAtValid ? (Date.now() - startedAt) / 1000 : 0;
+    const honeypotValue = String(formData.get("companyFax") || "").trim();
+
+    if (!startedAtValid || elapsedSeconds < MIN_SUBMIT_SECONDS) {
+      valid = false;
+    }
+
+    if (honeypotValue) {
+      valid = false;
+    }
+
     return valid;
   }
 
@@ -67,29 +81,50 @@
       website: formData.get("website").trim(),
       need: formData.get("need"),
       note: formData.get("note").trim(),
-      status: "new"
+      startedAt: Number(formData.get("startedAt") || "0"),
+      companyFax: String(formData.get("companyFax") || "").trim()
     };
   }
 
   async function submitLead(payload) {
-    const client = window.VitrinOS?.auth?.getClient?.();
-
-    if (!client) {
-      throw new Error("Supabase istemcisi hazir degil.");
+    const config = window.VitrinOS?.config;
+    const functionName = window.VitrinOS?.config?.leadSubmitFunction;
+    if (!config?.supabaseUrl || !config?.supabasePublishableKey || !functionName) {
+      throw new Error("Lead submit function tanimli degil.");
     }
 
-    const { error } = await client.from("leads").insert([payload]);
+    const response = await fetch(`${config.supabaseUrl.replace(/\/$/, "")}/functions/v1/${functionName}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: config.supabasePublishableKey,
+        Authorization: `Bearer ${config.supabasePublishableKey}`
+      },
+      body: JSON.stringify(payload)
+    });
 
-    if (error) {
-      throw error;
+    let data = null;
+    try {
+      data = await response.json();
+    } catch {
+      data = null;
+    }
+
+    if (!response.ok || !data?.ok) {
+      throw new Error(data?.message || "Basvuru kaydedilemedi.");
     }
   }
 
   function initLeadForm() {
     const form = document.querySelector("#leadForm");
     const statusEl = document.querySelector("#formStatus");
+    const startedAtInput = document.querySelector("#leadStartedAt");
 
     if (!form || !statusEl) return;
+
+    if (startedAtInput) {
+      startedAtInput.value = String(Date.now());
+    }
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -113,11 +148,17 @@
       try {
         await submitLead(buildLeadPayload(formData));
         form.reset();
+        if (startedAtInput) {
+          startedAtInput.value = String(Date.now());
+        }
         statusEl.textContent = "Basvuru alindi. Ekibimiz kaydi inceleyip sizinle iletisime gececek.";
         statusEl.dataset.kind = "success";
       } catch (error) {
         console.error("Lead kaydi basarisiz:", error);
-        statusEl.textContent = "Basvuru kaydedilemedi. Lutfen tekrar deneyin.";
+        if (startedAtInput) {
+          startedAtInput.value = String(Date.now());
+        }
+        statusEl.textContent = error?.message || "Basvuru kaydedilemedi. Lutfen tekrar deneyin.";
         statusEl.dataset.kind = "error";
       } finally {
         if (submitButton) {
