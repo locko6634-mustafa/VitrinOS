@@ -269,6 +269,11 @@
               <textarea id="note" name="note" rows="4" placeholder="Kullandığınız kanallar, marka sayısı veya mevcut darboğaz"></textarea>
             </div>
             <button class="button primary form-submit" type="submit">Başvuru gönder</button>
+            <div class="form-row honeypot-row" aria-hidden="true">
+              <label for="companyFax">Fax</label>
+              <input id="companyFax" name="companyFax" type="text" tabindex="-1" autocomplete="off">
+            </div>
+            <input id="leadStartedAt" name="startedAt" type="hidden" value="">
             <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
           </form>
         </div>
@@ -290,10 +295,14 @@
     </footer>
 
     <script src="js/config.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"
+      integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug"
+      crossorigin="anonymous"
+    ></script>
     <script src="js/supabase.js"></script>
     <script src="js/reveal.js"></script>
-    <script src="js/lead-form.js"></script>
+    <script src="js/lead-form.js?v=20260708-secure-leads"></script>
     <script src="js/main.js"></script>
   </body>
 </html>

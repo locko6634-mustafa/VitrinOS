@@ -7,6 +7,7 @@
     supabaseUrl: "https://wrzalebhnlwppufdcmiz.supabase.co",
     supabasePublishableKey: "sb_publishable_VqmAXSH5VRyyUBERRaUMEg_GQkuBgun",
     supabaseProjectRef: "wrzalebhnlwppufdcmiz",
+    leadSubmitFunction: "submit-lead",
     briefTriggerFunction: "trigger-brief",
     authUsernameDomain: "vitrinos.local"
   };

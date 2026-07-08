@@ -412,7 +412,7 @@
         const { data: newBrand, error: bErr } = await client
           .from('brands')
           .insert(brandPayload)
-          .select()
+          .select('id')
           .single();
         if (bErr) throw bErr;
         savedBrandId = newBrand.id;
@@ -767,7 +767,7 @@
       try {
         const { data, error } = await client.rpc('invite_user', { user_email: email, user_name: name });
         if (error) throw error;
-        alert("Kullanıcı başarıyla davet edildi (Varsayılan şifre: Vitrinos123!)");
+        alert("Kullanıcı başarıyla davet edildi (Geçici Şifre: " + data.temporary_password + ")");
         await fetchData();
         renderAll();
       } catch (err) {
@@ -799,9 +799,10 @@
       try {
         const { error: statusErr } = await client.from('leads').update({ status: 'approved' }).eq('id', leadId);
         if (statusErr) throw statusErr;
-        const { error: inviteErr } = await client.rpc('invite_user', { user_email: lead.email, user_name: lead.name });
+        const { data, error: inviteErr } = await client.rpc('invite_user', { user_email: lead.email, user_name: lead.name });
         if (inviteErr) throw inviteErr;
-        alert("Başvuru onaylandı ve kullanıcı davet edildi (Varsayılan şifre: Vitrinos123!)");
+        const tempPassword = data?.temporary_password || "Bilinmiyor";
+        alert(`Başvuru onaylandı ve kullanıcı davet edildi. (Geçici Şifre: ${tempPassword})`);
         await fetchData();
         renderAll();
       } catch (err) {

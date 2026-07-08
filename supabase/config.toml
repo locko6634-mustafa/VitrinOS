@@ -1,2 +1,5 @@
 [functions.trigger-brief]
 verify_jwt = true
+
+[functions.submit-lead]
+verify_jwt = false

@@ -138,15 +138,19 @@ VitrinOS/
      window.VitrinOS.config = {
        supabaseUrl: "https://<PROJE_ID>.supabase.co",
        supabasePublishableKey: "<PUBLISHABLE_KEY>",
+       leadSubmitFunction: "submit-lead",
        briefTriggerFunction: "trigger-brief",
        // ...
      };
      ```
      ```bash
+     supabase secrets set LEAD_ALLOWED_ORIGINS="https://vitrinos.com,https://www.vitrinos.com"
      supabase secrets set N8N_WEBHOOK_URL="https://<N8N_SUNUCUNUZ>/webhook/vitrinos-brief"
      supabase secrets set N8N_WEBHOOK_SECRET="<N8N_SHARED_SECRET>"
+     supabase functions deploy submit-lead
      supabase functions deploy trigger-brief
      ```
+     `public.leads` artik browser `anon` insert kabul etmez; basvurular `submit-lead` function uzerinden honeypot, rate limit, cooldown ve duplicate kontrolleri gecince kaydedilir.
      n8n `VitrinOS_BASE` webhook girisinde `x-vitrinos-webhook-secret` header degerini dogrulayin ve eski public webhook path'ini rotate edin.
 
 5. **Çalıştırma:**
