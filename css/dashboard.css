@@ -523,3 +523,27 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 }
+
+/* Loading skeleton loading shimmer style */
+.metric-card.is-loading strong,
+.metric-card.is-loading p,
+.work-panel.is-loading strong,
+.work-panel.is-loading span {
+  color: transparent !important;
+  background: rgba(245, 239, 228, 0.08) !important;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card.is-loading strong::after,
+.metric-card.is-loading p::after,
+.work-panel.is-loading strong::after,
+.work-panel.is-loading span::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(245, 239, 228, 0.12), transparent);
+  transform: translateX(-100%);
+  animation: shimmer 1.2s infinite;
+}

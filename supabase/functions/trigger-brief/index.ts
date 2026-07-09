@@ -35,9 +35,10 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_ANON_KEY") ?? Deno.env.get("SUPABASE_PUBLISHABLE_KEY");
   const n8nWebhookUrl = Deno.env.get("N8N_WEBHOOK_URL");
   const n8nWebhookSecret = Deno.env.get("N8N_WEBHOOK_SECRET");
+  const hmacSecret = Deno.env.get("N8N_API_SALT") || Deno.env.get("HMAC_SECRET");
   const authorization = req.headers.get("Authorization");
 
-  if (!supabaseUrl || !supabaseAnonKey || !n8nWebhookUrl) {
+  if (!supabaseUrl || !supabaseAnonKey || !n8nWebhookUrl || !hmacSecret) {
     return json({ ok: false, message: "Function secrets are not configured." }, 500);
   }
 
@@ -84,7 +85,6 @@ Deno.serve(async (req) => {
     );
   }
 
-  const hmacSecret = Deno.env.get("N8N_API_SALT") || Deno.env.get("HMAC_SECRET");
   const timestamp = Date.now().toString();
   const payloadBody = {
     jobId: job.id,
@@ -97,33 +97,28 @@ Deno.serve(async (req) => {
   };
   const payloadString = JSON.stringify(payloadBody);
 
-  let signature = "";
-  if (hmacSecret) {
-    const encoder = new TextEncoder();
-    const keyData = encoder.encode(hmacSecret);
-    const key = await crypto.subtle.importKey(
-      "raw",
-      keyData,
-      { name: "HMAC", hash: "SHA-256" },
-      false,
-      ["sign"]
-    );
-    const dataToSign = encoder.encode(`${timestamp}.${payloadString}`);
-    const signatureBuffer = await crypto.subtle.sign("HMAC", key, dataToSign);
-    const hashArray = Array.from(new Uint8Array(signatureBuffer));
-    signature = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  }
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(hmacSecret);
+  const key = await crypto.subtle.importKey(
+    "raw",
+    keyData,
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const dataToSign = encoder.encode(`${timestamp}.${payloadString}`);
+  const signatureBuffer = await crypto.subtle.sign("HMAC", key, dataToSign);
+  const hashArray = Array.from(new Uint8Array(signatureBuffer));
+  const signature = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
   const headers: Record<string, string> = {
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
+    "x-vitrinos-signature": signature,
+    "x-vitrinos-timestamp": timestamp
   };
 
   if (n8nWebhookSecret) {
     headers["x-vitrinos-webhook-secret"] = n8nWebhookSecret;
-  }
-  if (signature) {
-    headers["x-vitrinos-signature"] = signature;
-    headers["x-vitrinos-timestamp"] = timestamp;
   }
 
   const response = await fetch(n8nWebhookUrl, {

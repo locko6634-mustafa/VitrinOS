@@ -9,6 +9,8 @@
     supabaseProjectRef: "wrzalebhnlwppufdcmiz",
     leadSubmitFunction: "submit-lead",
     briefTriggerFunction: "trigger-brief",
+    adminUserActionFunction: "admin-user-actions",
+    jobActionFunction: "job-actions",
     authUsernameDomain: "vitrinos.local"
   };
 })();

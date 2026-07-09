@@ -19,8 +19,8 @@
           <span>VitrinOS</span>
         </a>
         <div class="app-context">
-          <span>NovaMarket</span>
-          <strong>E-ticaret kreatif operasyonu</strong>
+          <span id="appContextBrand">-</span>
+          <strong id="appContextUser">-</strong>
         </div>
         <div class="app-actions">
           <button class="button secondary compact-button" id="logoutButton" type="button">Çıkış</button>
@@ -33,7 +33,7 @@
             <p class="kicker">Ürün paneli</p>
             <h1 id="appTitle">Brief’ten onaya uzanan üretim hattı.</h1>
             <p>
-              Bu local ekran otomasyon mantığını web ürün paneli gibi gösterir. Gerçek auth, webhook ve storage bu fazda kapalıdır.
+              VitrinOS Canlı Otomasyon Sistemi, brief hazırlığından üretim takibine kadar tüm pazarlama görseli akışını tek panelde toplar.
             </p>
           </div>
           <div class="app-hero-media">
@@ -53,37 +53,37 @@
           <div class="metric-grid">
             <article class="metric-card">
               <span>Bugünkü üretim</span>
-              <strong id="metricJobs">18</strong>
+              <strong id="metricJobs">-</strong>
               <p>3 format ailesi</p>
             </article>
             <article class="metric-card">
               <span>Onay bekleyen</span>
-              <strong id="metricApprovals">7</strong>
+              <strong id="metricApprovals">-</strong>
               <p>revizyon kuyruğu dahil</p>
             </article>
             <article class="metric-card">
               <span>Ortalama süre</span>
-              <strong id="metricDuration">4.8 dk</strong>
+              <strong id="metricDuration">-</strong>
               <p>brief’ten önizlemeye</p>
             </article>
             <article class="metric-card">
               <span>Marka uyumu</span>
-              <strong id="metricMatch">91%</strong>
+              <strong id="metricMatch">-</strong>
               <p>uyum skoru</p>
             </article>
           </div>
 
           <div class="overview-grid">
-            <article class="work-panel">
+            <article class="work-panel" id="activeJobPanel">
               <div class="panel-heading">
                 <span class="mini-label">Aktif üretim</span>
-                <strong id="activeJobTitle">Teknoloji haftası banner</strong>
+                <strong id="activeJobTitle">-</strong>
               </div>
-              <div class="pipeline-list" aria-label="Üretim adımları">
-                <span class="is-done">Brief ayrıştırıldı</span>
-                <span class="is-done">Format seçildi</span>
-                <span class="is-current" id="pipelineCurrent">Önizleme hazır</span>
-                <span>Onay bekliyor</span>
+              <div class="pipeline-list" id="pipelineList" aria-label="Üretim adımları">
+                <span data-step="parsed">Brief ayrıştırıldı</span>
+                <span data-step="format">Format seçildi</span>
+                <span data-step="current" id="pipelineCurrent">Brief bekliyor</span>
+                <span data-step="approval">Onay bekliyor</span>
               </div>
             </article>
             <article class="work-panel">
@@ -91,10 +91,10 @@
                 <span class="mini-label">Kanal dağılımı</span>
                 <strong>Format kuyruğu</strong>
               </div>
-              <div class="format-bars" aria-label="Format dağılımı">
-                <div><span>Banner</span><strong style="--bar: 76%"></strong></div>
-                <div><span>Meta post</span><strong style="--bar: 58%"></strong></div>
-                <div><span>Story</span><strong style="--bar: 44%"></strong></div>
+              <div class="format-bars" id="formatBars" aria-label="Format dağılımı">
+                <div><span>Banner</span><strong id="barBanner" style="--bar: 0%"></strong></div>
+                <div><span>Meta post</span><strong id="barMetaPost" style="--bar: 0%"></strong></div>
+                <div><span>Story</span><strong id="barStory" style="--bar: 0%"></strong></div>
               </div>
             </article>
           </div>
@@ -123,10 +123,8 @@
                 </div>
                 <div class="form-row">
                   <label for="briefBrand">Marka</label>
-                  <select id="briefBrand" name="brand">
-                    <option>NovaMarket</option>
-                    <option>ModaPazar</option>
-                    <option>Evora Home</option>
+                  <select id="briefBrand" name="brand" required>
+                    <option value="" disabled selected>Markalar yükleniyor...</option>
                   </select>
                 </div>
               </div>
@@ -137,12 +135,12 @@
             <article class="brief-result" id="briefResult" aria-live="polite">
               <div class="panel-heading">
                 <span class="mini-label">Çıktı önizleme</span>
-                <strong id="resultTitle">Teknoloji haftası</strong>
+                <strong id="resultTitle">-</strong>
               </div>
               <div class="result-creative" id="resultCreative">
-                <span id="resultBrand">NovaMarket</span>
-                <strong id="resultHeadline">Koyu tema banner</strong>
-                <small id="resultMeta">Banner · 1600x600 · onay bekliyor</small>
+                <span id="resultBrand">-</span>
+                <strong id="resultHeadline">Brief bekleniyor</strong>
+                <small id="resultMeta">Kreatif alan boş</small>
               </div>
               <div class="result-actions">
                 <button class="button primary compact-button" id="approveButton" type="button">Onayla</button>
@@ -188,7 +186,7 @@
             <article class="work-panel">
               <div class="panel-heading">
                 <span class="mini-label">Canlı hazırlık</span>
-                <strong>Local demoda bilinçli olarak kapalı</strong>
+                <strong>Canlı üretim akışı için hazır</strong>
               </div>
               <div class="readiness-list">
                 <span>Supabase Auth</span>
