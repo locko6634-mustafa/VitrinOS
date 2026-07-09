@@ -18,12 +18,19 @@ type AttemptOutcome =
   | "blocked_duplicate"
   | "accepted";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+const baseCorsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Content-Type": "application/json"
 };
+
+function getCorsHeaders(origin: string, allowedOrigins: string[]) {
+  const headers: Record<string, string> = { ...baseCorsHeaders };
+  if (allowedOrigins.length > 0 && origin && allowedOrigins.includes(origin)) {
+    headers["Access-Control-Allow-Origin"] = origin;
+  }
+  return headers;
+}
 
 const NEED_OPTIONS = new Set(["50 adetten az", "50 200 arasi", "200 adetten fazla"]);
 const MIN_SUBMIT_MS = 3000;
@@ -34,10 +41,10 @@ const IP_LIMIT = 5;
 const EMAIL_LIMIT = 3;
 const COOLDOWN_SECONDS = 60;
 
-function json(body: unknown, status = 200) {
+function json(body: unknown, status = 200, headers: Record<string, string> = baseCorsHeaders) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: corsHeaders
+    headers
   });
 }
 
@@ -121,35 +128,41 @@ async function logAttempt(
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
-  }
-
-  if (req.method !== "POST") {
-    return json({ ok: false, message: "Method not allowed." }, 405);
-  }
-
-  const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!supabaseUrl || !serviceRoleKey) {
-    return json({ ok: false, message: "Function secrets are not configured." }, 500);
-  }
-
   const allowedOriginsRaw = Deno.env.get("LEAD_ALLOWED_ORIGINS") || "";
   const allowedOrigins = allowedOriginsRaw
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
   const origin = req.headers.get("origin") || "";
-  if (allowedOrigins.length && origin && !allowedOrigins.includes(origin)) {
-    return json({ ok: false, message: "Origin is not allowed." }, 403);
+  const isOriginAllowed = allowedOrigins.length > 0 && origin && allowedOrigins.includes(origin);
+  const responseHeaders = getCorsHeaders(origin, allowedOrigins);
+
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: responseHeaders });
+  }
+
+  if (req.method !== "POST") {
+    return json({ ok: false, message: "Method not allowed." }, 405, responseHeaders);
+  }
+
+  if (!isOriginAllowed) {
+    return new Response(JSON.stringify({ ok: false, message: "Origin is not allowed." }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!supabaseUrl || !serviceRoleKey) {
+    return json({ ok: false, message: "Function secrets are not configured." }, 500, responseHeaders);
   }
 
   let payload: LeadSubmitPayload;
   try {
     payload = await req.json();
   } catch {
-    return json({ ok: false, message: "Invalid JSON body." }, 400);
+    return json({ ok: false, message: "Invalid JSON body." }, 400, responseHeaders);
   }
 
   const name = sanitizeText(payload.name);
@@ -189,7 +202,7 @@ Deno.serve(async (req) => {
       outcome: "blocked_honeypot",
       reason: "Honeypot dolu geldi."
     });
-    return json({ ok: false, message: "Basvuru dogrulanamadi." }, 400);
+    return json({ ok: false, message: "Basvuru dogrulanamadi." }, 400, responseHeaders);
   }
 
   if (
@@ -212,7 +225,7 @@ Deno.serve(async (req) => {
       outcome: "blocked_validation",
       reason: "Sunucu tarafli alan dogrulamasi basarisiz."
     });
-    return json({ ok: false, message: "Basvuru verileri gecersiz." }, 400);
+    return json({ ok: false, message: "Basvuru verileri gecersiz." }, 400, responseHeaders);
   }
 
   const now = new Date();
@@ -254,7 +267,7 @@ Deno.serve(async (req) => {
   ]);
 
   if (ipCountError || emailCountError || duplicateCountError || cooldownCountError) {
-    return json({ ok: false, message: "Guvenlik kontrolleri tamamlanamadi." }, 500);
+    return json({ ok: false, message: "Guvenlik kontrolleri tamamlanamadi." }, 500, responseHeaders);
   }
 
   if ((cooldownCount || 0) > 0) {
@@ -267,7 +280,7 @@ Deno.serve(async (req) => {
       outcome: "blocked_rate_limit",
       reason: "IP cooldown limitine takildi."
     });
-    return json({ ok: false, message: "Cok hizli tekrar deneme algilandi. Bir dakika sonra tekrar deneyin." }, 429);
+    return json({ ok: false, message: "Cok hizli tekrar deneme algilandi. Bir dakika sonra tekrar deneyin." }, 429, responseHeaders);
   }
 
   if ((ipCount || 0) >= IP_LIMIT) {
@@ -280,7 +293,7 @@ Deno.serve(async (req) => {
       outcome: "blocked_rate_limit",
       reason: "Saatlik IP limiti asildi."
     });
-    return json({ ok: false, message: "Bu IP icin saatlik basvuru limiti doldu." }, 429);
+    return json({ ok: false, message: "Bu IP icin saatlik basvuru limiti doldu." }, 429, responseHeaders);
   }
 
   if ((emailCount || 0) >= EMAIL_LIMIT) {
@@ -293,7 +306,7 @@ Deno.serve(async (req) => {
       outcome: "blocked_rate_limit",
       reason: "Gunluk e-posta limiti asildi."
     });
-    return json({ ok: false, message: "Bu e-posta icin gunluk basvuru limiti doldu." }, 429);
+    return json({ ok: false, message: "Bu e-posta icin gunluk basvuru limiti doldu." }, 429, responseHeaders);
   }
 
   if ((duplicateCount || 0) > 0) {
@@ -306,7 +319,7 @@ Deno.serve(async (req) => {
       outcome: "blocked_duplicate",
       reason: "Ayni icerikte tekrar basvuru algilandi."
     });
-    return json({ ok: false, message: "Bu basvuru zaten alinmis gorunuyor." }, 409);
+    return json({ ok: false, message: "Bu basvuru zaten alinmis gorunuyor." }, 409, responseHeaders);
   }
 
   const { error: insertError } = await supabase.from("leads").insert([
@@ -322,7 +335,7 @@ Deno.serve(async (req) => {
   ]);
 
   if (insertError) {
-    return json({ ok: false, message: "Basvuru kaydedilemedi." }, 500);
+    return json({ ok: false, message: "Basvuru kaydedilemedi." }, 500, responseHeaders);
   }
 
   await logAttempt(supabase, {
@@ -335,5 +348,5 @@ Deno.serve(async (req) => {
     reason: "Lead kabul edildi."
   });
 
-  return json({ ok: true, message: "Basvuru alindi." });
+  return json({ ok: true, message: "Basvuru alindi." }, 200, responseHeaders);
 });

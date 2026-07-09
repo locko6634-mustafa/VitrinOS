@@ -141,18 +141,16 @@
 
 @media (max-width: 640px) {
   .auth-screen {
-    width: calc(100vw - 28px);
-    max-width: calc(100vw - 28px);
+    width: 100%;
+    max-width: 100%;
+    margin-inline: 0;
+    padding-inline: 16px;
+    padding: 2rem 0 3rem;
   }
 
   .auth-form,
   .auth-back {
     border-radius: 18px;
-  }
-
-  .auth-screen {
-    margin-inline: 14px;
-    padding: 2rem 0 3rem;
   }
 
   .auth-nav {
@@ -161,7 +159,8 @@
 
   .auth-back {
     position: static;
-    width: auto;
+    width: 100%;
+    text-align: center;
   }
 
   .auth-copy h1 {
@@ -173,11 +172,18 @@
     min-height: 230px;
   }
 
+  .auth-visual-card strong {
+    font-size: clamp(2.8rem, 12vw, 4.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+
   .auth-form .button {
     width: 100%;
   }
 
   .auth-visual-stack {
     grid-template-columns: 1fr;
+    gap: 8px;
   }
 }
