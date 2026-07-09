@@ -62,6 +62,20 @@
     jobStatusFilter: $("#jobStatusFilter")
   };
 
+  async function runAdminUserAction(payload) {
+    const functionName = window.VitrinOS.config.adminUserActionFunction || "admin-user-actions";
+    const { data, error } = await client.functions.invoke(functionName, {
+      body: payload
+    });
+
+    if (error) throw error;
+    if (!data?.ok) {
+      throw new Error(data?.message || "Islem tamamlanamadi.");
+    }
+
+    return data;
+  }
+
   async function fetchData() {
     try {
       const { data: dbBrands, error: bErr } = await client
@@ -91,7 +105,7 @@
         try {
           signedImageUrl = await window.VitrinOS.storage.getGeneratedAssetUrl(job.image_url);
         } catch (assetErr) {
-          console.error("GÃ¶rsel signed URL hatasÄ±:", assetErr);
+          console.error("Görsel signed URL hatası:", assetErr);
         }
         return { ...job, signedImageUrl };
       }));
@@ -750,8 +764,10 @@
       if (!button) return;
       const userId = button.dataset.toggleUser;
       try {
-        const { data, error } = await client.rpc('toggle_user_status', { target_user_id: userId });
-        if (error) throw error;
+        await runAdminUserAction({
+          action: "toggle_user_status",
+          userId
+        });
         await fetchData();
         renderAll();
       } catch (err) {
@@ -765,9 +781,12 @@
       const name = prompt("Kullanıcı adını girin:");
       if (!name) return;
       try {
-        const { data, error } = await client.rpc('invite_user', { user_email: email, user_name: name });
-        if (error) throw error;
-        alert("Kullanıcı başarıyla davet edildi (Geçici Şifre: " + data.temporary_password + ")");
+        await runAdminUserAction({
+          action: "invite_user",
+          email,
+          name
+        });
+        alert("Kullanıcı başarıyla davet edildi.");
         await fetchData();
         renderAll();
       } catch (err) {
@@ -797,12 +816,11 @@
       const lead = state.leads.find((item) => item.id === leadId);
       if (!lead) return;
       try {
-        const { error: statusErr } = await client.from('leads').update({ status: 'approved' }).eq('id', leadId);
-        if (statusErr) throw statusErr;
-        const { data, error: inviteErr } = await client.rpc('invite_user', { user_email: lead.email, user_name: lead.name });
-        if (inviteErr) throw inviteErr;
-        const tempPassword = data?.temporary_password || "Bilinmiyor";
-        alert(`Başvuru onaylandı ve kullanıcı davet edildi. (Geçici Şifre: ${tempPassword})`);
+        await runAdminUserAction({
+          action: "invite_lead",
+          leadId
+        });
+        alert("Başvuru onaylandı ve kullanıcı davet edildi.");
         await fetchData();
         renderAll();
       } catch (err) {

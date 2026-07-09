@@ -43,6 +43,13 @@
   const assetGrid = document.querySelector("#assetGrid");
   const historyList = document.querySelector("#historyList");
 
+  const appContextBrand = document.querySelector("#appContextBrand");
+  const appContextUser = document.querySelector("#appContextUser");
+  const pipelineList = document.querySelector("#pipelineList");
+  const barBanner = document.querySelector("#barBanner");
+  const barMetaPost = document.querySelector("#barMetaPost");
+  const barStory = document.querySelector("#barStory");
+
   async function triggerBriefWorkflow(payload) {
     const functionName = window.VitrinOS.config.briefTriggerFunction || "trigger-brief";
     const controller = new AbortController();
@@ -67,6 +74,54 @@
       throw err;
     } finally {
       clearTimeout(timeoutId);
+    }
+  }
+
+  async function runJobAction(payload) {
+    const functionName = window.VitrinOS.config.jobActionFunction || "job-actions";
+    const { data, error } = await client.functions.invoke(functionName, {
+      body: payload
+    });
+
+    if (error) throw error;
+    if (!data?.ok) {
+      throw new Error(data?.message || "Islem tamamlanamadi.");
+    }
+
+    return data;
+  }
+
+  function setPageLoading(isLoading) {
+    const cards = document.querySelectorAll(".metric-card, .work-panel, .brief-result");
+    cards.forEach(card => {
+      card.classList.toggle("is-loading", isLoading);
+    });
+  }
+
+  function renderFormatBars() {
+    const formats = { Banner: 0, "Meta Post": 0, Story: 0 };
+    let total = 0;
+
+    state.history.forEach(item => {
+      const fmt = item.format;
+      if (formats[fmt] !== undefined) {
+        formats[fmt]++;
+        total++;
+      }
+    });
+
+    if (total > 0) {
+      const bannerPct = Math.round((formats["Banner"] / total) * 100);
+      const metaPct = Math.round((formats["Meta Post"] / total) * 100);
+      const storyPct = Math.round((formats["Story"] / total) * 100);
+
+      if (barBanner) barBanner.style.setProperty("--bar", `${bannerPct}%`);
+      if (barMetaPost) barMetaPost.style.setProperty("--bar", `${metaPct}%`);
+      if (barStory) barStory.style.setProperty("--bar", `${storyPct}%`);
+    } else {
+      if (barBanner) barBanner.style.setProperty("--bar", "0%");
+      if (barMetaPost) barMetaPost.style.setProperty("--bar", "0%");
+      if (barStory) barStory.style.setProperty("--bar", "0%");
     }
   }
 
@@ -139,6 +194,7 @@
 
   // Supabase'den verileri çeken fonksiyon
   async function fetchData() {
+    setPageLoading(true);
     try {
       // 1. Markaları çek
       const { data: dbBrands, error: bErr } = await client
@@ -252,6 +308,8 @@
 
     } catch (err) {
       console.error("Dashboard veri çekme hatası:", err);
+    } finally {
+      setPageLoading(false);
     }
   }
 
@@ -341,15 +399,79 @@
     metricApprovals.textContent = String(state.approvals);
     if (metricDuration) metricDuration.textContent = state.avgDuration;
     if (metricMatch) metricMatch.textContent = state.brandMatch;
+
+    // app-context alanını güncelle
+    if (appContextUser && authContext && authContext.user) {
+      appContextUser.textContent = authContext.user.email;
+    }
+    if (appContextBrand && state.brands) {
+      if (state.brands.length > 0) {
+        const activeBrandId = document.querySelector("#briefBrand")?.value;
+        const brand = state.brands.find(b => b.id === activeBrandId) || state.brands[0];
+        appContextBrand.textContent = brand ? brand.name : "VitrinOS";
+      } else {
+        appContextBrand.textContent = "-";
+      }
+    }
+
+    // Pipeline listesini dinamik olarak güncelle
     if (state.currentJob) {
       activeJobTitle.textContent = state.currentJob.title;
       pipelineCurrent.textContent =
         state.currentJob.status === "approved" ? "Final çıktı hazır" : 
         state.currentJob.status === "completed" ? "Önizleme hazır" : statusLabel(state.currentJob.status);
+
+      if (pipelineList) {
+        const steps = pipelineList.querySelectorAll("span");
+        steps.forEach(step => {
+          step.className = ""; // Sınıfları temizle
+          const stepName = step.dataset.step;
+
+          if (stepName === "parsed") {
+            if (["pending", "processing", "completed", "approved", "revision_requested"].includes(state.currentJob.status)) {
+              step.classList.add("is-done");
+            }
+          } else if (stepName === "format") {
+            if (["processing", "completed", "approved", "revision_requested"].includes(state.currentJob.status)) {
+              step.classList.add("is-done");
+            }
+          } else if (stepName === "current") {
+            if (["pending", "processing"].includes(state.currentJob.status)) {
+              step.classList.add("is-current");
+              step.textContent = state.currentJob.status === "processing" ? "Üretiliyor..." : "İşleme alındı";
+            } else if (["completed", "revision_requested"].includes(state.currentJob.status)) {
+              step.classList.add("is-done");
+              step.textContent = "Önizleme hazır";
+            } else if (state.currentJob.status === "approved") {
+              step.classList.add("is-done");
+              step.textContent = "Final çıktı hazır";
+            }
+          } else if (stepName === "approval") {
+            if (state.currentJob.status === "completed") {
+              step.classList.add("is-current");
+            } else if (state.currentJob.status === "approved") {
+              step.classList.add("is-done");
+            }
+          }
+        });
+      }
     } else {
-      activeJobTitle.textContent = "Üretim yok";
+      activeJobTitle.textContent = "Aktif üretim yok";
       pipelineCurrent.textContent = "Brief bekliyor";
+      if (pipelineList) {
+        const steps = pipelineList.querySelectorAll("span");
+        steps.forEach(step => {
+          step.className = "";
+          if (step.dataset.step === "current") {
+            step.textContent = "Brief bekliyor";
+            step.classList.add("is-current");
+          }
+        });
+      }
     }
+
+    // Format barlarını güncelle
+    renderFormatBars();
   }
 
   function renderResult() {
@@ -366,6 +488,18 @@
       }
     } else {
       setLoading(false);
+      // Görsel üretimi başarıyla tamamlandığında veya onaylandığında bekleme mesajlarını temizle
+      if (job && (job.status === 'completed' || job.status === 'approved')) {
+        const currentText = briefStatus ? briefStatus.textContent : "";
+        if (
+          currentText.includes("bekleniyor") || 
+          currentText.includes("başladı") || 
+          currentText.includes("tetikleniyor") || 
+          currentText.includes("kaydediliyor")
+        ) {
+          setStatus(briefStatus, "");
+        }
+      }
     }
 
     if (job && job.status === 'failed') {
@@ -716,11 +850,10 @@
     setStatus(briefStatus, "Onaylanıyor...");
 
     try {
-      const { error } = await client.rpc('approve_job', {
-        target_job_id: state.currentJob.id
+      await runJobAction({
+        action: "approve_job",
+        jobId: state.currentJob.id
       });
-
-      if (error) throw error;
 
       setStatus(briefStatus, "Çıktı başarıyla onaylandı ve arşive aktarıldı.");
       await fetchData();
@@ -751,12 +884,11 @@
 
     try {
       // 1. Durumu revision_requested olarak güncelle ve revizyon sayısını artır
-      const { data: updatedJob, error: uErr } = await client.rpc('request_job_revision', {
-        target_job_id: state.currentJob.id,
-        revision_note: note
+      const { job: updatedJob } = await runJobAction({
+        action: "request_job_revision",
+        jobId: state.currentJob.id,
+        revisionNote: note
       });
-
-      if (uErr) throw uErr;
 
       setStatus(briefStatus, "Revizyon akışı (n8n) tetikleniyor...");
 
