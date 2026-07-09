@@ -4,7 +4,7 @@ Bu plan, VitrinOS platformunun canlı ortama (production) sorunsuz ve güvenli b
 
 ---
 
-## 1. P0: Canlıya Çıkmadan Önce Zorunlu Güvenlik ve Doğruluk İşleri
+## 1. Öncelik 1 (Kritik - Canlıya Çıkış Öncesi Yapılması Şart Olanlar)
 
 ### 1.1. n8n OpenAI Model Adlarının Düzeltilmesi
 - **Etkilenen Servis:** n8n İş Akışları (`VitrinOS_BASE`, `VitrinOS_STORY`, `VitrinOS_BANNER`, `VitrinOS_META_POST`, `VitrinOS_REVIZE`)
@@ -28,12 +28,10 @@ Bu plan, VitrinOS platformunun canlı ortama (production) sorunsuz ve güvenli b
      
      // Ham webhook isteği veya n8n API verisinden jobId'yi bulmaya çalış
      try {
-       // Alternatif 1: n8n API runData üzerinden
        const runData = executionData.data.resultData.runData;
        jobId = runData.Brief_Tetikleyici[0].data.main[0][0].json.body.jobId;
      } catch (e) {
        try {
-         // Alternatif 2: Doğrudan tetikleyici girdi verisinden
          jobId = $('Brief_Tetikleyici').first().json.body.jobId;
        } catch (err) {
          jobId = null;
@@ -49,77 +47,66 @@ Bu plan, VitrinOS platformunun canlı ortama (production) sorunsuz ve güvenli b
      ```
   3. `Supabase_Hata_Yaz` düğümünden önce bir "IF" veya "Filter" düğümü ekleyerek `jobId` değerinin geçerli bir UUID formatında olup olmadığını doğrulayın.
 - **Doğrulama Yöntemi:** Geçersiz bir HMAC imzası veya eksik parametre ile webhook'a istek gönderin. n8n'in Supabase tarafında boş UUID hatası vermeden merkezi hata loglarına hatayı düştüğünü doğrulayın.
-- **Geri Alma / Risk Notu:** Bu değişiklik hata loglamasını kurtaracak ancak `jobId`'nin hiç oluşturulamadığı durumlarda n8n veritabanına yazamayacaktır. Bu durumda n8n execution logları tek kaynak olacaktır.
+
+### 1.3. n8n Webhook Erişim Sıkılaştırması ve Çevre Değişkenleri
+- **Etkilenen Servis:** n8n Sunucusu & `VitrinOS_BASE` Webhook
+- **Teknik Adımlar:**
+  1. n8n sunucusunda `N8N_API_SALT` veya `HMAC_SECRET` çevre değişkenlerinin tanımlandığından ve `trigger-brief` Edge Function'ındaki değer ile birebir eşleştiğinden emin olun.
+  2. n8n webhook tetikleyicisinde (`Brief_Tetikleyici`) Header Auth özelliğini aktif ederek `x-vitrinos-webhook-secret` başlığını doğrulayın.
+  3. Webhook'un doğrudan internetten spam tetiklenmesini önlemek için, n8n üzerinde veya sunucu firewall/reverse proxy (Nginx, Cloudflare) seviyesinde sadece Supabase Edge Function IP aralıklarından veya belirli bir Gateway IP'sinden gelen isteklere izin verin.
+- **Doğrulama Yöntemi:** Edge Function dışındaki harici bir istemciden (örn: Postman) doğrudan n8n webhook URL'sine POST isteği atın. Yetkisiz isteklerin n8n'de execution başlatılmadan doğrudan 401 Unauthorized / 403 Forbidden ile engellendiğini doğrulayın.
+
+### 1.4. Supabase Storage Bucket Koruması ve Signed URL Entegrasyonu
+- **Etkilenen Servis:** Supabase Storage (`generated-assets` bucket'ı) & Frontend ([js/supabase.js](file:///c:/Users/Mustafa/Desktop/VitrinOS/js/supabase.js))
+- **Teknik Adımlar:**
+  1. Canlı Supabase panelinden Storage sekmesine gidin.
+  2. `generated-assets` bucket ayarlarını düzenleyin ve bucket'ı **Private** (`public = false`) yapın.
+  3. Frontend tarafında `js/supabase.js` içindeki `getGeneratedAssetUrl` fonksiyonunun (Signed URL üreten) tüm resim yüklemelerinde ve görüntülemelerinde (`dashboard.js` ve `admin.js` dosyalarında) aktif olarak çağrıldığını doğrulayın.
+- **Doğrulama Yöntemi:** Üretilen bir görselin ham Supabase Storage URL'sini kopyalayın ve gizli sekmede açın. "Access Denied" hatası aldığınızı, ancak dashboard üzerinde imzalı URL ile görselin sorunsuz görüntülendiğini doğrulayın.
 
 ---
 
-## 2. P1: Güvenilirlik, Gözlemlenebilirlik ve Hata Yönetimi
+## 2. Öncelik 2 (Orta - SaaS Ticarileştirme ve İzleme)
 
-### 2.1. Veritabanı Migration Driftlerinin Kapatılması
-- **Etkilenen Servis:** Supabase PostgreSQL Veritabanı & Yerel Migrations Klasörü
+### 2.1. Abonelik, Kredi ve Limit Sisteminin Kurulması
+- **Etkilenen Servis:** Supabase Veritabanı (`public.brands` tablosu), Stripe API & Webhook, Frontend Arayüzü
 - **Teknik Adımlar:**
-  1. Canlı veritabanındaki `apply_job_revision_request` RPC fonksiyonunun tam SQL tanımını dışarı aktarın (dışa aktarılan SQL tanımı mevcut yapı analizinde belgelenmiştir).
-  2. Yerel `supabase/migrations/` klasöründe yeni bir migration dosyası oluşturun (örn: `20260709160000_add_apply_job_revision_request.sql`).
-  3. RPC fonksiyon tanımını ve gerekli execute izinlerini bu dosyaya yazın:
-     ```sql
-     -- apply_job_revision_request fonksiyonu
-     CREATE OR REPLACE FUNCTION public.apply_job_revision_request(target_job_id uuid, target_user_id uuid, revision_note text)
-     RETURNS jobs
-     LANGUAGE plpgsql
-     SECURITY DEFINER
-     SET search_path TO 'public', 'pg_temp'
-     AS $$
-     -- ... fonksiyon gövdesi ...
-     $$;
-     
-     -- İzinler
-     REVOKE EXECUTE ON FUNCTION public.apply_job_revision_request(uuid, uuid, text) FROM public, anon, authenticated;
-     GRANT EXECUTE ON FUNCTION public.apply_job_revision_request(uuid, uuid, text) TO service_role;
-     ```
-- **Doğrulama Yöntemi:** Yerelde boş bir DB üzerine `supabase db reset` komutunu çalıştırarak tüm migration'ların hatasız uygulandığını ve lokalde fonksiyonun oluştuğunu doğrulayın.
-- **Geri Alma / Risk Notu:** Canlı veritabanına bu migration dosyasını `supabase db push` ile gönderirken drift oluşmamasına dikkat edilmelidir.
+  1. `public.brands` tablosuna `monthly_credit_limit` (integer, default 50) ve `used_credits` (integer, default 0) kolonlarını ekleyin.
+  2. `trigger-brief` edge function'ına veya Supabase veritabanında `jobs` tablosu üzerinde çalışacak bir trigger fonksiyonuna, her yeni görsel üretim talebinde kullanıcının/markanın kalan kredisini kontrol eden ve yeterli kredi yoksa isteği engelleyen bir validasyon ekleyin.
+  3. Stripe ile entegrasyon kurarak kullanıcıların abonelik paketlerine göre kredilerini güncelleyen bir Stripe Webhook Edge Function'ı (`stripe-webhook`) yazın. Bu fonksiyon, ödeme başarılı olduğunda ilgili markanın `monthly_credit_limit` ve `used_credits` alanlarını güncelleyecektir.
+  4. Müşteri panelinde (`dashboard.html`) markanın kalan kredi durumunu gösteren bir progress bar / metric card bileşeni ekleyin.
+- **Doğrulama Yöntemi:** Kredisi 0 olan bir markayla brief göndermeyi deneyin. Arayüzde "Krediniz yetersiz, lütfen paketinizi yükseltin" uyarısı aldığınızı ve n8n'e istek gitmediğini doğrulayın.
 
-### 2.2. n8n Jimp / Görsel İşleme Hata Toleransının Artırılması
-- **Etkilenen Servis:** n8n İş Akışları (`VitrinOS_STORY`, `VitrinOS_BANNER`, `VitrinOS_META_POST`)
+### 2.2. Kullanıcı Kayıt (Sign-up) Ekranının Eklenmesi
+- **Etkilenen Dosyalar:** [NEW] `signup.html`, `js/signup.js`, Supabase Auth Yapılandırması
 - **Teknik Adımlar:**
-  1. Jimp görsel işleme Code düğümlerini (`Story_Yeniden_Boyutlandır` vb.) try-catch blokları ile sararak daha esnek hale getirin.
-  2. Logo URL'sinden resim indirilemediğinde veya Jimp işlenirken bir hata oluştuğunda tüm akışın durması yerine, hata logunu n8n execution context'ine kaydedip görseli logosuz/ham haliyle oluşturup süreci devam ettirecek fallback mekanizması kurun:
-     ```javascript
-     // Fallback örneği
-     let logoImage;
-     try {
-       logoImage = await Jimp.read(brand.logo_url);
-     } catch (logoErr) {
-       console.warn("Logo indirilemedi, logosuz devam ediliyor:", logoErr.message);
-       logoImage = null;
-     }
-     if (logoImage) {
-       // Logo birleştirme işlemleri...
-     }
-     ```
-- **Doğrulama Yöntemi:** Bir markanın `logo_url` değerine geçersiz veya kırık bir link vererek brief gönderin. Görselin logosuz da olsa başarıyla üretildiğini ve job durumunun `completed` olduğunu doğrulayın.
-- **Geri Alma / Risk Notu:** Jimp kütüphanesinin n8n sunucusunda kurulu olduğundan emin olun (`NODE_FUNCTION_ALLOW_EXTERNAL=jimp` env değişkeni).
+  1. Kullanıcıların kendi hesaplarını oluşturabileceği, şifre gücü kontrolü içeren modern bir `signup.html` ve buna bağlı `js/signup.js` dosyası oluşturun.
+  2. Supabase Auth ayarlarında self-signup özelliğini aktif edin.
+  3. Yeni kullanıcı kaydolduğunda tetiklenecek olan `handle_auth_user_change` trigger fonksiyonunu kontrol ederek, yeni kullanıcının profile kaydının `public.users` tablosuna hatasız düştüğünden emin olun.
+  4. Kayıt olan kullanıcıyı doğrudan onboarding / marka oluşturma adımına yönlendirin.
+- **Doğrulama Yöntemi:** Yeni bir e-posta ile kayıt olun. E-posta onayından sonra dashboard'a yönlendirildiğinizi ve `public.users` tablosuna ilgili satırın eklendiğini doğrulayın.
+
+### 2.3. Hata İzleme (Sentry) ve n8n Slack/Email Bildirimleri
+- **Etkilenen Servis:** Frontend (Sentry SDK), n8n İş Akışları
+- **Teknik Adımlar:**
+  1. Frontend sayfalarına (`dashboard.html`, `admin.html`) Sentry CDN / SDK kodlarını ekleyin ve runtime hatalarını merkezi olarak izleyin.
+  2. n8n üzerinde merkezi bir "Hata İş Akışı" (Error Workflow) oluşturun ve tüm iş akışlarının ayarlarına bu hata akışını tanımlayın.
+  3. Bu hata akışında, bir düğüm çöktüğünde Slack veya E-posta yoluyla geliştirici ekibine "Workflow Hatası: [Workflow Name] - Hata: [Error Message]" detayını içeren anlık bildirimler gönderen Slack Webhook / Gmail node entegrasyonu kurun.
+- **Doğrulama Yöntemi:** n8n üzerinde yapay bir hata tetikleyin. Slack kanalınıza hata bildiriminin ve detaylı execution linkinin düştüğünü doğrulayın.
 
 ---
 
-## 3. P2: Kalite, Bakım, Dokümantasyon ve UX İyileştirmeleri
+## 3. Öncelik 3 (Düşük - Lansman Sonrası Adımlar)
 
-### 3.1. Giriş Ekranı Prefill ve Demo Simülasyonunun Eklenmesi
-- **Etkilenen Dosyalar:** [login.html](file:///c:/Users/Mustafa/Desktop/VitrinOS/login.html), [login.js](file:///c:/Users/Mustafa/Desktop/VitrinOS/js/login.js)
+### 3.1. SEO, Domain/SSL ve CDN Yapılandırması
+- **Etkilenen Servis:** DNS, Cloudflare, index.html Meta Tags
 - **Teknik Adımlar:**
-  1. `login.html` formunun altına veya uygun bir görsel alana "Demo Hesaplar" butonu/badge'i ekleyin. (Örn: "Pilot Girişi" ve "Admin Girişi").
-  2. `login.js` dosyasında bu butonlara tıklandığında formdaki `loginEmail` ve `loginPassword` alanlarını otomatik dolduracak (prefill) ve formu tetikleyecek JavaScript fonksiyonlarını ekleyin.
-  3. `sessionStorage` veya `localStorage` üzerinde demo oturumu simüle edecek yardımcı auth bayrakları ekleyerek internet kesintilerinde veya lokal testlerde veritabanı olmadan da arayüzün açılmasını sağlayın.
-- **Doğrulama Yöntemi:** Tarayıcıda `login.html` sayfasına gidin, "Demo Giriş" butonuna tıklayın, formun dolduğunu ve yönlendirmenin çalıştığını doğrulayın.
+  1. Projeyi özel bir domaine (örn: `https://vitrinos.com`) yönlendirin ve Cloudflare üzerinden SSL ile koruyun.
+  2. `index.html` üzerinde Open Graph (OG) meta etiketlerini (başlık, açıklama, kapak görseli) güncelleyerek sosyal mecralarda paylaşılabilirliği artırın.
+  3. Statik varlıklar (resimler, kütüphaneler) için CDN önbellekleme kuralları belirleyin.
 
-### 3.2. submit-lead CORS Origin Sıkılaştırması
-- **Etkilenen Dosya:** [submit-lead](file:///c:/Users/Mustafa/Desktop/VitrinOS/supabase/functions/submit-lead/index.ts#L138)
+### 3.2. Otomatik Veritabanı Yedeklemeleri
+- **Etkilenen Servis:** Supabase Projesi
 - **Teknik Adımlar:**
-  1. Supabase kontrol panelinden Edge Function çevre değişkenlerine (secrets) `LEAD_ALLOWED_ORIGINS` değişkenini ekleyin ve değer olarak projenin canlı frontend domain adını (örn: `https://vitrinos.com`) girin.
-  2. Edge function kodunda `LEAD_ALLOWED_ORIGINS` değişkeninin boş olması durumunda anonim tüm isteklere izin vermek yerine, hata fırlatarak istekleri reddeden bir fallback güvenlik duvarı ekleyin:
-     ```javascript
-     if (!allowedOrigins.length) {
-       return json({ ok: false, message: "Security configuration error: Allowed origins are not defined." }, 500);
-     }
-     ```
-- **Doğrulama Yöntemi:** Postman veya farklı bir origin üzerinden `submit-lead` fonksiyonuna doğrudan POST isteği atın ve 403 Forbidden / 500 Server Error hatası aldığınızı doğrulayın.
+  1. Supabase Pro kontrol panelinden günlük otomatik yedeklemeleri (Backups) aktif edin.
+  2. Felaket kurtarma senaryoları için yedeklerin harici bir AWS S3 bucket'ına veya lokal güvenli bir ortama haftalık olarak otomatik çekilmesini sağlayan bir script/akış kurgulayın.

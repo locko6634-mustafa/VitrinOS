@@ -487,15 +487,23 @@
     height: auto;
     border-right: 0;
     border-bottom: 1px solid var(--line);
+    padding: 12px 16px;
   }
 
   .admin-nav {
     display: flex;
     overflow-x: auto;
+    gap: 8px;
+    scroll-padding-inline: 8px;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
   }
 
   .admin-nav-button {
     white-space: nowrap;
+    min-height: 38px;
+    padding: 0 12px;
+    font-size: 0.88rem;
   }
 
   .admin-sidebar-note {
@@ -513,25 +521,58 @@
 }
 
 @media (max-width: 760px) {
-  .admin-topbar,
-  .admin-page-head,
-  .admin-topbar-actions {
-    align-items: flex-start;
-    flex-direction: column;
+  .admin-topbar {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    gap: 16px;
   }
 
-  .admin-topbar-actions,
+  .admin-context {
+    display: none; /* Mobilde dikey kalabalığı önlemek için gizle */
+  }
+
+  .admin-topbar-actions {
+    width: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .admin-topbar-actions .button,
   .admin-link-button,
   .admin-topbar .button {
-    width: 100%;
+    width: auto;
+    min-height: 38px;
+    padding-inline: 12px;
+    font-size: 0.86rem;
+  }
+
+  .admin-page-head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
   }
 
   .admin-main {
-    padding-inline: 14px;
+    padding-inline: 16px;
   }
 
-  .admin-metric-grid,
+  .admin-metric-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
   .admin-form-grid {
     grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .admin-table-wrap {
+    -webkit-overflow-scrolling: touch;
   }
 }

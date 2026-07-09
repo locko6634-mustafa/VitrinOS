@@ -734,7 +734,7 @@ p {
   .overview-grid,
   .brief-layout,
   .settings-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .process-showcase {
@@ -799,7 +799,7 @@ p {
   }
 
   h1 {
-    width: calc(100vw - 28px);
+    width: 100%;
     max-width: 100%;
     font-size: clamp(2.35rem, 10.5vw, 3.25rem);
     line-height: 0.98;
@@ -811,7 +811,7 @@ p {
   }
 
   .hero-copy {
-    width: calc(100vw - 28px);
+    width: 100%;
     max-width: 28rem;
     overflow-wrap: anywhere;
   }
@@ -819,27 +819,33 @@ p {
   .hero-actions {
     display: grid;
     grid-template-columns: 1fr;
-    width: calc(100vw - 28px);
+    width: 100%;
   }
 
   .button {
-    width: calc(100vw - 28px);
+    width: 100%;
     max-width: 100%;
   }
 
   .hero-content,
   .hero-visual,
   .operation-panel {
-    width: calc(100vw - 28px);
-    max-width: calc(100vw - 28px);
+    width: 100%;
+    max-width: 100%;
+    transform: none !important;
   }
 
   .flow-strip,
   .panel-grid,
   .intro-facts,
-  .process-showcase,
-  .lead-form {
+  .process-showcase {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .lead-form {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
   }
 
   .flow-strip article:nth-child(2) {
