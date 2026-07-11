@@ -1,7 +1,7 @@
 import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
 type AdminUserActionPayload = {
-  action?: "invite_user" | "invite_lead" | "toggle_user_status";
+  action?: "invite_user" | "invite_lead" | "toggle_user_status" | "delete_user";
   email?: string;
   name?: string;
   leadId?: string;
@@ -180,12 +180,19 @@ Deno.serve(async (req) => {
       return json({ ok: false, message: "Kullanici id zorunlu." }, 400);
     }
 
+    if (userId === auth.user.id) {
+      return json({ ok: false, message: "Kendi admin hesabinizin durumunu degistiremezsiniz." }, 400);
+    }
+
     const { data: current, error: getError } = await supabase.auth.admin.getUserById(userId);
     if (getError || !current.user) {
       return json({ ok: false, message: "Kullanici bulunamadi." }, 404);
     }
 
     const currentUser = current.user as typeof current.user & { banned_until?: string | null };
+    if (current.user.app_metadata?.role === "admin") {
+      return json({ ok: false, message: "Admin hesaplarinin durumu bu panelden degistirilemez." }, 400);
+    }
     const isBanned = Boolean(currentUser.banned_until);
     const { error: updateError } = await supabase.auth.admin.updateUserById(
       userId,
@@ -197,6 +204,33 @@ Deno.serve(async (req) => {
     }
 
     return json({ ok: true, status: isBanned ? "active" : "inactive" });
+  }
+
+  if (payload.action === "delete_user") {
+    const userId = sanitizeText(payload.userId);
+    if (!userId) {
+      return json({ ok: false, message: "Kullanici id zorunlu." }, 400);
+    }
+
+    if (userId === auth.user.id) {
+      return json({ ok: false, message: "Kendi admin hesabiniz silinemez." }, 400);
+    }
+
+    const { data: target, error: targetError } = await supabase.auth.admin.getUserById(userId);
+    if (targetError || !target.user) {
+      return json({ ok: false, message: "Kullanici bulunamadi." }, 404);
+    }
+
+    if (target.user.app_metadata?.role === "admin") {
+      return json({ ok: false, message: "Baska bir admin hesabi bu panelden silinemez." }, 400);
+    }
+
+    const { error: deleteError } = await supabase.auth.admin.deleteUser(userId);
+    if (deleteError) {
+      return json({ ok: false, message: deleteError.message }, deleteError.status || 400);
+    }
+
+    return json({ ok: true, userId });
   }
 
   return json({ ok: false, message: "Bilinmeyen islem." }, 400);
