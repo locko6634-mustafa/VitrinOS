@@ -98,7 +98,8 @@ async function inviteUser(
   }
 
   const { data, error } = await supabase.auth.admin.inviteUserByEmail(email, {
-    data: { name }
+    data: { name },
+    redirectTo: "https://locko6634-mustafa.github.io/VitrinOS/set-password.html"
   });
 
   if (error) {
