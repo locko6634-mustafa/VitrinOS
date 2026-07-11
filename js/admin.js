@@ -234,9 +234,10 @@
     return row;
   }
 
-  function appendTextCell(row, text) {
+  function appendTextCell(row, text, label) {
     const cell = document.createElement("td");
-    cell.textContent = text ?? "";
+    if (label) cell.dataset.label = label;
+    cell.append(textElement("span", text ?? "", "admin-cell-value"));
     row.append(cell);
     return cell;
   }
@@ -262,6 +263,20 @@
       panel.classList.toggle("is-active", active);
       panel.hidden = !active;
     });
+
+    const adminSidebar = document.getElementById("adminSidebar");
+    const adminTopbar = document.getElementById("adminTopbar");
+    if (adminSidebar && adminSidebar.classList.contains("is-open")) {
+      adminSidebar.classList.remove("is-open");
+      adminTopbar.classList.remove("is-open");
+      document.body.classList.remove("admin-sidebar-open");
+      const toggleBtn = document.getElementById("adminNavToggle");
+      if (toggleBtn) toggleBtn.setAttribute("aria-expanded", "false");
+    }
+
+    if (window.innerWidth <= 1120) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }
 
   function renderMetrics() {
@@ -342,16 +357,17 @@
       row.classList.toggle("is-selected", brand.id === state.selectedBrandId);
 
       const nameCell = document.createElement("td");
+      nameCell.dataset.label = "Marka";
       nameCell.append(
         textElement("strong", brand.name),
         textElement("small", brand.websiteUrl || "web sitesi yok")
       );
 
       row.append(nameCell);
-      appendTextCell(row, brand.userEmail);
-      appendTextCell(row, brand.theme === "koyu" ? "Koyu" : "Açık");
-      appendTextCell(row, brand.formatCount);
-      appendTextCell(row, brand.updatedAt);
+      appendTextCell(row, brand.userEmail, "Kullanıcı");
+      appendTextCell(row, brand.theme === "koyu" ? "Koyu" : "Açık", "Tema");
+      appendTextCell(row, brand.formatCount, "Format");
+      appendTextCell(row, brand.updatedAt, "Güncelleme");
       return row;
     }));
   }
@@ -486,20 +502,23 @@
     nodes.userRows.replaceChildren(...users.map((user) => {
       const row = document.createElement("tr");
       const userCell = document.createElement("td");
+      userCell.dataset.label = "E-posta";
       userCell.append(
         textElement("strong", user.email),
         textElement("small", `${user.brandIds.length} marka bağlı`)
       );
       row.append(userCell);
-      appendTextCell(row, user.brandIds.map(brandName).join(", ") || "Marka yok");
-      appendTextCell(row, user.jobCount);
-      appendTextCell(row, user.lastLogin);
+      appendTextCell(row, user.brandIds.map(brandName).join(", ") || "Marka yok", "Marka");
+      appendTextCell(row, user.jobCount, "Job");
+      appendTextCell(row, user.lastLogin, "Son giriş");
 
       const statusCell = document.createElement("td");
+      statusCell.dataset.label = "Durum";
       statusCell.append(statusBadge(user.status));
       row.append(statusCell);
 
       const actionCell = document.createElement("td");
+      actionCell.dataset.label = "Aksiyon";
       const button = textElement("button", user.status === "active" ? "Pasifleştir" : "Aktifleştir", "admin-row-button");
       button.type = "button";
       button.dataset.toggleUser = user.id;
@@ -531,19 +550,22 @@
     nodes.leadRows.replaceChildren(...leads.map((lead) => {
       const row = document.createElement("tr");
       const nameCell = document.createElement("td");
+      nameCell.dataset.label = "Ad";
       nameCell.append(textElement("strong", lead.name), textElement("small", lead.createdAt));
       row.append(nameCell);
-      appendTextCell(row, lead.company);
+      appendTextCell(row, lead.company, "Şirket");
 
       const emailCell = document.createElement("td");
+      emailCell.dataset.label = "E-posta";
       const emailLink = textElement("a", lead.email);
       emailLink.href = `mailto:${encodeURIComponent(lead.email)}`;
       emailCell.append(emailLink);
       row.append(emailCell);
 
-      appendTextCell(row, lead.need);
+      appendTextCell(row, lead.need, "İhtiyaç");
 
       const statusCell = document.createElement("td");
+      statusCell.dataset.label = "Durum";
       const select = document.createElement("select");
       select.dataset.leadStatus = lead.id;
       select.setAttribute("aria-label", `${lead.name} durumunu değiştir`);
@@ -558,6 +580,7 @@
       row.append(statusCell);
 
       const actionCell = document.createElement("td");
+      actionCell.dataset.label = "Aksiyon";
       const button = textElement("button", "Davet gönder", "admin-row-button");
       button.type = "button";
       button.dataset.inviteLead = lead.id;
@@ -616,17 +639,19 @@
       row.classList.toggle("is-selected", job.id === state.selectedJobId);
 
       const idCell = document.createElement("td");
+      idCell.dataset.label = "Job ID";
       idCell.append(textElement("strong", job.id.substring(0, 8)), textElement("small", job.userEmail));
       row.append(idCell);
-      appendTextCell(row, brandName(job.brandId));
-      appendTextCell(row, job.format);
+      appendTextCell(row, brandName(job.brandId), "Marka");
+      appendTextCell(row, job.format, "Format");
 
       const statusCell = document.createElement("td");
+      statusCell.dataset.label = "Durum";
       statusCell.append(statusBadge(job.status));
       row.append(statusCell);
 
-      appendTextCell(row, job.revisionCount);
-      appendTextCell(row, job.createdAt);
+      appendTextCell(row, job.revisionCount, "Revizyon");
+      appendTextCell(row, job.createdAt, "Tarih");
       return row;
     }));
   }
@@ -699,6 +724,33 @@
   }
 
   function bindEvents() {
+    const adminNavToggle = document.getElementById("adminNavToggle");
+    const adminSidebar = document.getElementById("adminSidebar");
+    const adminTopbar = document.getElementById("adminTopbar");
+
+    if (adminNavToggle && adminSidebar && adminTopbar) {
+      adminNavToggle.addEventListener("click", () => {
+        const isOpen = adminSidebar.classList.toggle("is-open");
+        adminTopbar.classList.toggle("is-open", isOpen);
+        document.body.classList.toggle("admin-sidebar-open", isOpen);
+        adminNavToggle.setAttribute("aria-expanded", String(isOpen));
+      });
+
+      document.body.addEventListener("click", (event) => {
+        if (
+          document.body.classList.contains("admin-sidebar-open") &&
+          !event.target.closest("#adminSidebar") &&
+          !event.target.closest("#adminNavToggle") &&
+          !event.target.closest("#adminTopbar")
+        ) {
+          adminSidebar.classList.remove("is-open");
+          adminTopbar.classList.remove("is-open");
+          document.body.classList.remove("admin-sidebar-open");
+          adminNavToggle.setAttribute("aria-expanded", "false");
+        }
+      });
+    }
+
     $$(".admin-nav-button").forEach((button) => {
       button.addEventListener("click", () => activateTab(button.dataset.adminTab));
     });

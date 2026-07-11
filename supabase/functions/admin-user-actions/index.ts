@@ -1,4 +1,4 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
 type AdminUserActionPayload = {
   action?: "invite_user" | "invite_lead" | "toggle_user_status";
@@ -83,7 +83,7 @@ async function requireAdmin(req: Request) {
 }
 
 async function inviteUser(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient<any, "public", any>,
   input: { email: string; name: string }
 ) {
   const email = sanitizeText(input.email).toLowerCase();
@@ -184,7 +184,8 @@ Deno.serve(async (req) => {
       return json({ ok: false, message: "Kullanici bulunamadi." }, 404);
     }
 
-    const isBanned = Boolean(current.user.banned_until);
+    const currentUser = current.user as typeof current.user & { banned_until?: string | null };
+    const isBanned = Boolean(currentUser.banned_until);
     const { error: updateError } = await supabase.auth.admin.updateUserById(
       userId,
       isBanned ? { ban_duration: "none" } : { ban_duration: "876000h" }

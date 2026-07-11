@@ -1,4 +1,4 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
 type LeadSubmitPayload = {
   name?: string;
@@ -103,7 +103,7 @@ async function sha256(value: string) {
 }
 
 async function logAttempt(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient<any, "public", any>,
   input: {
     ipHash: string;
     emailHash: string;

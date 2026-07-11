@@ -1,10 +1,14 @@
 (function () {
   window.VitrinOS = window.VitrinOS || {};
+  let initialized = false;
 
   function initReveal() {
+    if (initialized) return;
+    initialized = true;
+
     const revealItems = document.querySelectorAll("[data-reveal]");
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (!("IntersectionObserver" in window)) {
       revealItems.forEach((item) => item.classList.add("is-visible"));
       return;
     }
@@ -25,4 +29,10 @@
   }
 
   window.VitrinOS.initReveal = initReveal;
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initReveal, { once: true });
+  } else {
+    initReveal();
+  }
 })();
