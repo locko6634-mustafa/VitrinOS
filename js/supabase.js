@@ -64,14 +64,16 @@
 
   async function requireAuthenticated(options = {}) {
     const redirectTo = options.redirectTo || "login.html";
-    const context = await getCurrentUser();
 
-    if (!context) {
-      window.location.replace(redirectTo);
-      return null;
+    try {
+      const context = await getCurrentUser();
+      if (context) return context;
+    } catch (error) {
+      console.error("Oturum doğrulanamadı:", error);
     }
 
-    return context;
+    window.location.replace(redirectTo);
+    return null;
   }
 
   async function requireAdmin(options = {}) {

@@ -477,37 +477,151 @@
   padding: 18px;
 }
 
+/* Prompt Akordeon Stilleri */
+.admin-prompt-accordion {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  margin-bottom: 18px;
+  grid-column: span 2;
+}
+
+.prompt-details {
+  border: 1px solid rgba(245, 239, 228, 0.12);
+  border-radius: 12px;
+  background: rgba(10, 10, 9, 0.28);
+  overflow: hidden;
+  transition: border-color 220ms ease, background 220ms ease;
+}
+
+.prompt-details:hover {
+  border-color: rgba(243, 201, 111, 0.24);
+  background: rgba(10, 10, 9, 0.38);
+}
+
+.prompt-details[open] {
+  border-color: rgba(217, 150, 42, 0.34);
+  background: rgba(22, 21, 18, 0.45);
+}
+
+.prompt-details summary {
+  padding: 14px 18px;
+  font-weight: 800;
+  color: var(--ink);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  outline: none;
+}
+
+.prompt-details summary::after {
+  content: "→";
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--accent-soft);
+  transition: transform 220ms ease;
+}
+
+.prompt-details[open] summary::after {
+  transform: rotate(90deg);
+}
+
+.prompt-content {
+  padding: 0 18px 18px;
+  border-top: 1px solid rgba(245, 239, 228, 0.08);
+  display: grid;
+  gap: 12px;
+  margin-top: 10px;
+  animation: slideDown 260ms ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 24px;
+  height: 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 100;
+}
+
+.admin-nav-toggle .bar {
+  width: 100%;
+  height: 2px;
+  background-color: var(--ink);
+  border-radius: 999px;
+  transition: transform 300ms ease, opacity 300ms ease, background-color 300ms ease;
+}
+
 @media (max-width: 1120px) {
   .admin-shell {
     grid-template-columns: 1fr;
   }
 
+  .admin-nav-toggle {
+    display: flex;
+  }
+
   .admin-sidebar {
-    position: static;
-    height: auto;
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-    padding: 12px 16px;
+    position: fixed;
+    top: 72px;
+    left: -280px;
+    width: 270px;
+    height: calc(100dvh - 72px);
+    z-index: 45;
+    transition: transform 380ms cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 10px 0 40px rgba(0, 0, 0, 0.58);
+    border-right: 1px solid rgba(217, 150, 42, 0.22);
+    background: rgba(18, 17, 14, 0.98);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .admin-sidebar.is-open {
+    transform: translateX(280px);
+  }
+
+  body.admin-sidebar-open::after {
+    content: "";
+    position: fixed;
+    inset: 72px 0 0 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 42;
+    animation: fadeIn 300ms ease;
   }
 
   .admin-nav {
-    display: flex;
-    overflow-x: auto;
-    gap: 8px;
-    scroll-padding-inline: 8px;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 4px;
+    display: grid;
+    gap: 10px;
   }
 
   .admin-nav-button {
-    white-space: nowrap;
-    min-height: 38px;
-    padding: 0 12px;
-    font-size: 0.88rem;
+    white-space: normal;
+    min-height: 46px;
   }
 
   .admin-sidebar-note {
-    display: none;
+    display: block;
+    margin-top: auto;
   }
 
   .admin-split-grid,
@@ -517,6 +631,20 @@
 
   .admin-detail {
     position: static;
+  }
+
+  .admin-topbar.is-open .admin-nav-toggle .bar:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+    background-color: var(--accent-soft);
+  }
+
+  .admin-topbar.is-open .admin-nav-toggle .bar:nth-child(2) {
+    opacity: 0;
+  }
+
+  .admin-topbar.is-open .admin-nav-toggle .bar:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+    background-color: var(--accent-soft);
   }
 }
 
@@ -533,7 +661,7 @@
   }
 
   .admin-context {
-    display: none; /* Mobilde dikey kalabalığı önlemek için gizle */
+    display: none;
   }
 
   .admin-topbar-actions {
@@ -573,6 +701,62 @@
   }
 
   .admin-table-wrap {
-    -webkit-overflow-scrolling: touch;
+    border: 0;
+  }
+
+  /* Tabloları mobil karta dönüştürme */
+  .admin-table, 
+  .admin-table thead, 
+  .admin-table tbody, 
+  .admin-table th, 
+  .admin-table td, 
+  .admin-table tr {
+    display: block;
+    width: 100%;
+  }
+
+  .admin-table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  .admin-table tbody tr {
+    border: 1px solid rgba(245, 239, 228, 0.12);
+    border-radius: 14px;
+    background: rgba(245, 239, 228, 0.035);
+    margin-bottom: 12px;
+    padding: 10px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+  }
+
+  .admin-table td {
+    border: none;
+    border-bottom: 1px solid rgba(245, 239, 228, 0.08);
+    position: relative;
+    padding-left: 45% !important;
+    text-align: right !important;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .admin-table td:last-child {
+    border-bottom: 0;
+  }
+
+  .admin-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 12px;
+    width: 40%;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: 800;
+    color: var(--accent-soft);
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
   }
 }

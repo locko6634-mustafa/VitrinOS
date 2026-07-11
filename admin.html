@@ -6,14 +6,14 @@
     <title>VitrinOS Admin | Operasyon paneli</title>
     <meta name="description" content="VitrinOS admin paneli; marka, kullanıcı, başvuru ve job yönetimi için canlı operasyon arayüzü.">
     <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="14" fill="%23161512"/%3E%3Cpath d="M16 16h10l7 23 7-23h8L37 48h-9L16 16Z" fill="%23d9962a"/%3E%3C/svg%3E'>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/style.css?v=1.1">
+    <link rel="stylesheet" href="css/admin.css?v=1.1">
   </head>
   <body class="app-body admin-body">
     <a class="skip-link" href="#admin-main">İçeriğe geç</a>
 
     <div class="admin-shell">
-      <header class="admin-topbar">
+      <header class="admin-topbar" id="adminTopbar">
         <a class="brand" href="index.html" aria-label="VitrinOS ana sayfa">
           <span class="brand-mark" aria-hidden="true">V</span>
           <span>VitrinOS</span>
@@ -26,9 +26,14 @@
           <a class="admin-link-button" href="dashboard.html">Kullanıcı paneli</a>
           <button class="button secondary compact-button" type="button" id="adminLogout">Çıkış</button>
         </div>
+        <button class="admin-nav-toggle" id="adminNavToggle" type="button" aria-label="Menüyü aç/kapat" aria-expanded="false">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
       </header>
-
-      <aside class="admin-sidebar" aria-label="Admin bölümleri">
+ 
+      <aside class="admin-sidebar" id="adminSidebar" aria-label="Admin bölümleri">
         <nav class="admin-nav">
           <button class="admin-nav-button is-active" type="button" data-admin-tab="overview">Kontrol merkezi</button>
           <button class="admin-nav-button" type="button" data-admin-tab="brands">Markalar</button>
@@ -126,38 +131,50 @@
               <label>Marka tonu ve kuralları<textarea id="brandTone" rows="3"></textarea></label>
               <label>Yasaklı kelimeler<input id="brandBanned" placeholder="virgül ile ayır"></label>
 
-              <div class="admin-prompt-grid" style="grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
-                <div style="grid-column: span 2;">
-                  <label>Base Prompt (Brief Analiz Ajanı)<textarea id="basePrompt" rows="4"></textarea><button type="button" data-copy-template="base_prompt">Şablonu Kopyala</button></label>
-                </div>
-                
-                <div style="border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
-                  <h4 style="margin: 0 0 10px 0; color: var(--accent);">Story (Dikey 9:16) Prompts</h4>
-                  <label>Story Metin Oluşturucu<textarea id="storyTextPrompt" rows="3"></textarea><button type="button" data-copy-template="story_text_prompt">Şablonu Kopyala</button></label>
-                  <label>Story Arka Plan Oluşturucu<textarea id="storyBgPrompt" rows="3"></textarea><button type="button" data-copy-template="story_bg_prompt">Şablonu Kopyala</button></label>
-                  <label>Story Görsel Entegrasyon<textarea id="storyImgPrompt" rows="3"></textarea><button type="button" data-copy-template="story_img_prompt">Şablonu Kopyala</button></label>
-                </div>
-
-                <div style="border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
-                  <h4 style="margin: 0 0 10px 0; color: var(--accent);">Banner (Yatay) Prompts</h4>
-                  <label>Banner Metin Oluşturucu<textarea id="bannerTextPrompt" rows="3"></textarea><button type="button" data-copy-template="banner_text_prompt">Şablonu Kopyala</button></label>
-                  <label>Banner Arka Plan Oluşturucu<textarea id="bannerBgPrompt" rows="3"></textarea><button type="button" data-copy-template="banner_bg_prompt">Şablonu Kopyala</button></label>
-                  <label>Banner Görsel Entegrasyon<textarea id="bannerImgPrompt" rows="3"></textarea><button type="button" data-copy-template="banner_img_prompt">Şablonu Kopyala</button></label>
-                </div>
-
-                <div style="border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
-                  <h4 style="margin: 0 0 10px 0; color: var(--accent);">Meta Post (Kare/Dikey) Prompts</h4>
-                  <label>Meta Post Metin Oluşturucu<textarea id="metaPostTextPrompt" rows="3"></textarea><button type="button" data-copy-template="meta_post_text_prompt">Şablonu Kopyala</button></label>
-                  <label>Meta Post Arka Plan Oluşturucu<textarea id="metaPostBgPrompt" rows="3"></textarea><button type="button" data-copy-template="meta_post_bg_prompt">Şablonu Kopyala</button></label>
-                  <label>Meta Post Görsel Entegrasyon<textarea id="metaPostImgPrompt" rows="3"></textarea><button type="button" data-copy-template="meta_post_img_prompt">Şablonu Kopyala</button></label>
-                </div>
-
-                <div style="border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 6px; display: flex; flex-direction: column; justify-content: space-between;">
-                  <div>
-                    <h4 style="margin: 0 0 10px 0; color: var(--accent);">Revizyon (Görsel Düzenleme) Prompt</h4>
-                    <label>Görsel Revize Ajanı<textarea id="revizePrompt" rows="5"></textarea><button type="button" data-copy-template="revize_prompt">Şablonu Kopyala</button></label>
+              <div class="admin-prompt-accordion">
+                <details class="prompt-details">
+                  <summary>Base Prompt (Brief Analiz Ajanı)</summary>
+                  <div class="prompt-content">
+                    <label>Brief Analiz Prompt Şablonu
+                      <textarea id="basePrompt" rows="4"></textarea>
+                      <button type="button" data-copy-template="base_prompt" class="admin-row-button">Şablonu Kopyala</button>
+                    </label>
                   </div>
-                </div>
+                </details>
+                
+                <details class="prompt-details">
+                  <summary>Story (Dikey 9:16) Prompts</summary>
+                  <div class="prompt-content">
+                    <label>Story Metin Oluşturucu<textarea id="storyTextPrompt" rows="3"></textarea><button type="button" data-copy-template="story_text_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                    <label>Story Arka Plan Oluşturucu<textarea id="storyBgPrompt" rows="3"></textarea><button type="button" data-copy-template="story_bg_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                    <label>Story Görsel Entegrasyon<textarea id="storyImgPrompt" rows="3"></textarea><button type="button" data-copy-template="story_img_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                  </div>
+                </details>
+                
+                <details class="prompt-details">
+                  <summary>Banner (Yatay) Prompts</summary>
+                  <div class="prompt-content">
+                    <label>Banner Metin Oluşturucu<textarea id="bannerTextPrompt" rows="3"></textarea><button type="button" data-copy-template="banner_text_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                    <label>Banner Arka Plan Oluşturucu<textarea id="bannerBgPrompt" rows="3"></textarea><button type="button" data-copy-template="banner_bg_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                    <label>Banner Görsel Entegrasyon<textarea id="bannerImgPrompt" rows="3"></textarea><button type="button" data-copy-template="banner_img_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                  </div>
+                </details>
+
+                <details class="prompt-details">
+                  <summary>Meta Post (Kare/Dikey) Prompts</summary>
+                  <div class="prompt-content">
+                    <label>Meta Post Metin Oluşturucu<textarea id="metaPostTextPrompt" rows="3"></textarea><button type="button" data-copy-template="meta_post_text_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                    <label>Meta Post Arka Plan Oluşturucu<textarea id="metaPostBgPrompt" rows="3"></textarea><button type="button" data-copy-template="meta_post_bg_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                    <label>Meta Post Görsel Entegrasyon<textarea id="metaPostImgPrompt" rows="3"></textarea><button type="button" data-copy-template="meta_post_img_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                  </div>
+                </details>
+
+                <details class="prompt-details">
+                  <summary>Revizyon (Görsel Düzenleme) Prompt</summary>
+                  <div class="prompt-content">
+                    <label>Görsel Revize Ajanı<textarea id="revizePrompt" rows="4"></textarea><button type="button" data-copy-template="revize_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                  </div>
+                </details>
               </div>
               <button class="button primary" type="submit">Marka ayarlarını güncelle</button>
               <p class="form-status" id="brandStatus" role="status" aria-live="polite"></p>
@@ -237,8 +254,8 @@
       integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug"
       crossorigin="anonymous"
     ></script>
-    <script src="js/config.js"></script>
-    <script src="js/supabase.js"></script>
-    <script src="js/admin.js"></script>
+    <script src="js/config.js?v=1.1"></script>
+    <script src="js/supabase.js?v=1.1"></script>
+    <script src="js/admin.js?v=1.1"></script>
   </body>
 </html>

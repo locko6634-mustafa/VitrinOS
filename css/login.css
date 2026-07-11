@@ -148,19 +148,25 @@
     padding: 2rem 0 3rem;
   }
 
-  .auth-form,
-  .auth-back {
+  .auth-form {
     border-radius: 18px;
   }
 
   .auth-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
     margin-bottom: 2.2rem;
   }
 
   .auth-back {
     position: static;
-    width: 100%;
-    text-align: center;
+    width: fit-content;
+    min-height: 36px;
+    padding-inline: 14px;
+    font-size: 0.85rem;
+    font-weight: 700;
   }
 
   .auth-copy h1 {

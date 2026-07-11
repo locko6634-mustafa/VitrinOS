@@ -151,20 +151,6 @@
     return wrapper;
   }
 
-  function escapeHtml(value) {
-    return String(value ?? "").replace(/[&<>"']/g, (char) => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    })[char]);
-  }
-
-  function escapeAttr(value) {
-    return escapeHtml(value);
-  }
-
   function getFriendlyErrorMessage(rawError) {
     if (!rawError) return "Beklenmeyen bir hata oluştu. Lütfen briefinizi kontrol edip tekrar deneyin.";
     
@@ -363,12 +349,19 @@
       button.classList.toggle("is-active", isActive);
       button.setAttribute("aria-selected", String(isActive));
     });
-
+ 
     panels.forEach((panel) => {
       const isActive = panel.id === `panel-${tabName}`;
       panel.classList.toggle("is-active", isActive);
       panel.hidden = !isActive;
     });
+
+    if (window.innerWidth <= 640) {
+      const tabsContainer = document.querySelector(".app-tabs");
+      if (tabsContainer) {
+        tabsContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
   }
 
   function detectFormat(text, selectedFormat) {
