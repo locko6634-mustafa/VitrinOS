@@ -25,6 +25,11 @@
         <div class="app-actions">
           <button class="button secondary compact-button" id="logoutButton" type="button">Çıkış</button>
         </div>
+        <button class="app-menu-toggle" id="appMenuToggle" type="button" aria-label="Panel menüsünü aç" aria-controls="appTabs" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </header>
 
       <main class="app-main" id="app-main">
@@ -41,7 +46,7 @@
           </div>
         </section>
 
-        <nav class="app-tabs" role="tablist" aria-label="Panel sekmeleri">
+        <nav class="app-tabs" id="appTabs" role="tablist" aria-label="Panel sekmeleri">
           <button class="tab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-overview" data-tab="overview">Özet</button>
           <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="panel-brief" data-tab="brief">Brief</button>
           <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="panel-assets" data-tab="assets">Görseller</button>

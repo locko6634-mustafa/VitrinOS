@@ -19,6 +19,8 @@
   };
 
   const logoutButton = document.querySelector("#logoutButton");
+  const appShell = document.querySelector("#appShell");
+  const appMenuToggle = document.querySelector("#appMenuToggle");
   const tabButtons = Array.from(document.querySelectorAll("[data-tab]"));
   const panels = Array.from(document.querySelectorAll(".tab-panel"));
   const briefForm = document.querySelector("#briefForm");
@@ -356,12 +358,21 @@
       panel.hidden = !isActive;
     });
 
+    closeAppMenu();
+
     if (window.innerWidth <= 640) {
       const tabsContainer = document.querySelector(".app-tabs");
       if (tabsContainer) {
         tabsContainer.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     }
+  }
+
+  function closeAppMenu() {
+    if (!appShell || !appMenuToggle) return;
+    appShell.classList.remove("menu-open");
+    appMenuToggle.setAttribute("aria-expanded", "false");
+    appMenuToggle.setAttribute("aria-label", "Panel menüsünü aç");
   }
 
   function detectFormat(text, selectedFormat) {
@@ -772,6 +783,16 @@
 
   logoutButton.addEventListener("click", () => {
     window.VitrinOS.auth.signOut("login.html");
+  });
+
+  appMenuToggle?.addEventListener("click", () => {
+    const isOpen = appShell.classList.toggle("menu-open");
+    appMenuToggle.setAttribute("aria-expanded", String(isOpen));
+    appMenuToggle.setAttribute("aria-label", isOpen ? "Panel menüsünü kapat" : "Panel menüsünü aç");
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeAppMenu();
   });
 
   tabButtons.forEach((button) => {

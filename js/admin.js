@@ -46,6 +46,7 @@
     brandForm: $("#brandForm"),
     brandStatus: $("#brandStatus"),
     brandFormTitle: $("#brandFormTitle"),
+    brandOwner: $("#brandOwner"),
     userRows: $("#userRows"),
     userCount: $("#userCount"),
     userSearch: $("#userSearch"),
@@ -116,8 +117,11 @@
         brandIds: dbBrands.filter(b => b.user_id === u.id).map(b => b.id),
         jobCount: jobsWithAssetUrls.filter(j => j.user_id === u.id).length,
         lastLogin: u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleString('tr-TR') : "Hiç giriş yapmadı",
+        hasSignedIn: Boolean(u.last_sign_in_at),
         status: u.banned_until ? "inactive" : "active"
       }));
+
+      populateBrandOwnerOptions();
 
       state.brands = dbBrands.map(b => {
         const owner = state.users.find(u => u.id === b.user_id);
@@ -240,6 +244,17 @@
     cell.append(textElement("span", text ?? "", "admin-cell-value"));
     row.append(cell);
     return cell;
+  }
+
+  function populateBrandOwnerOptions() {
+    if (!nodes.brandOwner) return;
+    const current = nodes.brandOwner.value;
+    nodes.brandOwner.replaceChildren(new Option("Atanmamış", ""));
+    state.users
+      .slice()
+      .sort((a, b) => a.email.localeCompare(b.email, "tr"))
+      .forEach((user) => nodes.brandOwner.append(new Option(user.email, user.id)));
+    nodes.brandOwner.value = state.users.some((user) => user.id === current) ? current : "";
   }
 
   function setStatus(element, message, kind) {
@@ -380,6 +395,7 @@
     $("#brandName").value = brand.name;
     $("#brandLogo").value = brand.logoUrl;
     $("#brandWebsite").value = brand.websiteUrl;
+    nodes.brandOwner.value = brand.userId || "";
     $("#brandTheme").value = brand.theme;
     $("#brandPrimary").value = brand.primary;
     $("#brandSecondary").value = brand.secondary;
@@ -420,6 +436,7 @@
       name,
       logo_url: $("#brandLogo").value.trim(),
       website_url: $("#brandWebsite").value.trim(),
+      user_id: nodes.brandOwner.value || null,
       color_palette: { primary, secondary, theme },
       tone_rules: $("#brandTone").value.trim(),
       banned_words: $("#brandBanned").value.split(",").map((word) => word.trim()).filter(Boolean),
@@ -437,7 +454,7 @@
         if (bErr) throw bErr;
       } else {
         const firstNormalUser = state.users.find(u => u.email !== authContext.user.email);
-        brandPayload.user_id = firstNormalUser ? firstNormalUser.id : authContext.user.id;
+        brandPayload.user_id = nodes.brandOwner.value || (firstNormalUser ? firstNormalUser.id : authContext.user.id);
 
         const { data: newBrand, error: bErr } = await client
           .from('brands')
@@ -522,7 +539,14 @@
       const button = textElement("button", user.status === "active" ? "Pasifleştir" : "Aktifleştir", "admin-row-button");
       button.type = "button";
       button.dataset.toggleUser = user.id;
-      actionCell.append(button);
+      button.disabled = user.id === authContext.user.id;
+      button.title = button.disabled ? "Kendi hesabınızın durumunu değiştiremezsiniz" : "Kullanıcı durumunu değiştir";
+      const deleteButton = textElement("button", "Sil", "admin-row-button danger");
+      deleteButton.type = "button";
+      deleteButton.dataset.deleteUser = user.id;
+      deleteButton.disabled = user.id === authContext.user.id;
+      deleteButton.title = deleteButton.disabled ? "Kendi admin hesabınız silinemez" : "Kullanıcıyı ve job kayıtlarını sil";
+      actionCell.append(button, deleteButton);
       row.append(actionCell);
       return row;
     }));
@@ -531,10 +555,18 @@
   function filteredLeads() {
     const query = normalize(nodes.leadSearch.value);
     const status = nodes.leadStatusFilter.value;
+    const registeredUserEmails = new Set(
+      state.users
+        .filter((user) => user.hasSignedIn)
+        .map((user) => normalize(user.email))
+        .filter(Boolean)
+    );
+
     return state.leads.filter((lead) => {
+      const hasAccount = registeredUserEmails.has(normalize(lead.email));
       const matchesQuery = !query || normalize(`${lead.name} ${lead.company} ${lead.email}`).includes(query);
       const matchesStatus = status === "all" || lead.status === status;
-      return matchesQuery && matchesStatus;
+      return !hasAccount && matchesQuery && matchesStatus;
     });
   }
 
@@ -812,6 +844,23 @@
     });
 
     nodes.userRows.addEventListener("click", async (event) => {
+      const deleteButton = event.target.closest("[data-delete-user]");
+      if (deleteButton) {
+        const user = state.users.find((item) => item.id === deleteButton.dataset.deleteUser);
+        if (!user || user.id === authContext.user.id) return;
+        const confirmed = confirm(`${user.email} kullanıcısı silinsin mi? Bu kullanıcıya ait job kayıtları da silinir, marka kayıtları sahipsiz kalır.`);
+        if (!confirmed) return;
+        try {
+          deleteButton.disabled = true;
+          await runAdminUserAction({ action: "delete_user", userId: user.id });
+          await fetchData();
+          renderAll();
+        } catch (err) {
+          alert("Kullanıcı silinemedi: " + err.message);
+          deleteButton.disabled = false;
+        }
+        return;
+      }
       const button = event.target.closest("[data-toggle-user]");
       if (!button) return;
       const userId = button.dataset.toggleUser;

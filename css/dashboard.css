@@ -47,6 +47,41 @@
   gap: 10px;
 }
 
+.app-menu-toggle {
+  display: none;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 1px solid rgba(245, 239, 228, 0.16);
+  border-radius: 12px;
+  background: rgba(245, 239, 228, 0.06);
+  cursor: pointer;
+}
+
+.app-menu-toggle span {
+  width: 17px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--ink);
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.app-shell.menu-open .app-menu-toggle span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.app-shell.menu-open .app-menu-toggle span:nth-child(2) {
+  opacity: 0;
+}
+
+.app-shell.menu-open .app-menu-toggle span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
 .compact-button {
   width: auto;
   min-height: 42px;
@@ -550,16 +585,55 @@ button:disabled {
     padding: 0 12px;
   }
 
+  .app-menu-toggle {
+    display: flex;
+  }
+
   .app-tabs {
+    position: fixed;
+    top: 64px;
+    left: 12px;
+    right: 12px;
+    z-index: 45;
+    display: grid;
+    gap: 6px;
+    max-height: 0;
+    margin: 0;
+    overflow: hidden;
+    border-color: transparent;
     border-radius: 18px;
-    scroll-snap-type: x mandatory;
+    background: rgba(25, 23, 19, 0.98);
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
+    transform: translateY(-8px);
+    transition: max-height 220ms ease, opacity 180ms ease, transform 220ms ease, padding 220ms ease, border-color 220ms ease;
+  }
+
+  .app-shell.menu-open .app-tabs {
+    max-height: 360px;
+    padding: 8px;
+    border-color: rgba(245, 239, 228, 0.14);
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
   }
 
   .tab-button {
-    flex: 0 0 auto;
+    width: 100%;
     padding: 0 16px;
     font-size: 0.94rem;
-    scroll-snap-align: start;
+    text-align: left;
+  }
+
+  .app-shell.menu-open::after {
+    content: "";
+    position: fixed;
+    inset: 56px 0 0;
+    z-index: 44;
+    background: rgba(0, 0, 0, 0.42);
+    backdrop-filter: blur(3px);
   }
 
   .panel-heading,

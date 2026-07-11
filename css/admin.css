@@ -326,6 +326,16 @@
   cursor: pointer;
 }
 
+.admin-row-button.danger {
+  border-color: rgba(228, 117, 104, 0.3);
+  color: #efb2a8;
+}
+
+.admin-row-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .admin-table-card {
   overflow: hidden;
 }
@@ -702,6 +712,7 @@
 
   .admin-table-wrap {
     border: 0;
+    overflow: visible;
   }
 
   /* Tabloları mobil karta dönüştürme */
@@ -719,6 +730,10 @@
     position: absolute;
     top: -9999px;
     left: -9999px;
+  }
+
+  .admin-table {
+    min-width: 0;
   }
 
   .admin-table tbody tr {
@@ -741,6 +756,31 @@
     align-items: center;
     justify-content: flex-end;
     gap: 8px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-table td > * {
+    max-width: 100%;
+  }
+
+  .admin-table td > .admin-cell-value,
+  .admin-table td a,
+  .admin-table td strong,
+  .admin-table td small {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-table td strong,
+  .admin-table td small {
+    text-align: right;
+  }
+
+  .admin-table td select {
+    min-width: 0;
+    max-width: 100%;
   }
 
   .admin-table td:last-child {
