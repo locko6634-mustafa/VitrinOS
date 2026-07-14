@@ -141,6 +141,7 @@ Deno.serve(async (req) => {
     .filter(Boolean);
     const allowedOrigins = Array.from(new Set([
       ...configuredOrigins,
+      "https://vitrin-os.vercel.app",
       "https://vitrin-jc8wh9n-locko6634-mustafas-projects.vercel.app"
     ]));
   const origin = req.headers.get("origin") || "";
