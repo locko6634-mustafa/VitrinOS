@@ -723,3 +723,21 @@ button:disabled {
   transform: translateX(-100%);
   animation: shimmer 1.2s infinite;
 }
+
+.list-pager {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.list-pager button {
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.list-pager button:disabled { cursor: not-allowed; opacity: 0.45; }
