@@ -235,12 +235,14 @@
       // Onay bekleyen metrikleri (approved veya failed olmayan, tamamlanmış veya işlenen işler)
       state.approvals = jobsWithAssetUrls.filter(j => j.status !== 'approved' && j.status !== 'failed').length;
 
-      // Ortalama Süre hesaplama (completed veya approved olan işler için)
-      const completedJobs = jobsWithAssetUrls.filter(j => j.status === 'completed' || j.status === 'approved');
+      // Ortalama üretim süresi: yalnızca completed kayıtlarını kullan.
+      // approved kayıtlarında updated_at onay zamanına taşınabildiği için
+      // kullanıcı onay/revizyon gecikmesi üretim süresine dahil edilmemelidir.
+      const completedJobs = jobsWithAssetUrls.filter(j => j.status === 'completed');
       if (completedJobs.length > 0) {
         const totalDuration = completedJobs.reduce((acc, j) => {
           const diff = new Date(j.updated_at) - new Date(j.created_at); // ms
-          return acc + (diff / 1000 / 60); // minutes
+          return acc + Math.max(0, diff / 1000 / 60); // minutes
         }, 0);
         const avg = totalDuration / completedJobs.length;
         state.avgDuration = avg < 1 ? "1 dk altı" : `${avg.toFixed(1)} dk`;
@@ -248,11 +250,16 @@
         state.avgDuration = "-";
       }
 
-      // Marka Uyumu hesaplama (failed olmayanların oranı)
-      const totalJobsCount = jobsWithAssetUrls.length;
-      if (totalJobsCount > 0) {
-        const successJobs = jobsWithAssetUrls.filter(j => j.status !== 'failed').length;
-        state.brandMatch = `${Math.round((successJobs / totalJobsCount) * 100)}%`;
+      // Marka uyumu: yalnızca sonuçlanmış işlerde başarılı sonuç oranı.
+      // pending/processing/revision_requested işleri henüz kalite sonucu değildir.
+      const finishedJobs = jobsWithAssetUrls.filter(j =>
+        ['completed', 'approved', 'failed'].includes(j.status)
+      );
+      if (finishedJobs.length > 0) {
+        const successfulJobs = finishedJobs.filter(j =>
+          j.status === 'completed' || j.status === 'approved'
+        ).length;
+        state.brandMatch = `${Math.round((successfulJobs / finishedJobs.length) * 100)}%`;
       } else {
         state.brandMatch = "-";
       }
@@ -604,11 +611,6 @@
 
     resultCreative.replaceChildren();
     if (job.imageUrl) {
-      const hiddenBrand = document.createElement("span");
-      hiddenBrand.id = "resultBrand";
-      hiddenBrand.style.display = "none";
-      hiddenBrand.textContent = job.brand;
-
       const img = document.createElement("img");
       img.src = job.imageUrl;
       img.alt = `${job.format} önizlemesi`;
@@ -617,14 +619,11 @@
       img.style.height = "100%";
       img.style.objectFit = "cover";
       img.style.borderRadius = "6px";
-      resultCreative.append(hiddenBrand, img);
+      resultCreative.append(img);
     } else {
       const brand = createTextElement("span", job.brand);
-      brand.id = "resultBrand";
       const headline = createTextElement("strong", job.title);
-      headline.id = "resultHeadline";
       const meta = createTextElement("small", `${job.format} hazırlanıyor`);
-      meta.id = "resultMeta";
       resultCreative.append(brand, headline, meta);
     }
 

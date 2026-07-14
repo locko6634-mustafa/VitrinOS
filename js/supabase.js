@@ -13,6 +13,12 @@
         config.supabaseUrl,
         config.supabasePublishableKey,
         {
+          global: {
+            headers: {
+              "x-correlation-id": window.VitrinOS.observability?.getCorrelationId?.() || "",
+              traceparent: window.VitrinOS.observability?.getTraceparent?.() || ""
+            }
+          },
           auth: {
             persistSession: true,
             autoRefreshToken: true,

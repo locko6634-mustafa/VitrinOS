@@ -6,6 +6,7 @@ type AdminUserActionPayload = {
   name?: string;
   leadId?: string;
   userId?: string;
+  appUrl?: string;
 };
 
 const corsHeaders = {
@@ -84,7 +85,7 @@ async function requireAdmin(req: Request) {
 
 async function inviteUser(
   supabase: SupabaseClient<any, "public", any>,
-  input: { email: string; name: string }
+  input: { email: string; name: string; redirectTo: string }
 ) {
   const email = sanitizeText(input.email).toLowerCase();
   const name = sanitizeText(input.name);
@@ -99,7 +100,7 @@ async function inviteUser(
 
   const { data, error } = await supabase.auth.admin.inviteUserByEmail(email, {
     data: { name },
-    redirectTo: "https://locko6634-mustafa.github.io/VitrinOS/set-password.html"
+    redirectTo: input.redirectTo
   });
 
   if (error) {
@@ -107,6 +108,61 @@ async function inviteUser(
   }
 
   return json({ ok: true, userId: data.user?.id || null });
+}
+
+function getInviteRedirectUrl(req: Request, appUrl?: string) {
+  const configuredAppUrl = Deno.env.get("PUBLIC_APP_URL");
+  const referer = req.headers.get("Referer");
+  const requestOrigin = req.headers.get("Origin");
+  const refererBase = referer ? new URL(referer).href.replace(/[^/]+$/, "") : "";
+  const baseUrl = configuredAppUrl || appUrl || refererBase || requestOrigin;
+
+  if (!baseUrl) {
+    throw new Error("PUBLIC_APP_URL secret or request Origin is required.");
+  }
+
+  return new URL("set-password.html", `${baseUrl.replace(/\/$/, "")}/`).toString();
+}
+
+async function removeUserGeneratedAssets(
+  supabase: SupabaseClient<any, "public", any>,
+  userId: string
+) {
+  const { data: jobs, error: jobsError } = await supabase
+    .from("jobs")
+    .select("id, brand_id")
+    .eq("user_id", userId);
+
+  if (jobsError) {
+    throw new Error(`Kullanici asset listesi alinamadi: ${jobsError.message}`);
+  }
+
+  for (const job of jobs || []) {
+    const { data: files, error: listError } = await supabase.storage
+      .from("generated-assets")
+      .list(job.brand_id, {
+        limit: 1000,
+        search: `${job.id}_`
+      });
+
+    if (listError) {
+      throw new Error(`Job assetleri listelenemedi: ${listError.message}`);
+    }
+
+    const paths = (files || [])
+      .filter((file) => file.name && file.name.startsWith(`${job.id}_`))
+      .map((file) => `${job.brand_id}/${file.name}`);
+
+    if (!paths.length) continue;
+
+    const { error: removeError } = await supabase.storage
+      .from("generated-assets")
+      .remove(paths);
+
+    if (removeError) {
+      throw new Error(`Job assetleri silinemedi: ${removeError.message}`);
+    }
+  }
 }
 
 Deno.serve(async (req) => {
@@ -133,7 +189,8 @@ Deno.serve(async (req) => {
   if (payload.action === "invite_user") {
     return inviteUser(supabase, {
       email: payload.email || "",
-      name: payload.name || ""
+      name: payload.name || "",
+      redirectTo: getInviteRedirectUrl(req, payload.appUrl)
     });
   }
 
@@ -155,7 +212,8 @@ Deno.serve(async (req) => {
 
     const inviteResponse = await inviteUser(supabase, {
       email: lead.email,
-      name: lead.name
+      name: lead.name,
+      redirectTo: getInviteRedirectUrl(req, payload.appUrl)
     });
 
     if (!inviteResponse.ok) {
@@ -239,6 +297,16 @@ Deno.serve(async (req) => {
     });
     if (revokeError) {
       return json({ ok: false, message: "Kullanici silinmedi; aktif oturumlar sonlandirilamadi." }, 500);
+    }
+
+    try {
+      await removeUserGeneratedAssets(supabase, userId);
+    } catch (assetError) {
+      console.error("Kullanici asset temizleme hatasi:", assetError);
+      return json({
+        ok: false,
+        message: "Kullanici silinmedi; uretilen dosyalar temizlenemedi."
+      }, 500);
     }
 
     const { error: deleteError } = await supabase.auth.admin.deleteUser(userId);

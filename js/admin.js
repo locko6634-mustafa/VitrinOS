@@ -13,7 +13,7 @@
     selectedBrandId: "",
     selectedJobId: "",
     brandSort: { key: "name", dir: 1 },
-    jobSort: { key: "created_at", dir: -1 },
+    jobSort: { key: "createdAt", dir: -1 },
     brands: [],
     users: [],
     leads: [],
@@ -71,7 +71,10 @@
   async function runAdminUserAction(payload) {
     const functionName = window.VitrinOS.config.adminUserActionFunction || "admin-user-actions";
     const { data, error } = await client.functions.invoke(functionName, {
-      body: payload
+      body: {
+        ...payload,
+        appUrl: window.VitrinOS.config.appUrl
+      }
     });
 
     if (error) throw error;
@@ -143,6 +146,7 @@
           toneRules: b.tone_rules || "",
           bannedWords: b.banned_words || [],
           formatCount: jobsWithAssetUrls.filter(j => j.brand_id === b.id).length,
+          updatedAtRaw: b.updated_at,
           updatedAt: new Date(b.updated_at).toLocaleString('tr-TR'),
           prompts: {
             base_prompt: prompts.base_prompt || "",
@@ -184,6 +188,7 @@
           imageUrl: '',
           imagePath: j.image_url || '',
           revisionCount: j.revision_count,
+          createdAtRaw: j.created_at,
           createdAt: new Date(j.created_at).toLocaleString('tr-TR'),
           briefJson: j.brief_json || {},
           timeline: j.brief_json?.timeline || ["pending", j.status].filter(Boolean)
@@ -358,6 +363,9 @@
       })
       .sort((a, b) => {
         const key = state.brandSort.key;
+        if (key === "updatedAt") {
+          return (new Date(a.updatedAtRaw) - new Date(b.updatedAtRaw)) * state.brandSort.dir;
+        }
         return String(a[key]).localeCompare(String(b[key]), "tr") * state.brandSort.dir;
       });
   }
@@ -656,8 +664,8 @@
       .filter((job) => (brand === "all" || job.brandId === brand) && (format === "all" || job.format === format) && (status === "all" || job.status === status))
       .sort((a, b) => {
         const key = state.jobSort.key;
-        if (key === "created_at" || key === "createdAt") {
-          return new Date(b.createdAt) - new Date(a.createdAt);
+        if (key === "createdAt") {
+          return (new Date(a.createdAtRaw) - new Date(b.createdAtRaw)) * state.jobSort.dir;
         }
         return String(a[key]).localeCompare(String(b[key]), "tr") * state.jobSort.dir;
       });
@@ -1001,7 +1009,7 @@
         } else {
           const job = payload.new;
           const owner = state.users.find((user) => user.id === job.user_id);
-          const item = { id: job.id, brandId: job.brand_id, userEmail: owner?.email || 'Bilinmeyen', brief: job.brief_text, format: job.format, status: job.status, imageUrl: '', imagePath: job.image_url || '', revisionCount: job.revision_count, createdAt: new Date(job.created_at).toLocaleString('tr-TR'), briefJson: job.brief_json || {}, timeline: job.brief_json?.timeline || ['pending', job.status].filter(Boolean) };
+          const item = { id: job.id, brandId: job.brand_id, userEmail: owner?.email || 'Bilinmeyen', brief: job.brief_text, format: job.format, status: job.status, imageUrl: '', imagePath: job.image_url || '', revisionCount: job.revision_count, createdAtRaw: job.created_at, createdAt: new Date(job.created_at).toLocaleString('tr-TR'), briefJson: job.brief_json || {}, timeline: job.brief_json?.timeline || ['pending', job.status].filter(Boolean) };
           state.jobs = [item, ...state.jobs.filter((existing) => existing.id !== item.id)].slice(0, PAGE_SIZE);
         }
         renderAll();
