@@ -96,10 +96,16 @@ function normalizeWebsite(value: string) {
   }
 }
 
-async function sha256(value: string) {
-  const encoded = new TextEncoder().encode(value);
-  const hash = await crypto.subtle.digest("SHA-256", encoded);
-  return Array.from(new Uint8Array(hash), (byte) => byte.toString(16).padStart(2, "0")).join("");
+async function hmacSha256(value: string, secret: string) {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const signature = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(signature), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 async function logAttempt(
@@ -165,7 +171,8 @@ Deno.serve(async (req) => {
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!supabaseUrl || !serviceRoleKey) {
+  const leadHashSecret = Deno.env.get("LEAD_HASH_SECRET");
+  if (!supabaseUrl || !serviceRoleKey || !leadHashSecret) {
     return json({ ok: false, message: "Function secrets are not configured." }, 500, responseHeaders);
   }
 
@@ -190,10 +197,11 @@ Deno.serve(async (req) => {
   const websiteHost = website ? new URL(website).hostname.replace(/^www\./, "") : null;
   const normalizedNeed = normalizeNeedKey(need);
 
-  const ipHash = await sha256(ip || "unknown-ip");
-  const emailHash = await sha256(email || "unknown-email");
-  const fingerprintHash = await sha256(
-    [name.toLowerCase(), company.toLowerCase(), email, website || "", need, note.toLowerCase()].join("|")
+  const ipHash = await hmacSha256(`ip:${ip || "unknown-ip"}`, leadHashSecret);
+  const emailHash = await hmacSha256(`email:${email || "unknown-email"}`, leadHashSecret);
+  const fingerprintHash = await hmacSha256(
+    `fingerprint:${[name.toLowerCase(), company.toLowerCase(), email, website || "", need, note.toLowerCase()].join("|")}`,
+    leadHashSecret
   );
 
   const supabase = createClient(supabaseUrl, serviceRoleKey, {
