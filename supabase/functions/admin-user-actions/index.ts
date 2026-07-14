@@ -203,6 +203,15 @@ Deno.serve(async (req) => {
       return json({ ok: false, message: updateError.message }, updateError.status || 400);
     }
 
+    if (!isBanned) {
+      const { error: revokeError } = await supabase.rpc("revoke_user_sessions", {
+        target_user_id: userId
+      });
+      if (revokeError) {
+        return json({ ok: false, message: "Kullanici pasiflestirildi ancak aktif oturumlar sonlandirilamadi." }, 500);
+      }
+    }
+
     return json({ ok: true, status: isBanned ? "active" : "inactive" });
   }
 
@@ -223,6 +232,13 @@ Deno.serve(async (req) => {
 
     if (target.user.app_metadata?.role === "admin") {
       return json({ ok: false, message: "Baska bir admin hesabi bu panelden silinemez." }, 400);
+    }
+
+    const { error: revokeError } = await supabase.rpc("revoke_user_sessions", {
+      target_user_id: userId
+    });
+    if (revokeError) {
+      return json({ ok: false, message: "Kullanici silinmedi; aktif oturumlar sonlandirilamadi." }, 500);
     }
 
     const { error: deleteError } = await supabase.auth.admin.deleteUser(userId);
