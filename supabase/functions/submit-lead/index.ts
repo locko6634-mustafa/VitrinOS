@@ -33,13 +33,26 @@ function getCorsHeaders(origin: string, allowedOrigins: string[]) {
 }
 
 const NEED_OPTIONS = new Set(["50 adetten az", "50 200 arasi", "200 adetten fazla"]);
-const MIN_SUBMIT_MS = 3000;
-const IP_WINDOW_MINUTES = 60;
-const EMAIL_WINDOW_HOURS = 24;
-const DUPLICATE_WINDOW_DAYS = 7;
-const IP_LIMIT = 5;
-const EMAIL_LIMIT = 3;
-const COOLDOWN_SECONDS = 60;
+function requiredPositiveEnv(name: string) {
+  const value = Number(Deno.env.get(name));
+  if (!Number.isInteger(value) || value <= 0) {
+    throw new Error(`Missing or invalid environment variable: ${name}`);
+  }
+  return value;
+}
+
+function getLeadConfig() {
+  return {
+    minSubmitMs: requiredPositiveEnv("LEAD_MIN_SUBMIT_MS"),
+    ipWindowMinutes: requiredPositiveEnv("LEAD_IP_WINDOW_MINUTES"),
+    emailWindowHours: requiredPositiveEnv("LEAD_EMAIL_WINDOW_HOURS"),
+    duplicateWindowDays: requiredPositiveEnv("LEAD_DUPLICATE_WINDOW_DAYS"),
+    ipLimit: requiredPositiveEnv("LEAD_IP_LIMIT"),
+    emailLimit: requiredPositiveEnv("LEAD_EMAIL_LIMIT"),
+    cooldownSeconds: requiredPositiveEnv("LEAD_COOLDOWN_SECONDS"),
+    maxNoteLength: requiredPositiveEnv("LEAD_MAX_NOTE_LENGTH")
+  };
+}
 
 function json(body: unknown, status = 200, headers: Record<string, string> = baseCorsHeaders) {
   return new Response(JSON.stringify(body), {
@@ -146,11 +159,7 @@ Deno.serve(async (req) => {
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
-    const allowedOrigins = Array.from(new Set([
-      ...configuredOrigins,
-      "https://vitrin-os.vercel.app",
-      "https://vitrin-jc8wh9n-locko6634-mustafas-projects.vercel.app"
-    ]));
+    const allowedOrigins = Array.from(new Set(configuredOrigins));
   const origin = req.headers.get("origin") || "";
   const isOriginAllowed = allowedOrigins.length > 0 && origin && allowedOrigins.includes(origin);
   responseHeaders = getCorsHeaders(origin, allowedOrigins);
@@ -172,6 +181,8 @@ Deno.serve(async (req) => {
       headers: { "Content-Type": "application/json" }
     });
   }
+
+  const leadConfig = getLeadConfig();
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -234,10 +245,10 @@ Deno.serve(async (req) => {
     !validateEmail(email) ||
     (websiteRaw && !website) ||
     !NEED_OPTIONS.has(normalizedNeed) ||
-    note.length > 2000 ||
+    note.length > leadConfig.maxNoteLength ||
     !Number.isFinite(startedAt) ||
     startedAt <= 0 ||
-    Date.now() - startedAt < MIN_SUBMIT_MS
+    Date.now() - startedAt < leadConfig.minSubmitMs
   ) {
     await logAttempt(supabase, {
       ipHash,
@@ -263,12 +274,12 @@ Deno.serve(async (req) => {
     p_website: website,
     p_need: need,
     p_note: note,
-    p_ip_limit: IP_LIMIT,
-    p_email_limit: EMAIL_LIMIT,
-    p_ip_window: `${IP_WINDOW_MINUTES} minutes`,
-    p_email_window: `${EMAIL_WINDOW_HOURS} hours`,
-    p_duplicate_window: `${DUPLICATE_WINDOW_DAYS} days`,
-    p_cooldown: `${COOLDOWN_SECONDS} seconds`
+    p_ip_limit: leadConfig.ipLimit,
+    p_email_limit: leadConfig.emailLimit,
+    p_ip_window: `${leadConfig.ipWindowMinutes} minutes`,
+    p_email_window: `${leadConfig.emailWindowHours} hours`,
+    p_duplicate_window: `${leadConfig.duplicateWindowDays} days`,
+    p_cooldown: `${leadConfig.cooldownSeconds} seconds`
   });
 
   if (error || !data) {

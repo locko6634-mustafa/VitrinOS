@@ -25,6 +25,27 @@
     sentryDsn: "",
     observabilitySampleRate: 1,
     release: "vitrinos-web@0.1.0",
+    defaults: {
+      colors: {
+        primary: "#d9962a",
+        secondary: "#7a4f12"
+      },
+      formats: {
+        story: { name: "Story", dimensions: "1080x1920", keywords: ["story", "hikaye", "9:16"] },
+        banner: { name: "Banner", dimensions: "1600x600", keywords: ["banner", "1600", "600"] },
+        metaPost: { name: "Meta Post", dimensions: "1080x1350", keywords: [] }
+      },
+      dashboard: {
+        jobPageSize: 24,
+        briefMinLength: 12,
+        revisionMinLength: 6,
+        revisionLimit: 3,
+        requestTimeoutMs: 15000,
+        mobileBreakpoint: 640
+      },
+      admin: { pageSize: 25, mobileBreakpoint: 1120 },
+      lead: { minSubmitSeconds: 3 }
+    },
     ...runtimeConfig
   };
 

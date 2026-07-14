@@ -8,7 +8,9 @@
 
   const client = window.VitrinOS.auth.getClient();
 
-  const PAGE_SIZE = 25;
+  const adminConfig = window.VitrinOS.config.defaults.admin;
+  const colors = window.VitrinOS.config.defaults.colors;
+  const PAGE_SIZE = adminConfig.pageSize;
   const state = {
     selectedBrandId: "",
     selectedJobId: "",
@@ -69,7 +71,7 @@
   };
 
   async function runAdminUserAction(payload) {
-    const functionName = window.VitrinOS.config.adminUserActionFunction || "admin-user-actions";
+    const functionName = window.VitrinOS.config.adminUserActionFunction;
     const { data, error } = await client.functions.invoke(functionName, {
       body: {
         ...payload,
@@ -140,8 +142,8 @@
           userId: b.user_id,
           logoUrl: b.logo_url || "",
           websiteUrl: b.website_url || "",
-          primary: b.color_palette?.primary || "#d9962a",
-          secondary: b.color_palette?.secondary || "#7a4f12",
+          primary: b.color_palette?.primary || colors.primary,
+          secondary: b.color_palette?.secondary || colors.secondary,
           theme: b.color_palette?.theme || "koyu",
           toneRules: b.tone_rules || "",
           bannedWords: b.banned_words || [],
@@ -299,7 +301,7 @@
       if (toggleBtn) toggleBtn.setAttribute("aria-expanded", "false");
     }
 
-    if (window.innerWidth <= 1120) {
+    if (window.innerWidth <= adminConfig.mobileBreakpoint) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }
@@ -848,8 +850,8 @@
       state.selectedBrandId = "";
       nodes.brandForm.reset();
       $("#brandId").value = "";
-      $("#brandPrimary").value = "#d9962a";
-      $("#brandSecondary").value = "#7a4f12";
+      $("#brandPrimary").value = colors.primary;
+      $("#brandSecondary").value = colors.secondary;
       nodes.brandFormTitle.textContent = "Yeni marka";
       setStatus(nodes.brandStatus, "Yeni marka ekleniyor.");
       renderBrands();
