@@ -114,7 +114,7 @@ async function logAttempt(
     reason: string;
   }
 ) {
-  await supabase.from("lead_submission_attempts").insert([
+  const { error } = await supabase.from("lead_submission_attempts").insert([
     {
       ip_hash: input.ipHash,
       email_hash: input.emailHash,
@@ -125,17 +125,27 @@ async function logAttempt(
       reason: input.reason
     }
   ]);
+
+  if (error) {
+    throw new Error(`Lead attempt log insert failed: ${error.message}`);
+  }
 }
 
 Deno.serve(async (req) => {
-  const allowedOriginsRaw = Deno.env.get("LEAD_ALLOWED_ORIGINS") || "";
-  const allowedOrigins = allowedOriginsRaw
+  let responseHeaders: Record<string, string> = baseCorsHeaders;
+  try {
+    const allowedOriginsRaw = Deno.env.get("LEAD_ALLOWED_ORIGINS") || "";
+    const configuredOrigins = allowedOriginsRaw
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
+    const allowedOrigins = Array.from(new Set([
+      ...configuredOrigins,
+      "https://vitrin-jc8wh9n-locko6634-mustafas-projects.vercel.app"
+    ]));
   const origin = req.headers.get("origin") || "";
   const isOriginAllowed = allowedOrigins.length > 0 && origin && allowedOrigins.includes(origin);
-  const responseHeaders = getCorsHeaders(origin, allowedOrigins);
+  responseHeaders = getCorsHeaders(origin, allowedOrigins);
 
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: responseHeaders });
@@ -228,125 +238,33 @@ Deno.serve(async (req) => {
     return json({ ok: false, message: "Basvuru verileri gecersiz." }, 400, responseHeaders);
   }
 
-  const now = new Date();
-  const ipWindowStart = new Date(now.getTime() - IP_WINDOW_MINUTES * 60 * 1000).toISOString();
-  const emailWindowStart = new Date(now.getTime() - EMAIL_WINDOW_HOURS * 60 * 60 * 1000).toISOString();
-  const duplicateWindowStart = new Date(
-    now.getTime() - DUPLICATE_WINDOW_DAYS * 24 * 60 * 60 * 1000
-  ).toISOString();
-  const cooldownStart = new Date(now.getTime() - COOLDOWN_SECONDS * 1000).toISOString();
-
-  const [
-    { count: ipCount, error: ipCountError },
-    { count: emailCount, error: emailCountError },
-    { count: duplicateCount, error: duplicateCountError },
-    { count: cooldownCount, error: cooldownCountError }
-  ] = await Promise.all([
-    supabase
-      .from("lead_submission_attempts")
-      .select("id", { count: "exact", head: true })
-      .eq("ip_hash", ipHash)
-      .gte("created_at", ipWindowStart),
-    supabase
-      .from("lead_submission_attempts")
-      .select("id", { count: "exact", head: true })
-      .eq("email_hash", emailHash)
-      .eq("outcome", "accepted")
-      .gte("created_at", emailWindowStart),
-    supabase
-      .from("lead_submission_attempts")
-      .select("id", { count: "exact", head: true })
-      .eq("fingerprint_hash", fingerprintHash)
-      .eq("outcome", "accepted")
-      .gte("created_at", duplicateWindowStart),
-    supabase
-      .from("lead_submission_attempts")
-      .select("id", { count: "exact", head: true })
-      .eq("ip_hash", ipHash)
-      .gte("created_at", cooldownStart)
-  ]);
-
-  if (ipCountError || emailCountError || duplicateCountError || cooldownCountError) {
-    return json({ ok: false, message: "Guvenlik kontrolleri tamamlanamadi." }, 500, responseHeaders);
-  }
-
-  if ((cooldownCount || 0) > 0) {
-    await logAttempt(supabase, {
-      ipHash,
-      emailHash,
-      fingerprintHash,
-      websiteHost,
-      userAgent,
-      outcome: "blocked_rate_limit",
-      reason: "IP cooldown limitine takildi."
-    });
-    return json({ ok: false, message: "Cok hizli tekrar deneme algilandi. Bir dakika sonra tekrar deneyin." }, 429, responseHeaders);
-  }
-
-  if ((ipCount || 0) >= IP_LIMIT) {
-    await logAttempt(supabase, {
-      ipHash,
-      emailHash,
-      fingerprintHash,
-      websiteHost,
-      userAgent,
-      outcome: "blocked_rate_limit",
-      reason: "Saatlik IP limiti asildi."
-    });
-    return json({ ok: false, message: "Bu IP icin saatlik basvuru limiti doldu." }, 429, responseHeaders);
-  }
-
-  if ((emailCount || 0) >= EMAIL_LIMIT) {
-    await logAttempt(supabase, {
-      ipHash,
-      emailHash,
-      fingerprintHash,
-      websiteHost,
-      userAgent,
-      outcome: "blocked_rate_limit",
-      reason: "Gunluk e-posta limiti asildi."
-    });
-    return json({ ok: false, message: "Bu e-posta icin gunluk basvuru limiti doldu." }, 429, responseHeaders);
-  }
-
-  if ((duplicateCount || 0) > 0) {
-    await logAttempt(supabase, {
-      ipHash,
-      emailHash,
-      fingerprintHash,
-      websiteHost,
-      userAgent,
-      outcome: "blocked_duplicate",
-      reason: "Ayni icerikte tekrar basvuru algilandi."
-    });
-    return json({ ok: false, message: "Bu basvuru zaten alinmis gorunuyor." }, 409, responseHeaders);
-  }
-
-  const { error: insertError } = await supabase.from("leads").insert([
-    {
-      name,
-      company,
-      email,
-      website,
-      need,
-      note,
-      status: "new"
-    }
-  ]);
-
-  if (insertError) {
-    return json({ ok: false, message: "Basvuru kaydedilemedi." }, 500, responseHeaders);
-  }
-
-  await logAttempt(supabase, {
-    ipHash,
-    emailHash,
-    fingerprintHash,
-    websiteHost,
-    userAgent,
-    outcome: "accepted",
-    reason: "Lead kabul edildi."
+  const { data, error } = await supabase.rpc("submit_lead_atomically", {
+    p_ip_hash: ipHash,
+    p_email_hash: emailHash,
+    p_fingerprint_hash: fingerprintHash,
+    p_website_host: websiteHost,
+    p_user_agent: userAgent,
+    p_name: name,
+    p_company: company,
+    p_email: email,
+    p_website: website,
+    p_need: need,
+    p_note: note,
+    p_ip_limit: IP_LIMIT,
+    p_email_limit: EMAIL_LIMIT,
+    p_ip_window: `${IP_WINDOW_MINUTES} minutes`,
+    p_email_window: `${EMAIL_WINDOW_HOURS} hours`,
+    p_duplicate_window: `${DUPLICATE_WINDOW_DAYS} days`,
+    p_cooldown: `${COOLDOWN_SECONDS} seconds`
   });
 
-  return json({ ok: true, message: "Basvuru alindi." }, 200, responseHeaders);
+  if (error || !data) {
+    throw new Error(`Atomic lead submission failed: ${error?.message || "empty response"}`);
+  }
+
+  return json(data, Number(data.status || 200), responseHeaders);
+  } catch (error) {
+    console.error("Lead submission failed", error);
+    return json({ ok: false, message: "Basvuru islemi tamamlanamadi." }, 500, responseHeaders);
+  }
 });
