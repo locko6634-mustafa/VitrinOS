@@ -74,8 +74,7 @@
     const functionName = window.VitrinOS.config.adminUserActionFunction;
     const { data, error } = await client.functions.invoke(functionName, {
       body: {
-        ...payload,
-        appUrl: window.VitrinOS.config.appUrl
+        ...payload
       }
     });
 
@@ -216,11 +215,7 @@
       reviewed: "İncelendi",
       approved: "Onaylandı",
       rejected: "Reddedildi",
-      pending: "Pending",
-      processing: "Processing",
-      completed: "Completed",
-      failed: "Failed",
-      revision_requested: "Revizyon istendi"
+      ...window.VitrinOS.config.defaults.statuses.labels
     };
     return labels[status] || status;
   }

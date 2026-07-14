@@ -144,7 +144,7 @@ VitrinOS/
      };
      ```
      ```bash
-     supabase secrets set LEAD_ALLOWED_ORIGINS="https://vitrinos.com,https://www.vitrinos.com"
+     supabase secrets set LEAD_ALLOWED_ORIGINS="https://vitrin-os.vercel.app"
      supabase secrets set LEAD_HASH_SECRET="<random-32-byte-secret>"
      supabase secrets set LEAD_MIN_SUBMIT_MS="3000"
      supabase secrets set LEAD_IP_WINDOW_MINUTES="60"
@@ -156,6 +156,8 @@ VitrinOS/
      supabase secrets set LEAD_MAX_NOTE_LENGTH="2000"
      supabase secrets set N8N_WEBHOOK_URL="https://<N8N_SUNUCUNUZ>/webhook/vitrinos-brief"
      supabase secrets set N8N_WEBHOOK_SECRET="<N8N_SHARED_SECRET>"
+     supabase secrets set ALLOWED_ORIGINS="https://vitrin-os.vercel.app"
+     supabase secrets set PUBLIC_APP_URL="https://vitrin-os.vercel.app"
      supabase functions deploy submit-lead
      supabase functions deploy trigger-brief
      ```

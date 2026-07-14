@@ -107,7 +107,13 @@
   }
 
   function renderFormatBars() {
-    const formats = { Banner: 0, "Meta Post": 0, Story: 0 };
+    const formatNames = Object.values(formatConfig).map((format) => format.name);
+    const formats = Object.fromEntries(formatNames.map((name) => [name, 0]));
+    const barTargets = {
+      [formatConfig.banner.name]: barBanner,
+      [formatConfig.metaPost.name]: barMetaPost,
+      [formatConfig.story.name]: barStory
+    };
     let total = 0;
 
     state.history.forEach(item => {
@@ -119,17 +125,14 @@
     });
 
     if (total > 0) {
-      const bannerPct = Math.round((formats["Banner"] / total) * 100);
-      const metaPct = Math.round((formats["Meta Post"] / total) * 100);
-      const storyPct = Math.round((formats["Story"] / total) * 100);
-
-      if (barBanner) barBanner.style.setProperty("--bar", `${bannerPct}%`);
-      if (barMetaPost) barMetaPost.style.setProperty("--bar", `${metaPct}%`);
-      if (barStory) barStory.style.setProperty("--bar", `${storyPct}%`);
+      Object.entries(formats).forEach(([formatName, count]) => {
+        const target = barTargets[formatName];
+        if (target) target.style.setProperty("--bar", `${Math.round((count / total) * 100)}%`);
+      });
     } else {
-      if (barBanner) barBanner.style.setProperty("--bar", "0%");
-      if (barMetaPost) barMetaPost.style.setProperty("--bar", "0%");
-      if (barStory) barStory.style.setProperty("--bar", "0%");
+      Object.values(barTargets).forEach((target) => {
+        if (target) target.style.setProperty("--bar", "0%");
+      });
     }
   }
 
@@ -343,11 +346,7 @@
       reviewed: "İncelendi",
       approved: "Onaylandı",
       rejected: "Reddedildi",
-      pending: "Pending",
-      processing: "Processing",
-      completed: "Completed",
-      failed: "Failed",
-      revision_requested: "Revizyon istendi"
+      ...window.VitrinOS.config.defaults.statuses.labels
     };
     return labels[status] || status;
   }

@@ -6,8 +6,12 @@ type JobActionPayload = {
   revisionNote?: string;
 };
 
+const allowedOrigins = (Deno.env.get("ALLOWED_ORIGINS") || "")
+  .split(",")
+  .map((value) => value.trim())
+  .filter(Boolean);
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  ...(allowedOrigins[0] ? { "Access-Control-Allow-Origin": allowedOrigins[0] } : {}),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS"
 };
@@ -24,6 +28,11 @@ function json(body: unknown, status = 200) {
 
 function sanitizeText(value: unknown) {
   return String(value || "").trim().replace(/\s+/g, " ");
+}
+
+function isAllowedOrigin(req: Request) {
+  const origin = req.headers.get("Origin");
+  return !origin || allowedOrigins.includes(origin);
 }
 
 function getAdminClient() {
@@ -81,6 +90,10 @@ Deno.serve(async (req) => {
 
   if (req.method !== "POST") {
     return json({ ok: false, message: "Method not allowed." }, 405);
+  }
+
+  if (!isAllowedOrigin(req)) {
+    return json({ ok: false, message: "Origin not allowed." }, 403);
   }
 
   const auth = await requireUser(req);

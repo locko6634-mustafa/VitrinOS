@@ -22,6 +22,9 @@
     briefTriggerFunction: "trigger-brief",
     adminUserActionFunction: "admin-user-actions",
     jobActionFunction: "job-actions",
+    external: {
+      sentryCdnUrl: "https://browser.sentry-cdn.com/8.55.0/bundle.min.js"
+    },
     sentryDsn: "",
     observabilitySampleRate: 1,
     release: "vitrinos-web@0.1.0",
@@ -34,6 +37,17 @@
         story: { name: "Story", dimensions: "1080x1920", keywords: ["story", "hikaye", "9:16"] },
         banner: { name: "Banner", dimensions: "1600x600", keywords: ["banner", "1600", "600"] },
         metaPost: { name: "Meta Post", dimensions: "1080x1350", keywords: [] }
+      },
+      statuses: {
+        values: ["pending", "processing", "completed", "approved", "failed", "revision_requested"],
+        labels: {
+          pending: "Bekliyor",
+          processing: "Üretiliyor",
+          completed: "Tamamlandı",
+          approved: "Onaylandı",
+          failed: "Başarısız",
+          revision_requested: "Revizyon istendi"
+        }
       },
       dashboard: {
         jobPageSize: 24,

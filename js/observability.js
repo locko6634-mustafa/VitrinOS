@@ -32,7 +32,7 @@
 
   if (config.sentryDsn && !window.Sentry) {
     const script = document.createElement("script");
-    script.src = "https://browser.sentry-cdn.com/8.55.0/bundle.min.js";
+    script.src = config.external?.sentryCdnUrl || "";
     script.crossOrigin = "anonymous";
     script.onload = () => window.Sentry?.init({
       dsn: config.sentryDsn,
