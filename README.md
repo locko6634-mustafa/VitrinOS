@@ -145,12 +145,13 @@ VitrinOS/
      ```
      ```bash
      supabase secrets set LEAD_ALLOWED_ORIGINS="https://vitrinos.com,https://www.vitrinos.com"
+     supabase secrets set LEAD_HASH_SECRET="<random-32-byte-secret>"
      supabase secrets set N8N_WEBHOOK_URL="https://<N8N_SUNUCUNUZ>/webhook/vitrinos-brief"
      supabase secrets set N8N_WEBHOOK_SECRET="<N8N_SHARED_SECRET>"
      supabase functions deploy submit-lead
      supabase functions deploy trigger-brief
      ```
-     `public.leads` artik browser `anon` insert kabul etmez; basvurular `submit-lead` function uzerinden honeypot, rate limit, cooldown ve duplicate kontrolleri gecince kaydedilir.
+     `public.leads` artik browser `anon` insert kabul etmez; basvurular `submit-lead` function uzerinden honeypot, rate limit, cooldown ve duplicate kontrolleri gecince kaydedilir. IP/e-posta/fingerprint degerleri `LEAD_HASH_SECRET` ile HMAC-SHA-256 olarak tutulur ve `lead_submission_attempts` kayitlari 30 gun sonra pg_cron ile temizlenir.
      n8n `VitrinOS_BASE` webhook girisinde `x-vitrinos-webhook-secret` header degerini dogrulayin ve eski public webhook path'ini rotate edin.
 
 5. **Çalıştırma:**
