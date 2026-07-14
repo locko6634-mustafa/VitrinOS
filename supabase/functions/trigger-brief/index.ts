@@ -11,23 +11,25 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS"
 };
 
-function json(body: unknown, status = 200) {
+function json(body: unknown, status = 200, correlationId = "") {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       ...corsHeaders,
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      ...(correlationId ? { "x-correlation-id": correlationId } : {})
     }
   });
 }
 
 Deno.serve(async (req) => {
+  const correlationId = req.headers.get("x-correlation-id") || crypto.randomUUID();
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   if (req.method !== "POST") {
-    return json({ ok: false, message: "Method not allowed." }, 405);
+    return json({ ok: false, message: "Method not allowed." }, 405, correlationId);
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
@@ -39,22 +41,22 @@ Deno.serve(async (req) => {
   const authorization = req.headers.get("Authorization");
 
   if (!supabaseUrl || !supabaseAnonKey || !n8nWebhookUrl || !hmacSecret) {
-    return json({ ok: false, message: "Function secrets are not configured." }, 500);
+    return json({ ok: false, message: "Function secrets are not configured." }, 500, correlationId);
   }
 
   if (!authorization) {
-    return json({ ok: false, message: "Missing authorization header." }, 401);
+    return json({ ok: false, message: "Missing authorization header." }, 401, correlationId);
   }
 
   let payload: TriggerPayload;
   try {
     payload = await req.json();
   } catch {
-    return json({ ok: false, message: "Invalid JSON body." }, 400);
+    return json({ ok: false, message: "Invalid JSON body." }, 400, correlationId);
   }
 
   if (!payload.jobId) {
-    return json({ ok: false, message: "jobId is required." }, 400);
+    return json({ ok: false, message: "jobId is required." }, 400, correlationId);
   }
 
   const supabase = createClient(supabaseUrl, supabaseAnonKey, {
@@ -74,13 +76,13 @@ Deno.serve(async (req) => {
     .single();
 
   if (error || !job) {
-    return json({ ok: false, message: "Job not found or not accessible." }, 404);
+    return json({ ok: false, message: "Job not found or not accessible." }, 404, correlationId);
   }
 
   const expectedStatus = payload.isRevision ? "revision_requested" : "pending";
   if (job.status !== expectedStatus) {
     return json(
-      { ok: false, message: `Job status must be ${expectedStatus} before triggering.` },
+      { ok: false, message: `Job status must be ${expectedStatus} before triggering.`, correlationId },
       409
     );
   }
@@ -114,7 +116,9 @@ Deno.serve(async (req) => {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     "x-vitrinos-signature": signature,
-    "x-vitrinos-timestamp": timestamp
+    "x-vitrinos-timestamp": timestamp,
+    "x-correlation-id": correlationId,
+    traceparent: req.headers.get("traceparent") || ""
   };
 
   if (n8nWebhookSecret) {
@@ -130,10 +134,10 @@ Deno.serve(async (req) => {
   if (!response.ok) {
     const message = await response.text();
     return json(
-      { ok: false, message: message || "n8n workflow could not be triggered." },
+      { ok: false, message: message || "n8n workflow could not be triggered.", correlationId },
       502
     );
   }
 
-  return json({ ok: true });
+  return json({ ok: true, correlationId }, 200, correlationId);
 });

@@ -138,6 +138,7 @@ async function logAttempt(
 }
 
 Deno.serve(async (req) => {
+  const correlationId = req.headers.get("x-correlation-id") || crypto.randomUUID();
   let responseHeaders: Record<string, string> = baseCorsHeaders;
   try {
     const allowedOriginsRaw = Deno.env.get("LEAD_ALLOWED_ORIGINS") || "";
@@ -159,7 +160,10 @@ Deno.serve(async (req) => {
   }
 
   if (req.method !== "POST") {
-    return json({ ok: false, message: "Method not allowed." }, 405, responseHeaders);
+    return json({ ok: false, message: "Method not allowed.", correlationId }, 405, {
+      ...responseHeaders,
+      "x-correlation-id": correlationId
+    });
   }
 
   if (!isOriginAllowed) {

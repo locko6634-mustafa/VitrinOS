@@ -106,7 +106,7 @@
                       <th>Kullanıcı</th>
                       <th>Tema</th>
                       <th><button type="button" data-sort-brands="formatCount">Format</button></th>
-                      <th>Güncelleme</th>
+                      <th><button type="button" data-sort-brands="updatedAt">Güncelleme</button></th>
                     </tr>
                   </thead>
                   <tbody id="brandRows"></tbody>
@@ -234,7 +234,7 @@
                       <th>Format</th>
                       <th><button type="button" data-sort-jobs="status">Durum</button></th>
                       <th>Revizyon</th>
-                      <th>Tarih</th>
+                      <th><button type="button" data-sort-jobs="createdAt">Tarih</button></th>
                     </tr>
                   </thead>
                   <tbody id="jobRows"></tbody>
@@ -256,6 +256,7 @@
       crossorigin="anonymous"
     ></script>
     <script src="js/config.js?v=1.1"></script>
+    <script src="js/observability.js?v=1.1"></script>
     <script src="js/supabase.js?v=1.1"></script>
     <script src="js/admin.js?v=1.1"></script>
   </body>

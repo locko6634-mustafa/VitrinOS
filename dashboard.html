@@ -184,9 +184,11 @@
                 <span class="mini-label">Marka hafızası</span>
                 <strong>NovaMarket kuralları</strong>
               </div>
-              <label class="check-row"><input type="checkbox" checked> Kurgusal marka dilini koru</label>
-              <label class="check-row"><input type="checkbox" checked> Ürün görseli geldiyse gerçek ürünü sahneye yerleştir</label>
-              <label class="check-row"><input type="checkbox" checked> Her çıktı için onay veya revizyon kaydı tut</label>
+              <div class="readiness-list">
+                <span>Marka dili ve kuralları workflow tarafından uygulanır</span>
+                <span>Ürün görseli varsa sahneye entegrasyon workflow tarafından uygulanır</span>
+                <span>Onay ve revizyon kaydı job akışında tutulur</span>
+              </div>
             </article>
             <article class="work-panel">
               <div class="panel-heading">
@@ -211,6 +213,7 @@
       crossorigin="anonymous"
     ></script>
     <script src="js/config.js?v=1.1"></script>
+    <script src="js/observability.js?v=1.1"></script>
     <script src="js/supabase.js?v=1.1"></script>
     <script src="js/dashboard.js?v=1.1"></script>
   </body>

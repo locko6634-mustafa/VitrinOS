@@ -98,7 +98,9 @@
       headers: {
         "Content-Type": "application/json",
         apikey: config.supabasePublishableKey,
-        Authorization: `Bearer ${config.supabasePublishableKey}`
+        Authorization: `Bearer ${config.supabasePublishableKey}`,
+        "x-correlation-id": window.VitrinOS.observability?.getCorrelationId?.() || "",
+        traceparent: window.VitrinOS.observability?.getTraceparent?.() || ""
       },
       body: JSON.stringify(payload)
     });
