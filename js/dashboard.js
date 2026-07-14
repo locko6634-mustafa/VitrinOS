@@ -7,7 +7,10 @@
 
   const client = window.VitrinOS.auth.getClient();
 
-  const JOB_PAGE_SIZE = 24;
+  const dashboardConfig = window.VitrinOS.config.defaults.dashboard;
+  const formatConfig = window.VitrinOS.config.defaults.formats;
+  const colors = window.VitrinOS.config.defaults.colors;
+  const JOB_PAGE_SIZE = dashboardConfig.jobPageSize;
   const state = {
     jobsToday: 0,
     approvals: 0,
@@ -56,9 +59,9 @@
   const barStory = document.querySelector("#barStory");
 
   async function triggerBriefWorkflow(payload) {
-    const functionName = window.VitrinOS.config.briefTriggerFunction || "trigger-brief";
+    const functionName = window.VitrinOS.config.briefTriggerFunction;
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 saniye timeout
+    const timeoutId = setTimeout(() => controller.abort(), dashboardConfig.requestTimeoutMs);
 
     try {
       const { data, error } = await client.functions.invoke(functionName, { 
@@ -83,7 +86,7 @@
   }
 
   async function runJobAction(payload) {
-    const functionName = window.VitrinOS.config.jobActionFunction || "job-actions";
+    const functionName = window.VitrinOS.config.jobActionFunction;
     const { data, error } = await client.functions.invoke(functionName, {
       body: payload
     });
@@ -221,8 +224,8 @@
         name: b.name,
         logoUrl: b.logo_url || "",
         websiteUrl: b.website_url || "",
-        primary: b.color_palette?.primary || "#d9962a",
-        secondary: b.color_palette?.secondary || "#7a4f12",
+        primary: b.color_palette?.primary || colors.primary,
+        secondary: b.color_palette?.secondary || colors.secondary,
         theme: b.color_palette?.theme || "koyu",
         toneRules: b.tone_rules || "",
         bannedWords: b.banned_words || []
@@ -375,7 +378,7 @@
 
     closeAppMenu();
 
-    if (window.innerWidth <= 640) {
+    if (window.innerWidth <= dashboardConfig.mobileBreakpoint) {
       const tabsContainer = document.querySelector(".app-tabs");
       if (tabsContainer) {
         tabsContainer.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -394,15 +397,13 @@
     if (selectedFormat && selectedFormat !== "auto") return selectedFormat;
 
     const normalized = text.toLocaleLowerCase("tr-TR");
-    if (normalized.includes("story") || normalized.includes("hikaye") || normalized.includes("9:16")) return "Story";
-    if (normalized.includes("banner") || normalized.includes("1600") || normalized.includes("600")) return "Banner";
-    return "Meta Post";
+    if (formatConfig.story.keywords.some((keyword) => normalized.includes(keyword))) return formatConfig.story.name;
+    if (formatConfig.banner.keywords.some((keyword) => normalized.includes(keyword))) return formatConfig.banner.name;
+    return formatConfig.metaPost.name;
   }
 
   function dimensionsFor(format) {
-    if (format === "Story") return "1080x1920";
-    if (format === "Banner") return "1600x600";
-    return "1080x1350";
+    return Object.values(formatConfig).find((item) => item.name === format)?.dimensions || formatConfig.metaPost.dimensions;
   }
 
   function titleFor(text, format) {
@@ -678,10 +679,10 @@
     }
 
     // Revizyon limit kontrolü
-    const revisionLimitReached = (job.revisionCount >= 3);
+    const revisionLimitReached = (job.revisionCount >= dashboardConfig.revisionLimit);
     if (revisionLimitReached) {
       reviseButton.disabled = true;
-      reviseButton.textContent = "Limit ulaşıldı (3/3)";
+      reviseButton.textContent = `Limit ulaşıldı (${dashboardConfig.revisionLimit}/${dashboardConfig.revisionLimit})`;
       reviseButton.style.opacity = "0.5";
       reviseButton.title = "Maksimum revizyon limitine ulaşıldı.";
     } else {
@@ -836,7 +837,7 @@
     const brief = String(formData.get("brief") || "").trim();
     const brandId = formData.get("brand");
 
-    if (brief.length < 12) {
+    if (brief.length < dashboardConfig.briefMinLength) {
       setStatus(briefStatus, "Brief en az 12 karakter olmalı.", "error");
       return;
     }
@@ -919,7 +920,7 @@
     
     const note = revisionText.value.trim();
 
-    if (note.length < 6) {
+    if (note.length < dashboardConfig.revisionMinLength) {
       setStatus(briefStatus, "Revizyon notu biraz daha açık olmalı.", "error");
       return;
     }

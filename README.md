@@ -146,6 +146,14 @@ VitrinOS/
      ```bash
      supabase secrets set LEAD_ALLOWED_ORIGINS="https://vitrinos.com,https://www.vitrinos.com"
      supabase secrets set LEAD_HASH_SECRET="<random-32-byte-secret>"
+     supabase secrets set LEAD_MIN_SUBMIT_MS="3000"
+     supabase secrets set LEAD_IP_WINDOW_MINUTES="60"
+     supabase secrets set LEAD_EMAIL_WINDOW_HOURS="24"
+     supabase secrets set LEAD_DUPLICATE_WINDOW_DAYS="7"
+     supabase secrets set LEAD_IP_LIMIT="5"
+     supabase secrets set LEAD_EMAIL_LIMIT="3"
+     supabase secrets set LEAD_COOLDOWN_SECONDS="60"
+     supabase secrets set LEAD_MAX_NOTE_LENGTH="2000"
      supabase secrets set N8N_WEBHOOK_URL="https://<N8N_SUNUCUNUZ>/webhook/vitrinos-brief"
      supabase secrets set N8N_WEBHOOK_SECRET="<N8N_SHARED_SECRET>"
      supabase functions deploy submit-lead

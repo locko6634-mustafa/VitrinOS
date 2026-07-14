@@ -1,6 +1,6 @@
 (function () {
   window.VitrinOS = window.VitrinOS || {};
-  const MIN_SUBMIT_SECONDS = 3;
+  const MIN_SUBMIT_SECONDS = window.VitrinOS.config.defaults.lead.minSubmitSeconds;
 
   function setError(field, message) {
     const errorEl = document.querySelector(`[data-error-for="${field.id}"]`);
