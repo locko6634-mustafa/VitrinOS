@@ -10,7 +10,7 @@ Bu dosya VitrinOS projesinde çalışan ajanların tekil proje bağlamıdır. T�
 
 ## Proje Özeti
 
-VitrinOS, e-ticaret markaları için AI destekli pazarlama görselleri üreten vanilla HTML/CSS/JS tabanlı bir web uygulamasıdır. Proje canlıda `https://locko6634-mustafa.github.io/VitrinOS/` adresinde çalışmaktadır.
+VitrinOS, e-ticaret markaları için AI destekli pazarlama görselleri üreten vanilla HTML/CSS/JS tabanlı bir web uygulamasıdır. Proje canlıda `https://vitrin-os.vercel.app/` adresinde çalışmaktadır.
 
 Ana akış:
 1. Kullanıcı `dashboard.html` üzerinden brief oluşturur veya revizyon ister.
@@ -39,7 +39,7 @@ Ana akış:
 
 ## Çalıştırma ve Browser Doğrulama
 
-- Proje canlıda `https://locko6634-mustafa.github.io/VitrinOS/` adresinde çalışmaktadır. Geliştirme ve doğrulamalar bu canlı URL bağlamı göz önüne alınarak yapılmalıdır.
+- Proje canlıda `https://vitrin-os.vercel.app/` adresinde çalışmaktadır. Geliştirme ve doğrulamalar bu canlı URL bağlamı göz önüne alınarak yapılmalıdır.
 - Yerel sunucu doğrulama için `http://localhost:8000` adresinde kullanılabilir, ancak nihai yayına alım ve entegrasyon doğrulamaları canlı URL temelinde gerçekleştirilmelidir.
 - Browser özelliğiyle doğrulama yapılırken ana ekran, login, dashboard ve admin yüzeylerinde kırık layout, konsol hatası ve temel etkileşimler kontrol edilmelidir.
 - Her küçük değişiklikten sonra tarayıcı testi döngüsü başlatma; değişiklikleri grupla, sonra doğrula.

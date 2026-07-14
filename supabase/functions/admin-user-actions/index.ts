@@ -6,11 +6,14 @@ type AdminUserActionPayload = {
   name?: string;
   leadId?: string;
   userId?: string;
-  appUrl?: string;
 };
 
+const allowedOrigins = (Deno.env.get("ALLOWED_ORIGINS") || "")
+  .split(",")
+  .map((value) => value.trim())
+  .filter(Boolean);
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  ...(allowedOrigins[0] ? { "Access-Control-Allow-Origin": allowedOrigins[0] } : {}),
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS"
 };
@@ -31,6 +34,12 @@ function sanitizeText(value: unknown) {
 
 function validateEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function isAllowedOrigin(req: Request) {
+  const origin = req.headers.get("Origin");
+  if (!origin) return true;
+  return allowedOrigins.includes(origin);
 }
 
 function getAdminClient() {
@@ -110,15 +119,12 @@ async function inviteUser(
   return json({ ok: true, userId: data.user?.id || null });
 }
 
-function getInviteRedirectUrl(req: Request, appUrl?: string) {
+function getInviteRedirectUrl() {
   const configuredAppUrl = Deno.env.get("PUBLIC_APP_URL");
-  const referer = req.headers.get("Referer");
-  const requestOrigin = req.headers.get("Origin");
-  const refererBase = referer ? new URL(referer).href.replace(/[^/]+$/, "") : "";
-  const baseUrl = configuredAppUrl || appUrl || refererBase || requestOrigin;
+  const baseUrl = configuredAppUrl;
 
   if (!baseUrl) {
-    throw new Error("PUBLIC_APP_URL secret or request Origin is required.");
+    throw new Error("PUBLIC_APP_URL secret is required.");
   }
 
   return new URL("set-password.html", `${baseUrl.replace(/\/$/, "")}/`).toString();
@@ -174,6 +180,10 @@ Deno.serve(async (req) => {
     return json({ ok: false, message: "Method not allowed." }, 405);
   }
 
+  if (!isAllowedOrigin(req)) {
+    return json({ ok: false, message: "Origin not allowed." }, 403);
+  }
+
   const auth = await requireAdmin(req);
   if (auth.error) return auth.error;
 
@@ -190,7 +200,7 @@ Deno.serve(async (req) => {
     return inviteUser(supabase, {
       email: payload.email || "",
       name: payload.name || "",
-      redirectTo: getInviteRedirectUrl(req, payload.appUrl)
+      redirectTo: getInviteRedirectUrl()
     });
   }
 
@@ -213,7 +223,7 @@ Deno.serve(async (req) => {
     const inviteResponse = await inviteUser(supabase, {
       email: lead.email,
       name: lead.name,
-      redirectTo: getInviteRedirectUrl(req, payload.appUrl)
+      redirectTo: getInviteRedirectUrl()
     });
 
     if (!inviteResponse.ok) {
