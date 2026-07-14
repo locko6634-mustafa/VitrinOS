@@ -11,7 +11,7 @@ const allowedOrigins = (Deno.env.get("ALLOWED_ORIGINS") || "")
   .filter(Boolean);
 const corsHeaders = {
   ...(allowedOrigins[0] ? { "Access-Control-Allow-Origin": allowedOrigins[0] } : {}),
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-correlation-id, traceparent",
   "Access-Control-Allow-Methods": "POST, OPTIONS"
 };
 
