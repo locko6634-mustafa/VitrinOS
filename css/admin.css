@@ -326,6 +326,24 @@
   cursor: pointer;
 }
 
+.list-pager {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
+
+.list-pager button {
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.list-pager button:disabled { cursor: not-allowed; opacity: 0.45; }
+
 .admin-row-button.danger {
   border-color: rgba(228, 117, 104, 0.3);
   color: #efb2a8;

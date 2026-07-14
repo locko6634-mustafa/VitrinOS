@@ -8,6 +8,7 @@
 
   const client = window.VitrinOS.auth.getClient();
 
+  const PAGE_SIZE = 25;
   const state = {
     selectedBrandId: "",
     selectedJobId: "",
@@ -17,6 +18,10 @@
     users: [],
     leads: [],
     jobs: [],
+    jobPage: 0,
+    leadPage: 0,
+    hasMoreJobs: false,
+    hasMoreLeads: false,
     promptTemplates: {
       base_prompt: "HEPSIBURADA BASE ŞABLONU: Kullanıcı brief'ini niyet, kategori, kampanya, format ve zorunlu görsel kısıtlar olarak JSON'a ayır.",
       story_text_prompt: "HEPSIBURADA STORY METİN ŞABLONU: 1080x1920 dikey Story için metin ve kurguyu oluştur.",
@@ -89,27 +94,26 @@
         .select('id,email,last_sign_in_at,banned_until');
       if (uErr) throw uErr;
 
-      const { data: dbLeads, error: lErr } = await client
+      const leadFrom = state.leadPage * PAGE_SIZE;
+      const { data: leadPage, error: lErr } = await client
         .from('leads')
         .select('id,name,company,email,website,need,note,status,created_at')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(leadFrom, leadFrom + PAGE_SIZE);
       if (lErr) throw lErr;
 
-      const { data: dbJobs, error: jErr } = await client
+      const jobFrom = state.jobPage * PAGE_SIZE;
+      const { data: jobPage, error: jErr } = await client
         .from('jobs')
         .select('id,user_id,brand_id,brief_text,format,status,image_url,revision_count,brief_json,created_at')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(jobFrom, jobFrom + PAGE_SIZE);
       if (jErr) throw jErr;
 
-      const jobsWithAssetUrls = await Promise.all(dbJobs.map(async (job) => {
-        let signedImageUrl = "";
-        try {
-          signedImageUrl = await window.VitrinOS.storage.getGeneratedAssetUrl(job.image_url);
-        } catch (assetErr) {
-          console.error("Görsel signed URL hatası:", assetErr);
-        }
-        return { ...job, signedImageUrl };
-      }));
+      state.hasMoreLeads = leadPage.length > PAGE_SIZE;
+      state.hasMoreJobs = jobPage.length > PAGE_SIZE;
+      const dbLeads = leadPage.slice(0, PAGE_SIZE);
+      const jobsWithAssetUrls = jobPage.slice(0, PAGE_SIZE);
 
       state.users = dbUsers.map(u => ({
         id: u.id,
@@ -177,7 +181,8 @@
           brief: j.brief_text,
           format: j.format,
           status: j.status,
-          imageUrl: j.signedImageUrl,
+          imageUrl: '',
+          imagePath: j.image_url || '',
           revisionCount: j.revision_count,
           createdAt: new Date(j.created_at).toLocaleString('tr-TR'),
           briefJson: j.brief_json || {},
@@ -573,6 +578,7 @@
   function renderLeads() {
     const leads = filteredLeads();
     nodes.leadCount.textContent = `${leads.length} başvuru`;
+    nodes.leadRows.closest('.admin-table-wrap').parentElement.querySelector('.list-pager[data-pager="lead"]')?.remove();
 
     if (!leads.length) {
       nodes.leadRows.replaceChildren(createEmptyRow(6, "Bu filtreye uyan başvuru yok."));
@@ -620,6 +626,7 @@
       row.append(actionCell);
       return row;
     }));
+    renderPager(nodes.leadRows, 'lead');
   }
 
   function populateJobBrandFilter() {
@@ -659,6 +666,7 @@
   function renderJobs() {
     const jobs = filteredJobs();
     nodes.jobCount.textContent = `${jobs.length} job`;
+    nodes.jobRows.closest('.admin-table-wrap').parentElement.querySelector('.list-pager[data-pager="job"]')?.remove();
 
     if (!jobs.length) {
       nodes.jobRows.replaceChildren(createEmptyRow(6, "Bu filtreye uyan job yok."));
@@ -686,6 +694,34 @@
       appendTextCell(row, job.createdAt, "Tarih");
       return row;
     }));
+    renderPager(nodes.jobRows, 'job');
+  }
+
+  function renderPager(rows, type) {
+    const tableWrap = rows.closest('.admin-table-wrap');
+    tableWrap.parentElement.querySelector(`.list-pager[data-pager="${type}"]`)?.remove();
+    const pager = document.createElement('div');
+    pager.className = 'list-pager';
+    pager.dataset.pager = type;
+    const pageKey = type === 'job' ? 'jobPage' : 'leadPage';
+    const moreKey = type === 'job' ? 'hasMoreJobs' : 'hasMoreLeads';
+    const previous = document.createElement('button');
+    previous.type = 'button';
+    previous.textContent = 'Önceki';
+    previous.disabled = state[pageKey] === 0;
+    const next = document.createElement('button');
+    next.type = 'button';
+    next.textContent = 'Sonraki';
+    next.disabled = !state[moreKey];
+    const changePage = async (delta) => {
+      state[pageKey] += delta;
+      await fetchData();
+      renderAll();
+    };
+    previous.addEventListener('click', () => changePage(-1));
+    next.addEventListener('click', () => changePage(1));
+    pager.append(previous, next);
+    tableWrap.after(pager);
   }
 
   function renderJobDetail(id) {
@@ -697,6 +733,15 @@
       head.append(textElement("span", "Job detayı"), textElement("strong", "Seçim bekliyor"));
       nodes.jobDetail.replaceChildren(head, textElement("p", "Tablodan bir job seç.", "admin-empty"));
       return;
+    }
+
+    if (job.imagePath && !job.imageUrl) {
+      window.VitrinOS.storage.getGeneratedAssetUrl(job.imagePath)
+        .then((url) => {
+          job.imageUrl = url;
+          if (state.selectedJobId === id) renderJobDetail(id);
+        })
+        .catch((error) => console.error('Görsel signed URL hatası:', error));
     }
 
     const head = document.createElement("div");
@@ -948,7 +993,17 @@
     client
       .channel('public:jobs')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'jobs' }, async (payload) => {
-        await fetchData();
+        const changedId = payload.new?.id || payload.old?.id;
+        const isVisible = state.jobs.some((job) => job.id === changedId);
+        if (!isVisible && !(payload.eventType === 'INSERT' && state.jobPage === 0)) return;
+        if (payload.eventType === 'DELETE') {
+          state.jobs = state.jobs.filter((job) => job.id !== changedId);
+        } else {
+          const job = payload.new;
+          const owner = state.users.find((user) => user.id === job.user_id);
+          const item = { id: job.id, brandId: job.brand_id, userEmail: owner?.email || 'Bilinmeyen', brief: job.brief_text, format: job.format, status: job.status, imageUrl: '', imagePath: job.image_url || '', revisionCount: job.revision_count, createdAt: new Date(job.created_at).toLocaleString('tr-TR'), briefJson: job.brief_json || {}, timeline: job.brief_json?.timeline || ['pending', job.status].filter(Boolean) };
+          state.jobs = [item, ...state.jobs.filter((existing) => existing.id !== item.id)].slice(0, PAGE_SIZE);
+        }
         renderAll();
         if (state.selectedJobId) renderJobDetail(state.selectedJobId);
       })
@@ -964,8 +1019,17 @@
 
     client
       .channel('public:leads')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, async () => {
-        await fetchData();
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, async (payload) => {
+        const changedId = payload.new?.id || payload.old?.id;
+        const isVisible = state.leads.some((lead) => lead.id === changedId);
+        if (!isVisible && !(payload.eventType === 'INSERT' && state.leadPage === 0)) return;
+        if (payload.eventType === 'DELETE') {
+          state.leads = state.leads.filter((lead) => lead.id !== changedId);
+        } else {
+          const lead = payload.new;
+          const item = { id: lead.id, name: lead.name, company: lead.company, email: lead.email, website: lead.website || '', need: lead.need || '', note: lead.note || '', status: lead.status || 'new', createdAt: new Date(lead.created_at).toLocaleString('tr-TR') };
+          state.leads = [item, ...state.leads.filter((existing) => existing.id !== item.id)].slice(0, PAGE_SIZE);
+        }
         renderAll();
       })
       .subscribe();

@@ -7,6 +7,7 @@
 
   const client = window.VitrinOS.auth.getClient();
 
+  const JOB_PAGE_SIZE = 24;
   const state = {
     jobsToday: 0,
     approvals: 0,
@@ -15,7 +16,9 @@
     currentJob: null,
     brands: [],
     assets: [],
-    history: []
+    history: [],
+    jobPage: 0,
+    hasMoreJobs: false
   };
 
   const logoutButton = document.querySelector("#logoutButton");
@@ -191,14 +194,19 @@
       if (bErr) throw bErr;
 
       // 2. Jobları çek (sadece kullanıcıya ait olanlar RLS ile gelir ama yine de filtreliyoruz)
-      const { data: dbJobs, error: jErr } = await client
+      const from = state.jobPage * JOB_PAGE_SIZE;
+      const { data: jobPage, error: jErr } = await client
         .from('jobs')
         .select('id,user_id,brand_id,brief_text,format,status,image_url,revision_count,revision_note,brief_json,created_at,updated_at')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(from, from + JOB_PAGE_SIZE);
       if (jErr) throw jErr;
 
+      state.hasMoreJobs = jobPage.length > JOB_PAGE_SIZE;
+      const dbJobs = jobPage.slice(0, JOB_PAGE_SIZE);
       const jobsWithAssetUrls = await Promise.all(dbJobs.map(async (job) => {
         let signedImageUrl = "";
+        if (!job.image_url || !['completed', 'approved'].includes(job.status)) return { ...job, signedImageUrl };
         try {
           signedImageUrl = await window.VitrinOS.storage.getGeneratedAssetUrl(job.image_url);
         } catch (assetErr) {
@@ -735,6 +743,7 @@
       return;
     }
     state.assets.forEach((asset) => assetGrid.append(createAssetCard(asset)));
+    renderJobPager(assetGrid);
   }
 
   function createHistoryItem(item) {
@@ -766,6 +775,29 @@
       return;
     }
     state.history.forEach((item) => historyList.append(createHistoryItem(item)));
+    renderJobPager(historyList);
+  }
+
+  function renderJobPager(container) {
+    const pager = document.createElement('div');
+    pager.className = 'list-pager';
+    const previous = document.createElement('button');
+    previous.type = 'button';
+    previous.textContent = 'Önceki';
+    previous.disabled = state.jobPage === 0;
+    const next = document.createElement('button');
+    next.type = 'button';
+    next.textContent = 'Sonraki';
+    next.disabled = !state.hasMoreJobs;
+    const changePage = async (delta) => {
+      state.jobPage += delta;
+      await fetchData();
+      renderAll();
+    };
+    previous.addEventListener('click', () => changePage(-1));
+    next.addEventListener('click', () => changePage(1));
+    pager.append(previous, next);
+    container.append(pager);
   }
 
   function renderAll() {
@@ -933,7 +965,34 @@
       .channel('public:jobs')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'jobs', filter: userFilter }, async (payload) => {
         console.log("Realtime dashboard jobs güncellemesi alındı:", payload);
-        await fetchData();
+        const changedId = payload.new?.id || payload.old?.id;
+        const isVisible = state.history.some((job) => job.id === changedId);
+        if (!isVisible && !(payload.eventType === 'INSERT' && state.jobPage === 0)) return;
+
+        if (payload.eventType === 'DELETE') {
+          state.history = state.history.filter((job) => job.id !== changedId);
+          state.assets = state.assets.filter((job) => job.id !== changedId);
+        } else {
+          const job = payload.new;
+          const historyItem = {
+            id: job.id,
+            brief: job.brief_text,
+            format: job.format,
+            status: job.status,
+            time: new Date(job.created_at).toLocaleString('tr-TR')
+          };
+          state.history = [historyItem, ...state.history.filter((item) => item.id !== job.id)].slice(0, JOB_PAGE_SIZE);
+
+          if (['completed', 'approved'].includes(job.status)) {
+            let imageUrl = '';
+            if (job.image_url) imageUrl = await window.VitrinOS.storage.getGeneratedAssetUrl(job.image_url);
+            const brand = state.brands.find((item) => item.id === job.brand_id);
+            const asset = { id: job.id, title: titleFor(job.brief_text, job.format), brand: brand?.name || 'Bilinmeyen', format: job.format, dimensions: dimensionsFor(job.format), status: job.status, imageUrl };
+            state.assets = [asset, ...state.assets.filter((item) => item.id !== job.id)].slice(0, JOB_PAGE_SIZE);
+          } else {
+            state.assets = state.assets.filter((item) => item.id !== job.id);
+          }
+        }
         renderAll();
       })
       .subscribe();
