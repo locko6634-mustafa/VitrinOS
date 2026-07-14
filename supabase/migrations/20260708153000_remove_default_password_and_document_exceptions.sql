@@ -1,5 +1,5 @@
 -- VitrinOS SECURITY DEFINER RPC Güvenlik Güncellemesi
--- 1. Sabit şifre (Vitrinos123!) kaldırılarak rastgele geçici şifre üretimine geçiliyor.
+-- 1. Sabit şifre kaldırılarak rastgele geçici şifre üretimine geçiliyor.
 -- 2. SECURITY DEFINER fonksiyonlar için veritabanı seviyesinde istisna (exception) açıklamaları ekleniyor.
 
 create or replace function public.invite_user(user_email text, user_name text)

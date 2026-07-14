@@ -159,7 +159,7 @@ begin
     'authenticated',
     'authenticated',
     lower(trim(user_email)),
-    extensions.crypt('Vitrinos123!', extensions.gen_salt('bf')),
+    extensions.crypt(encode(gen_random_bytes(32), 'hex'), extensions.gen_salt('bf')),
     now(),
     '{"provider":"email","providers":["email"]}'::jsonb,
     jsonb_build_object('name', nullif(trim(user_name), '')),
