@@ -203,7 +203,7 @@
       const from = state.jobPage * JOB_PAGE_SIZE;
       const { data: jobPage, error: jErr } = await client
         .from('jobs')
-        .select('id,user_id,brand_id,brief_text,format,status,image_url,revision_count,revision_note,brief_json,created_at,updated_at')
+        .select('id,user_id,brand_id,brief_text,format,status,image_url,revision_count,revision_note,brief_json,brand_match_score,processing_started_at,completed_at,created_at,updated_at')
         .order('created_at', { ascending: false })
         .range(from, from + JOB_PAGE_SIZE - 1);
       if (jErr) throw jErr;
@@ -241,33 +241,32 @@
       // Onay bekleyen metrikleri (approved veya failed olmayan, tamamlanmış veya işlenen işler)
       state.approvals = jobsWithAssetUrls.filter(j => j.status !== 'approved' && j.status !== 'failed').length;
 
-      // Ortalama üretim süresi: yalnızca completed kayıtlarını kullan.
-      // approved kayıtlarında updated_at onay zamanına taşınabildiği için
-      // kullanıcı onay/revizyon gecikmesi üretim süresine dahil edilmemelidir.
-      const completedJobs = jobsWithAssetUrls.filter(j => j.status === 'completed');
+      // Ortalama üretim süresi: yalnızca gerçek processing/completed timestamp'i olan
+      // tamamlanmış job'larda hesaplanır. Kullanıcı onay/revizyon süresi dahil edilmez.
+      const completedJobs = jobsWithAssetUrls.filter(j =>
+        j.status === 'completed' && j.processing_started_at && j.completed_at
+      );
       if (completedJobs.length > 0) {
         const totalDuration = completedJobs.reduce((acc, j) => {
-          const diff = new Date(j.updated_at) - new Date(j.created_at); // ms
-          return acc + Math.max(0, diff / 1000 / 60); // minutes
+          const diff = new Date(j.completed_at) - new Date(j.processing_started_at);
+          return acc + Math.max(0, diff / 1000 / 60);
         }, 0);
         const avg = totalDuration / completedJobs.length;
         state.avgDuration = avg < 1 ? "1 dk altı" : `${avg.toFixed(1)} dk`;
       } else {
-        state.avgDuration = "-";
+        state.avgDuration = "Veri yok";
       }
 
-      // Marka uyumu: yalnızca sonuçlanmış işlerde başarılı sonuç oranı.
-      // pending/processing/revision_requested işleri henüz kalite sonucu değildir.
-      const finishedJobs = jobsWithAssetUrls.filter(j =>
-        ['completed', 'approved', 'failed'].includes(j.status)
+      // Marka uyumu, başarı oranı değildir. Yalnızca açıkça kaydedilmiş kalite
+      // skorlarının ortalamasını göster; skor yoksa ölçülmediğini belirt.
+      const scoredJobs = jobsWithAssetUrls.filter(j =>
+        Number.isFinite(Number(j.brand_match_score))
       );
-      if (finishedJobs.length > 0) {
-        const successfulJobs = finishedJobs.filter(j =>
-          j.status === 'completed' || j.status === 'approved'
-        ).length;
-        state.brandMatch = `${Math.round((successfulJobs / finishedJobs.length) * 100)}%`;
+      if (scoredJobs.length > 0) {
+        const averageScore = scoredJobs.reduce((sum, j) => sum + Number(j.brand_match_score), 0) / scoredJobs.length;
+        state.brandMatch = `${Math.round(averageScore)}%`;
       } else {
-        state.brandMatch = "-";
+        state.brandMatch = "Ölçülmüyor";
       }
 
       const lastJob = jobsWithAssetUrls.find(j => j.status !== 'approved');
