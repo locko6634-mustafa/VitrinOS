@@ -40,7 +40,10 @@
       if (error) throw error;
       if (!data?.id || !data.totp?.qr_code || !data.totp?.secret) throw new Error("MFA kayıt verisi alınamadı.");
       factorId = data.id;
-      qrCode.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(data.totp.qr_code)}`;
+      const qrValue = String(data.totp.qr_code);
+      qrCode.src = qrValue.startsWith("data:")
+        ? qrValue
+        : `data:image/svg+xml;charset=utf-8,${encodeURIComponent(qrValue)}`;
       qrCode.hidden = false;
       manualSecret.textContent = `Manuel anahtar: ${data.totp.secret}`;
       manualSecret.hidden = false;
