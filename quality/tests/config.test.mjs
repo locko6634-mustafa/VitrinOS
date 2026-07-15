@@ -51,3 +51,10 @@ test("correlation ID başlıkları Edge Function çağrılarına taşınır", as
     assert.match(source, /getCorrelationId/);
   }
 });
+
+test("runtime config Sentry yapılandırmalarını aktarıyor", async () => {
+  const source = await readFile("api/runtime-config.js", "utf8");
+  assert.match(source, /sentryDsn/);
+  assert.match(source, /observabilitySampleRate/);
+  assert.match(source, /release/);
+});
