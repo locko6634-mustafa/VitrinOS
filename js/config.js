@@ -10,14 +10,14 @@
       : appBasePath
   );
 
-  window.VitrinOS.config = {
-    supabaseUrl: "https://wrzalebhnlwppufdcmiz.supabase.co",
-    supabasePublishableKey: "sb_publishable_VqmAXSH5VRyyUBERRaUMEg_GQkuBgun",
-    supabaseProjectRef: "wrzalebhnlwppufdcmiz",
-    ...runtimeConfig,
+  const defaults = {
+    supabaseUrl: "",
+    supabasePublishableKey: "",
+    supabaseProjectRef: "",
+    environment: "development",
     appBasePath: runtimeConfig.appBasePath || appBasePath,
     appUrl,
-    contactEmail: runtimeConfig.contactEmail || "",
+    contactEmail: "",
     leadSubmitFunction: "submit-lead",
     briefTriggerFunction: "trigger-brief",
     adminUserActionFunction: "admin-user-actions",
@@ -59,8 +59,15 @@
       },
       admin: { pageSize: 25, mobileBreakpoint: 1120 },
       lead: { minSubmitSeconds: 3 }
-    },
-    ...runtimeConfig
+    }
+  };
+
+  window.VitrinOS.config = {
+    ...defaults,
+    ...runtimeConfig,
+    appUrl: runtimeConfig.appUrl || appUrl,
+    external: { ...defaults.external, ...(runtimeConfig.external || {}) },
+    defaults: { ...defaults.defaults, ...(runtimeConfig.defaults || {}) }
   };
 
   window.document?.querySelectorAll("[data-config-email]").forEach((element) => {

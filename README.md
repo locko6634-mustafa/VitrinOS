@@ -133,16 +133,11 @@ VitrinOS/
    * n8n arayüzünde yeni bir workflow oluşturup yukarıda detaylandırılan iş akışlarının JSON şablonlarını import edin. Webhook URL'lerini aktif hale getirin.
 
 4. **Arayüz Yapılandırması:**
-   * [js/config.js](file:///c:/Users/Mustafa/Desktop/VitrinOS/js/config.js) dosyasini acarak kendi Supabase URL'nizi ve Publishable Key'inizi girin. n8n webhook URL'sini frontend'e koymayin; Supabase secret olarak tanimlayin:
-     ```javascript
-     window.VitrinOS.config = {
-       supabaseUrl: "https://<PROJE_ID>.supabase.co",
-       supabasePublishableKey: "<PUBLISHABLE_KEY>",
-       leadSubmitFunction: "submit-lead",
-       briefTriggerFunction: "trigger-brief",
-       // ...
-     };
-     ```
+   * Frontend bağlantı ayarları `/api/runtime-config.js` üzerinden Vercel Environment Variables ile sağlanır. Preview ve Production ortamlarında aşağıdaki public değişkenleri ayrı ayrı tanımlayın:
+
+     `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_PROJECT_REF`, `PUBLIC_APP_URL`, `PUBLIC_CONTACT_EMAIL`
+
+     `PUBLIC_APP_URL` belirtilmezse Vercel'in `VERCEL_URL` değeri kullanılır. n8n webhook URL'sini frontend'e koymayin; Supabase secret olarak tanimlayin:
      ```bash
      supabase secrets set LEAD_ALLOWED_ORIGINS="https://vitrin-os.vercel.app"
      supabase secrets set LEAD_HASH_SECRET="<random-32-byte-secret>"
