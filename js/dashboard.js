@@ -32,6 +32,7 @@
   const briefForm = document.querySelector("#briefForm");
   const briefStatus = document.querySelector("#briefStatus");
   const briefSubmit = document.querySelector("#briefSubmit");
+  const sourceImageInput = document.querySelector("#sourceImage");
   const revisionBox = document.querySelector("#revisionBox");
   const revisionText = document.querySelector("#revisionText");
   const approveButton = document.querySelector("#approveButton");
@@ -83,6 +84,26 @@
     } finally {
       clearTimeout(timeoutId);
     }
+  }
+
+  async function uploadSourceImage(file, brandId) {
+    if (!file) return "";
+
+    const functionName = window.VitrinOS.config.sourceImageUploadFunction;
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("brandId", brandId);
+
+    const { data, error } = await client.functions.invoke(functionName, {
+      body: formData
+    });
+
+    if (error) throw error;
+    if (!data?.ok || !data.path) {
+      throw new Error(data?.message || "Ürün görseli yüklenemedi.");
+    }
+
+    return data.path;
   }
 
   async function runJobAction(payload) {
@@ -850,8 +871,16 @@
     setLoading(true);
 
     const format = detectFormat(brief, formData.get("format"));
+    const sourceImage = sourceImageInput?.files?.[0] || null;
+    let sourceImagePath = "";
+    let jobCreated = false;
 
     try {
+      if (sourceImage) {
+        setStatus(briefStatus, "Ürün görseli güvenli Storage alanına yükleniyor...");
+        sourceImagePath = await uploadSourceImage(sourceImage, brandId);
+      }
+
       // 1. Supabase'e pending job insert et
       const { data: newJob, error: jErr } = await client
         .from('jobs')
@@ -860,12 +889,14 @@
           brand_id: brandId,
           brief_text: brief,
           format: format,
-          status: 'pending'
+          status: 'pending',
+          source_image_path: sourceImagePath || null
         })
         .select('id')
         .single();
 
       if (jErr) throw jErr;
+      jobCreated = true;
 
       setStatus(briefStatus, "Kreatif üretim akışı (n8n) tetikleniyor...");
 
@@ -876,6 +907,7 @@
       });
       // 3. Local state'i yenile
       await fetchData();
+      if (sourceImageInput) sourceImageInput.value = "";
       setLoading(false);
       setStatus(briefStatus, "Üretim akışı başladı. Supabase Realtime ile görsel hazır olduğunda otomatik güncellenecektir.");
       revisionBox.hidden = true;
@@ -884,6 +916,9 @@
 
     } catch (err) {
       console.error(err);
+      if (sourceImagePath && !jobCreated) {
+        await client.storage.from("source-assets").remove([sourceImagePath]).catch(() => {});
+      }
       setStatus(briefStatus, "Hata oluştu: " + err.message, "error");
       setLoading(false);
     }

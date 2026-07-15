@@ -20,6 +20,7 @@
     contactEmail: "",
     leadSubmitFunction: "submit-lead",
     briefTriggerFunction: "trigger-brief",
+    sourceImageUploadFunction: "upload-source-image",
     adminUserActionFunction: "admin-user-actions",
     jobActionFunction: "job-actions",
     external: {

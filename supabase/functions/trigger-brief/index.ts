@@ -84,7 +84,7 @@ Deno.serve(async (req) => {
 
   const { data: job, error } = await supabase
     .from("jobs")
-    .select("id,user_id,brand_id,brief_text,format,revision_note,status")
+    .select("id,user_id,brand_id,brief_text,format,revision_note,status,source_image_path")
     .eq("id", payload.jobId)
     .single();
 
@@ -108,6 +108,7 @@ Deno.serve(async (req) => {
     briefText: job.brief_text,
     format: job.format,
     revisionNote: payload.isRevision ? job.revision_note : null,
+    sourceImagePath: payload.isRevision ? null : job.source_image_path,
     isRevision: Boolean(payload.isRevision)
   };
   const payloadString = JSON.stringify(payloadBody);
