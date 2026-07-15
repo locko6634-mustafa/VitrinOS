@@ -1,0 +1,53 @@
+{
+  "release_id": "2026-07-14-security-edge-functions",
+  "environment": "production",
+  "project_ref": "wrzalebhnlwppufdcmiz",
+  "deployed_at": {
+    "timezone": "Europe/Istanbul",
+    "first": "2026-07-14T17:42:57+03:00",
+    "last": "2026-07-14T17:43:04+03:00"
+  },
+  "git": {
+    "commit": "38e6eeb4667f09ec180c221dfc51c30d84348372",
+    "committed_at": "2026-07-14T17:42:43+03:00",
+    "subject": "Edge Function CORS headerlarini duzelt"
+  },
+  "functions": [
+    {
+      "slug": "admin-user-actions",
+      "version": 16,
+      "verify_jwt": true,
+      "deployed_at": "2026-07-14T17:42:57+03:00",
+      "bundle_sha256": "1ec931aa81e5b12768033b22b0b03957643239f6ef6e5500fb1ff8241f1cc69c",
+      "source_path": "supabase/functions/admin-user-actions/index.ts",
+      "source_sha256": "ab31ac16497ace9f6f9d5e600d3f22485ec10082ea0f3b828d7adf1e01584492"
+    },
+    {
+      "slug": "job-actions",
+      "version": 14,
+      "verify_jwt": true,
+      "deployed_at": "2026-07-14T17:43:00+03:00",
+      "bundle_sha256": "e43080cdbd45bada6f9ba6863a4cd685475b8e869dc2a9e5c24d8770c0727936",
+      "source_path": "supabase/functions/job-actions/index.ts",
+      "source_sha256": "6c12db8dd259da294c2626b231ea50ffb179c3d02c5361dc035375755c084a02"
+    },
+    {
+      "slug": "submit-lead",
+      "version": 22,
+      "verify_jwt": false,
+      "deployed_at": "2026-07-14T17:43:02+03:00",
+      "bundle_sha256": "f6409d2f16fabdb1187304ed79e77a47c486026a74a91ec2b586c024e9802c32",
+      "source_path": "supabase/functions/submit-lead/index.ts",
+      "source_sha256": "e5fc20a78dbd83324636303f2c57dcf3b0a6d7990e4bb609c94ed01cdb58cf76"
+    },
+    {
+      "slug": "trigger-brief",
+      "version": 20,
+      "verify_jwt": true,
+      "deployed_at": "2026-07-14T17:43:04+03:00",
+      "bundle_sha256": "5665971dd8640ae396c84218d95ccc74ad984cb0609ca4c9649abf6deac608b0",
+      "source_path": "supabase/functions/trigger-brief/index.ts",
+      "source_sha256": "a4e7500c4935e8ad14604029bcaaf54800885e6b5607d989bfcf4bb27106e9f1"
+    }
+  ]
+}
