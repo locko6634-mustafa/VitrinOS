@@ -549,6 +549,10 @@
       const button = textElement("button", user.status === "active" ? "Pasifleştir" : "Aktifleştir", "admin-row-button");
       button.type = "button";
       button.dataset.toggleUser = user.id;
+      const resetButton = textElement("button", "Sifre sifirla", "admin-row-button");
+      resetButton.type = "button";
+      resetButton.dataset.resetUser = user.id;
+      resetButton.title = "Kullaniciya sifre sifirlama e-postasi gonder";
       button.disabled = user.id === authContext.user.id;
       button.title = button.disabled ? "Kendi hesabınızın durumunu değiştiremezsiniz" : "Kullanıcı durumunu değiştir";
       const deleteButton = textElement("button", "Sil", "admin-row-button danger");
@@ -556,7 +560,7 @@
       deleteButton.dataset.deleteUser = user.id;
       deleteButton.disabled = user.id === authContext.user.id;
       deleteButton.title = deleteButton.disabled ? "Kendi admin hesabınız silinemez" : "Kullanıcıyı ve job kayıtlarını sil";
-      actionCell.append(button, deleteButton);
+      actionCell.append(button, resetButton, deleteButton);
       row.append(actionCell);
       return row;
     }));
@@ -894,6 +898,23 @@
     });
 
     nodes.userRows.addEventListener("click", async (event) => {
+      const resetButton = event.target.closest("[data-reset-user]");
+      if (resetButton) {
+        const user = state.users.find((item) => item.id === resetButton.dataset.resetUser);
+        if (!user) return;
+        const confirmed = confirm(`${user.email} kullanicisine sifre sifirlama e-postasi gonderilsin mi?`);
+        if (!confirmed) return;
+        try {
+          resetButton.disabled = true;
+          await runAdminUserAction({ action: "send_password_recovery", userId: user.id });
+          alert("Sifre sifirlama e-postasi gonderildi.");
+        } catch (err) {
+          alert("Sifre sifirlama e-postasi gonderilemedi: " + err.message);
+        } finally {
+          resetButton.disabled = false;
+        }
+        return;
+      }
       const deleteButton = event.target.closest("[data-delete-user]");
       if (deleteButton) {
         const user = state.users.find((item) => item.id === deleteButton.dataset.deleteUser);

@@ -1,7 +1,7 @@
 import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 
 type AdminUserActionPayload = {
-  action?: "invite_user" | "invite_lead" | "toggle_user_status" | "delete_user";
+  action?: "invite_user" | "invite_lead" | "toggle_user_status" | "delete_user" | "send_password_recovery";
   email?: string;
   name?: string;
   leadId?: string;
@@ -58,6 +58,32 @@ function getAdminClient() {
   });
 }
 
+async function logSecurityEvent(
+  supabase: SupabaseClient<any, "public", any>,
+  input: {
+    actor: { id: string; email?: string | null };
+    action: string;
+    outcome: "requested" | "succeeded" | "failed";
+    targetUserId?: string | null;
+    targetEmail?: string | null;
+    metadata?: Record<string, unknown>;
+  }
+) {
+  const { error } = await supabase.from("security_audit_log").insert({
+    actor_user_id: input.actor.id,
+    actor_email: input.actor.email || null,
+    action: input.action,
+    outcome: input.outcome,
+    target_user_id: input.targetUserId || null,
+    target_email: input.targetEmail || null,
+    metadata: input.metadata || {}
+  });
+
+  if (error) {
+    throw new Error(`Denetim kaydi yazilamadi: ${error.message}`);
+  }
+}
+
 async function requireAdmin(req: Request) {
   const authorization = req.headers.get("Authorization");
   if (!authorization) {
@@ -94,7 +120,7 @@ async function requireAdmin(req: Request) {
 
 async function inviteUser(
   supabase: SupabaseClient<any, "public", any>,
-  input: { email: string; name: string; redirectTo: string }
+  input: { email: string; name: string; redirectTo: string; actor: { id: string; email?: string | null }; source: string }
 ) {
   const email = sanitizeText(input.email).toLowerCase();
   const name = sanitizeText(input.name);
@@ -114,6 +140,19 @@ async function inviteUser(
 
   if (error) {
     return json({ ok: false, message: error.message }, error.status || 400);
+  }
+
+  try {
+    await logSecurityEvent(supabase, {
+      actor: input.actor,
+      action: "user_invited",
+      outcome: "succeeded",
+      targetUserId: data.user?.id || null,
+      targetEmail: email,
+      metadata: { source: input.source }
+    });
+  } catch {
+    return json({ ok: false, message: "Davet gonderildi ancak denetim kaydi yazilamadi. Islemi tekrar etmeyin." }, 500);
   }
 
   return json({ ok: true, userId: data.user?.id || null });
@@ -200,7 +239,9 @@ Deno.serve(async (req) => {
     return inviteUser(supabase, {
       email: payload.email || "",
       name: payload.name || "",
-      redirectTo: getInviteRedirectUrl()
+      redirectTo: getInviteRedirectUrl(),
+      actor: auth.user,
+      source: "admin_panel"
     });
   }
 
@@ -223,7 +264,9 @@ Deno.serve(async (req) => {
     const inviteResponse = await inviteUser(supabase, {
       email: lead.email,
       name: lead.name,
-      redirectTo: getInviteRedirectUrl()
+      redirectTo: getInviteRedirectUrl(),
+      actor: auth.user,
+      source: "lead_approval"
     });
 
     if (!inviteResponse.ok) {
@@ -280,7 +323,53 @@ Deno.serve(async (req) => {
       }
     }
 
+    try {
+      await logSecurityEvent(supabase, {
+        actor: auth.user,
+        action: isBanned ? "user_activated" : "user_deactivated",
+        outcome: "succeeded",
+        targetUserId: userId,
+        targetEmail: current.user.email || null,
+        metadata: { sessions_revoked: !isBanned }
+      });
+    } catch {
+      return json({ ok: false, message: "Kullanici durumu degisti ancak denetim kaydi yazilamadi. Islemi tekrar etmeyin." }, 500);
+    }
+
     return json({ ok: true, status: isBanned ? "active" : "inactive" });
+  }
+
+  if (payload.action === "send_password_recovery") {
+    const userId = sanitizeText(payload.userId);
+    if (!userId) {
+      return json({ ok: false, message: "Kullanici id zorunlu." }, 400);
+    }
+
+    const { data: target, error: targetError } = await supabase.auth.admin.getUserById(userId);
+    if (targetError || !target.user?.email) {
+      return json({ ok: false, message: "Kullanici bulunamadi." }, 404);
+    }
+
+    const { error: recoveryError } = await supabase.auth.resetPasswordForEmail(target.user.email, {
+      redirectTo: getInviteRedirectUrl()
+    });
+    if (recoveryError) {
+      return json({ ok: false, message: recoveryError.message }, recoveryError.status || 400);
+    }
+
+    try {
+      await logSecurityEvent(supabase, {
+        actor: auth.user,
+        action: "password_recovery_requested",
+        outcome: "succeeded",
+        targetUserId: userId,
+        targetEmail: target.user.email
+      });
+    } catch {
+      return json({ ok: false, message: "Sifirlama e-postasi gonderildi ancak denetim kaydi yazilamadi. Islemi tekrar etmeyin." }, 500);
+    }
+
+    return json({ ok: true });
   }
 
   if (payload.action === "delete_user") {
@@ -300,6 +389,18 @@ Deno.serve(async (req) => {
 
     if (target.user.app_metadata?.role === "admin") {
       return json({ ok: false, message: "Baska bir admin hesabi bu panelden silinemez." }, 400);
+    }
+
+    try {
+      await logSecurityEvent(supabase, {
+        actor: auth.user,
+        action: "user_deletion",
+        outcome: "requested",
+        targetUserId: userId,
+        targetEmail: target.user.email || null
+      });
+    } catch {
+      return json({ ok: false, message: "Kullanici silinmeden once denetim kaydi yazilamadi." }, 500);
     }
 
     const { error: revokeError } = await supabase.rpc("revoke_user_sessions", {
@@ -322,6 +423,18 @@ Deno.serve(async (req) => {
     const { error: deleteError } = await supabase.auth.admin.deleteUser(userId);
     if (deleteError) {
       return json({ ok: false, message: deleteError.message }, deleteError.status || 400);
+    }
+
+    try {
+      await logSecurityEvent(supabase, {
+        actor: auth.user,
+        action: "user_deletion",
+        outcome: "succeeded",
+        targetUserId: userId,
+        targetEmail: target.user.email || null
+      });
+    } catch {
+      return json({ ok: false, message: "Kullanici silindi ancak denetim kaydi yazilamadi. Islemi tekrar etmeyin." }, 500);
     }
 
     return json({ ok: true, userId });
