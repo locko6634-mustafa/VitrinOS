@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VitrinOS | Yönetici MFA kurulumu</title>
+    <meta name="description" content="VitrinOS yönetici hesabı için TOTP çok faktörlü doğrulama kurulumu.">
+    <link rel="stylesheet" href="css/style.css?v=1.1">
+    <link rel="stylesheet" href="css/admin.css?v=1.1">
+  </head>
+  <body class="app-body admin-body">
+    <main class="mfa-setup-shell">
+      <section class="admin-card mfa-setup-card" aria-labelledby="mfaTitle">
+        <p class="kicker">Yönetici güvenliği</p>
+        <h1 id="mfaTitle">Doğrulayıcı uygulamasını bağla</h1>
+        <p id="mfaStatus" class="admin-note" aria-live="polite">MFA durumu kontrol ediliyor…</p>
+        <div id="mfaEnrollPanel" hidden>
+          <ol class="mfa-steps">
+            <li>Google Authenticator, 1Password veya benzeri bir uygulama açın.</li>
+            <li>Kodu tarayın ve uygulamanın ürettiği 6 haneli kodu girin.</li>
+          </ol>
+          <img id="mfaQrCode" class="mfa-qr-code" alt="VitrinOS MFA QR kodu" hidden>
+          <p id="mfaManualSecret" class="mfa-secret" hidden></p>
+          <label class="mfa-code-label" for="mfaCode">Doğrulama kodu</label>
+          <input id="mfaCode" class="mfa-code-input" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="123456">
+          <div class="mfa-actions">
+            <button id="mfaVerifyButton" class="button primary" type="button" disabled>Doğrula ve etkinleştir</button>
+            <button id="mfaRestartButton" class="button secondary" type="button">Yeni kod oluştur</button>
+          </div>
+        </div>
+        <div class="mfa-actions">
+          <button id="mfaStartButton" class="button primary" type="button" hidden>Doğrulayıcı uygulamasını bağla</button>
+          <a class="button secondary" href="admin.html">Admin panele dön</a>
+        </div>
+      </section>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
+    <script src="js/config.js?v=1.1"></script>
+    <script src="js/observability.js?v=1.1"></script>
+    <script src="js/supabase.js?v=1.1"></script>
+    <script src="js/mfa-setup.js?v=1.1"></script>
+  </body>
+</html>

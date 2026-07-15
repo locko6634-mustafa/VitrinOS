@@ -42,8 +42,8 @@
     const password = passwordInput.value;
     const confirmation = confirmInput.value;
 
-    if (password.length < 8) {
-      setStatus("Şifren en az 8 karakter olmalı.", "error");
+    if (password.length < 12) {
+      setStatus("Şifren en az 12 karakter olmalı.", "error");
       passwordInput.focus();
       return;
     }

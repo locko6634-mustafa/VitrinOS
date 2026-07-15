@@ -11,6 +11,63 @@
   grid-template-rows: auto 1fr;
 }
 
+.mfa-setup-shell {
+  width: min(100% - 32px, 680px);
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  margin: auto;
+  padding-block: 32px;
+}
+
+.mfa-setup-card {
+  width: 100%;
+  display: grid;
+  gap: 18px;
+  padding: clamp(24px, 5vw, 42px);
+}
+
+.mfa-setup-card h1 { margin: 0; }
+
+.mfa-steps {
+  display: grid;
+  gap: 8px;
+  color: var(--muted-strong);
+  line-height: 1.55;
+  padding-left: 24px;
+}
+
+.mfa-qr-code {
+  width: min(100%, 280px);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  padding: 12px;
+}
+
+.mfa-secret {
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+}
+
+.mfa-code-label { color: var(--muted-strong); font-weight: 800; }
+
+.mfa-code-input {
+  width: min(100%, 260px);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: rgba(245, 239, 228, 0.06);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 1.35rem;
+  letter-spacing: 0.22em;
+  padding: 12px 16px;
+}
+
+.mfa-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.admin-note.is-error { color: #ffb4a8; }
+
 .admin-topbar {
   grid-column: 1 / -1;
   position: sticky;
