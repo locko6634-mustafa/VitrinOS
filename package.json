@@ -3,6 +3,7 @@
   "scripts": {
     "test": "node --test quality/tests/config.test.mjs",
     "release-gate": "node quality/scripts/release-gate.mjs",
+    "release-manifest": "node quality/scripts/generate-release-manifest.mjs",
     "ops-check": "node quality/scripts/ops-contract.mjs",
     "check": "npm test && npm run ops-check && npm run release-gate"
   },

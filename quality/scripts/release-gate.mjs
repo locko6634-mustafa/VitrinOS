@@ -23,6 +23,20 @@ for (const file of frontendFiles) {
   }
 }
 
+const functionConfig = await readFile("supabase/config.toml", "utf8");
+const functionDirs = await (await import("node:fs/promises")).readdir("supabase/functions", { withFileTypes: true });
+for (const dir of functionDirs.filter((entry) => entry.isDirectory())) {
+  const sourcePath = `supabase/functions/${dir.name}/index.ts`;
+  try {
+    await access(sourcePath);
+  } catch {
+    continue;
+  }
+  if (!functionConfig.includes(`[functions.${dir.name}]`)) {
+    throw new Error(`Release gate: ${dir.name} config.toml icinde kayitli degil.`);
+  }
+}
+
 const config = await readFile("js/config.js", "utf8");
 if (!config.includes("sentryDsn") || !config.includes("observabilitySampleRate")) {
   throw new Error("Release gate: gözlemlenebilirlik ayarları eksik.");
