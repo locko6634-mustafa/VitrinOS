@@ -145,9 +145,10 @@ MCP ile `VitrinOS` araması sonucu 5 aktif workflow doğrulandı.
 
 ## GitHub Commit, Push ve Deploy Disiplini
 
-- Düşük riskli değişikliklerde kullanıcıdan ayrıca onay bekleme: değişikliği uygula, ilgili kontrolleri çalıştır, mevcut dalda anlamlı bir commit oluştur ve GitHub'a pushla.
+- Düşük riskli değişikliklerde kullanıcıdan ayrıca onay bekleme: değişikliği uygula, ilgili kontrolleri çalıştır, mevcut dalda anlamlı bir commit oluştur ve GitHub'a pushla. Bu kural frontend, dokümantasyon, testler ve riskli olmayan Supabase/n8n/hosting değişiklikleri için de geçerlidir.
 - Düşük risk kapsamı: frontend HTML/CSS/JS düzeltmeleri, dokümantasyon, testler, hata düzeltmeleri ve geri alınabilir arayüz iyileştirmeleri.
-- Aşağıdaki durumlarda commit/push/deploy öncesi kullanıcı onayı iste: Supabase/n8n/hosting tarafında kalıcı değişiklik, migration veya RLS değişikliği, kimlik bilgileri/secret/config değişikliği, veri silme veya dönüşü olmayan işlemler, büyük kapsamı belirsiz değişiklikler.
+- Aşağıdaki durumlarda commit/push/deploy öncesi kullanıcı onayı iste: veri kaybı riski taşıyan veya geri dönüşü zor Supabase/n8n/hosting değişikliği, migration veya RLS değişikliği, kimlik bilgileri/secret/config değişikliği, veri silme veya dönüşü olmayan işlemler, büyük kapsamı belirsiz değişiklikler. Riskli olmayan Supabase değişikliklerinde onay bekleme.
+- Her tamamlanan değişiklik grubundan sonra kapsamı doğru yansıtan anlamlı bir commit oluştur ve doğrulamalar başarılıysa GitHub'a pushla; değişiklikleri gereksiz yere biriktirme.
 - Push sonrası Vercel gibi GitHub bağlı otomatik deploy sistemi varsa deploy'un push ile tetiklenmesini bekle ve sonucu kontrol et; bağımsız production deploy komutu çalıştırma.
 - Kullanıcı tarafından istenmeyen mevcut değişiklikleri geri alma veya üzerine yazma.
 
