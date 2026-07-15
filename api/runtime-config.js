@@ -4,8 +4,16 @@ function toAppUrl(value) {
   return normalized.replace(/\/$/, "");
 }
 
+const PRODUCTION_DEFAULTS = {
+  supabaseUrl: "https://wrzalebhnlwppufdcmiz.supabase.co",
+  supabasePublishableKey: "sb_publishable_VqmAXSH5VRyyUBERRaUMEg_GQkuBgun",
+  supabaseProjectRef: "wrzalebhnlwppufdcmiz"
+};
+
 module.exports = function handler(_request, response) {
   const appUrl = toAppUrl(process.env.PUBLIC_APP_URL || process.env.VERCEL_URL);
+  const isProduction = (process.env.VERCEL_ENV || "development") === "production";
+  const defaults = isProduction ? PRODUCTION_DEFAULTS : {};
 
   response.setHeader("Cache-Control", "no-store, max-age=0");
   response.setHeader("Content-Type", "application/javascript; charset=utf-8");
@@ -14,9 +22,9 @@ module.exports = function handler(_request, response) {
     `window.VitrinOSRuntimeConfig = ${JSON.stringify({
       environment: process.env.VERCEL_ENV || "development",
       appUrl,
-      supabaseUrl: process.env.SUPABASE_URL || "",
-      supabasePublishableKey: process.env.SUPABASE_PUBLISHABLE_KEY || "",
-      supabaseProjectRef: process.env.SUPABASE_PROJECT_REF || "",
+      supabaseUrl: process.env.SUPABASE_URL || defaults.supabaseUrl || "",
+      supabasePublishableKey: process.env.SUPABASE_PUBLISHABLE_KEY || defaults.supabasePublishableKey || "",
+      supabaseProjectRef: process.env.SUPABASE_PROJECT_REF || defaults.supabaseProjectRef || "",
       contactEmail: process.env.PUBLIC_CONTACT_EMAIL || ""
     })};`
   );
