@@ -205,11 +205,11 @@
         .from('jobs')
         .select('id,user_id,brand_id,brief_text,format,status,image_url,revision_count,revision_note,brief_json,created_at,updated_at')
         .order('created_at', { ascending: false })
-        .range(from, from + JOB_PAGE_SIZE);
+        .range(from, from + JOB_PAGE_SIZE - 1);
       if (jErr) throw jErr;
 
-      state.hasMoreJobs = jobPage.length > JOB_PAGE_SIZE;
-      const dbJobs = jobPage.slice(0, JOB_PAGE_SIZE);
+      state.hasMoreJobs = jobPage.length === JOB_PAGE_SIZE;
+      const dbJobs = jobPage;
       const jobsWithAssetUrls = await Promise.all(dbJobs.map(async (job) => {
         let signedImageUrl = "";
         if (!job.image_url || !['completed', 'approved'].includes(job.status)) return { ...job, signedImageUrl };

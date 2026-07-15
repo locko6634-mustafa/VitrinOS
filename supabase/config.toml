@@ -10,6 +10,9 @@ verify_jwt = true
 [functions.job-actions]
 verify_jwt = true
 
+[functions.storage-cleanup-worker]
+verify_jwt = true
+
 [api]
 port = 54450
 

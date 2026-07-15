@@ -103,7 +103,7 @@
         .from('leads')
         .select('id,name,company,email,website,need,note,status,created_at')
         .order('created_at', { ascending: false })
-        .range(leadFrom, leadFrom + PAGE_SIZE);
+        .range(leadFrom, leadFrom + PAGE_SIZE - 1);
       if (lErr) throw lErr;
 
       const jobFrom = state.jobPage * PAGE_SIZE;
@@ -111,13 +111,13 @@
         .from('jobs')
         .select('id,user_id,brand_id,brief_text,format,status,image_url,revision_count,brief_json,created_at')
         .order('created_at', { ascending: false })
-        .range(jobFrom, jobFrom + PAGE_SIZE);
+        .range(jobFrom, jobFrom + PAGE_SIZE - 1);
       if (jErr) throw jErr;
 
-      state.hasMoreLeads = leadPage.length > PAGE_SIZE;
-      state.hasMoreJobs = jobPage.length > PAGE_SIZE;
-      const dbLeads = leadPage.slice(0, PAGE_SIZE);
-      const jobsWithAssetUrls = jobPage.slice(0, PAGE_SIZE);
+      state.hasMoreLeads = leadPage.length === PAGE_SIZE;
+      state.hasMoreJobs = jobPage.length === PAGE_SIZE;
+      const dbLeads = leadPage;
+      const jobsWithAssetUrls = jobPage;
 
       state.users = dbUsers.map(u => ({
         id: u.id,

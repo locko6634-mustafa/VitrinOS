@@ -26,6 +26,33 @@ Bu belge, canlı n8n ve Supabase değişiklikleri için manuel uygulama sözleş
 - `lead_submission_attempts` cleanup cron'unu günlük çalıştırıp son çalıştırma zamanını gözlemleyin.
 - `jobs` için iş yaşam döngüsü retention'ı ayrıca tanımlanmadan otomatik silme uygulamayın; müşteri teslim geçmişi ve yasal saklama ihtiyacı netleşmeli.
 - Storage `generated-assets` için yaşam süresi, silme yetkisi ve geri yükleme kaynağı belgelenmeli.
+
+## Storage orphan cleanup
+
+Kullanıcı silme akışı Storage nesnelerini artık doğrudan silmez. Nesne yollarını
+`private.storage_cleanup_queue` tablosuna yazar ve kullanıcıyı siler. Böylece
+Storage API geçici olarak hata verse bile silme işi kaybolmaz.
+
+`storage-cleanup-worker` Edge Function her çalışmada:
+
+- orphan nesneleri kuyruğa alır,
+- en fazla 50 işi claim eder,
+- başarılı silmeleri `succeeded` yapar,
+- hataları 1, 2, 4 ... dakika aralıklarıyla yeniden dener,
+- 8 denemeden sonra `dead` durumunda bırakır.
+
+Dağıtım sonrası Cron Jobs ekranında her 5 dakikada şu POST isteğini oluşturun.
+İstek `Authorization: Bearer <service-role-key>` başlığıyla gönderilmeli; service-role
+anahtarını yalnızca Cron/Vault secret alanında tutun:
+
+`https://<project-ref>.supabase.co/functions/v1/storage-cleanup-worker`
+
+Header: `Authorization: Bearer <service-role-key>`
+
+Migration ayrıca her 15 dakikada orphan uzlaştırma işini (`storage-cleanup-reconciliation`)
+çalıştırır. Kuyruk durumunu yalnızca service-role erişimiyle kontrol edin:
+
+`select status, count(*) from private.storage_cleanup_queue group by status;`
 - Leaked password protection ayarı Supabase Dashboard > Authentication > Password Security bölümünde açılmalı; bu canlı değişiklik kullanıcı onayıyla yapılmalıdır.
 
 ## Alarm eşikleri
