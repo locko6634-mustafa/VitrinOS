@@ -51,6 +51,17 @@
   font-size: 0.82rem;
 }
 
+.mfa-secret-details {
+  color: var(--muted-strong);
+  font-size: 0.84rem;
+}
+
+.mfa-secret-details summary {
+  cursor: pointer;
+  color: var(--accent-soft);
+  font-weight: 800;
+}
+
 .mfa-code-label { color: var(--muted-strong); font-weight: 800; }
 
 .mfa-code-input {
