@@ -40,14 +40,16 @@
         metaPost: { name: "Meta Post", dimensions: "1080x1350", keywords: [] }
       },
       statuses: {
-        values: ["pending", "processing", "completed", "approved", "failed", "revision_requested"],
+        values: ["pending", "processing", "completed", "approved", "failed", "revision_requested", "failed_dispatch", "pending_retry"],
         labels: {
           pending: "Bekliyor",
           processing: "Üretiliyor",
           completed: "Tamamlandı",
           approved: "Onaylandı",
           failed: "Başarısız",
-          revision_requested: "Revizyon istendi"
+          revision_requested: "Revizyon istendi",
+          failed_dispatch: "Tetikleme Başarısız",
+          pending_retry: "Yeniden Denenecek"
         }
       },
       dashboard: {

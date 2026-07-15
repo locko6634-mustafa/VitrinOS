@@ -31,6 +31,60 @@ function isAllowedOrigin(req: Request) {
   return !origin || allowedOrigins.includes(origin);
 }
 
+async function handleDispatchFailure(
+  supabaseUrl: string,
+  jobId: string,
+  errorMessage: string,
+  currentRetryCount: number,
+  maxRetries: number
+) {
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!serviceRoleKey) {
+    console.error("SUPABASE_SERVICE_ROLE_KEY is missing, cannot update job status.");
+    return;
+  }
+
+  const supabaseService = createClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    }
+  });
+
+  const nextRetryCount = currentRetryCount + 1;
+  const isTransient = true; // n8n webhook veya fetch hataları varsayılan olarak geçicidir.
+
+  if (isTransient && nextRetryCount <= maxRetries) {
+    // exponential backoff: 2^nextRetryCount dakika sonra
+    const nextRetryAt = new Date(Date.now() + Math.pow(2, nextRetryCount) * 60 * 1000).toISOString();
+    const { error } = await supabaseService
+      .from("jobs")
+      .update({
+        status: "pending_retry",
+        retry_count: nextRetryCount,
+        last_error: errorMessage.substring(0, 1000),
+        next_retry_at: nextRetryAt
+      })
+      .eq("id", jobId);
+    
+    if (error) {
+      console.error(`Failed to update job ${jobId} to pending_retry:`, error);
+    }
+  } else {
+    const { error } = await supabaseService
+      .from("jobs")
+      .update({
+        status: "failed_dispatch",
+        last_error: errorMessage.substring(0, 1000)
+      })
+      .eq("id", jobId);
+
+    if (error) {
+      console.error(`Failed to update job ${jobId} to failed_dispatch:`, error);
+    }
+  }
+}
+
 Deno.serve(async (req) => {
   const correlationId = req.headers.get("x-correlation-id") || crypto.randomUUID();
   if (req.method === "OPTIONS") {
@@ -84,7 +138,7 @@ Deno.serve(async (req) => {
 
   const { data: job, error } = await supabase
     .from("jobs")
-    .select("id,user_id,brand_id,brief_text,format,revision_note,status,source_image_path")
+    .select("id,user_id,brand_id,brief_text,format,revision_note,status,source_image_path,retry_count,max_retries")
     .eq("id", payload.jobId)
     .single();
 
@@ -93,9 +147,10 @@ Deno.serve(async (req) => {
   }
 
   const expectedStatus = payload.isRevision ? "revision_requested" : "pending";
-  if (job.status !== expectedStatus) {
+  // Eger bu bir yeniden deneme ise status pending_retry de olabilir
+  if (job.status !== expectedStatus && job.status !== "pending_retry") {
     return json(
-      { ok: false, message: `Job status must be ${expectedStatus} before triggering.`, correlationId },
+      { ok: false, message: `Job status must be ${expectedStatus} or pending_retry before triggering.`, correlationId },
       409
     );
   }
@@ -139,18 +194,47 @@ Deno.serve(async (req) => {
     headers["x-vitrinos-webhook-secret"] = n8nWebhookSecret;
   }
 
-  const response = await fetch(n8nWebhookUrl, {
-    method: "POST",
-    headers,
-    body: payloadString
-  });
+  let response: Response;
+  try {
+    response = await fetch(n8nWebhookUrl, {
+      method: "POST",
+      headers,
+      body: payloadString
+    });
+  } catch (fetchErr) {
+    const errorMsg = fetchErr instanceof Error ? fetchErr.message : String(fetchErr);
+    await handleDispatchFailure(supabaseUrl, job.id, errorMsg, job.retry_count, job.max_retries);
+    return json(
+      { ok: false, message: `n8n webhook fetch error: ${errorMsg}`, correlationId },
+      502,
+      correlationId
+    );
+  }
 
   if (!response.ok) {
     const message = await response.text();
+    const errorMsg = message || `n8n responded with status ${response.status}`;
+    await handleDispatchFailure(supabaseUrl, job.id, errorMsg, job.retry_count, job.max_retries);
     return json(
-      { ok: false, message: message || "n8n workflow could not be triggered.", correlationId },
-      502
+      { ok: false, message: errorMsg, correlationId },
+      502,
+      correlationId
     );
+  }
+
+  // n8n tetiklemesi basarili oldugunda status pending_retry ise eski durumuna geri alalim
+  if (job.status === "pending_retry") {
+    const originalStatus = (job.revision_note && job.revision_note.length > 0) ? "revision_requested" : "pending";
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (serviceRoleKey) {
+      const supabaseService = createClient(supabaseUrl, serviceRoleKey, {
+        auth: { persistSession: false, autoRefreshToken: false }
+      });
+      await supabaseService
+        .from("jobs")
+        .update({ status: originalStatus })
+        .eq("id", job.id);
+    }
   }
 
   return json({ ok: true, correlationId }, 200, correlationId);

@@ -86,6 +86,39 @@
     }
   }
 
+  let activeRetryTimeoutId = null;
+
+  async function handlePendingRetryAutoTrigger(job) {
+    if (activeRetryTimeoutId) {
+      clearTimeout(activeRetryTimeoutId);
+      activeRetryTimeoutId = null;
+    }
+
+    if (!job || job.status !== 'pending_retry' || !job.next_retry_at) return;
+
+    const nextRetry = new Date(job.next_retry_at);
+    const delay = Math.max(0, nextRetry.getTime() - Date.now());
+
+    console.log(`Job ${job.id} will be retried in ${delay} ms`);
+
+    activeRetryTimeoutId = setTimeout(async () => {
+      try {
+        setStatus(briefStatus, `Yeniden deneniyor (Deneme #${job.retry_count + 1})...`);
+        setLoading(true);
+        await triggerBriefWorkflow({
+          jobId: job.id,
+          isRevision: job.revision_count > 0
+        });
+        setStatus(briefStatus, "Yeniden tetikleme başarılı. Akış başlatıldı.");
+        await fetchData();
+      } catch (err) {
+        console.error("Auto retry trigger failed:", err);
+        setStatus(briefStatus, "Yeniden deneme tetiklenirken hata oluştu: " + err.message, "error");
+        setLoading(false);
+      }
+    }, delay);
+  }
+
   async function uploadSourceImage(file, brandId) {
     if (!file) return "";
 
@@ -518,11 +551,21 @@
     const job = state.currentJob;
     const resultPanel = document.querySelector("#briefResult");
 
+    // Eger durum pending_retry degilse zamanlayiciyi temizle
+    if (!job || job.status !== 'pending_retry') {
+      if (activeRetryTimeoutId) {
+        clearTimeout(activeRetryTimeoutId);
+        activeRetryTimeoutId = null;
+      }
+    }
+
     // Yüklenme durumunu otomatik kontrol et
-    if (job && (job.status === 'pending' || job.status === 'processing' || job.status === 'revision_requested')) {
+    if (job && (job.status === 'pending' || job.status === 'processing' || job.status === 'revision_requested' || job.status === 'pending_retry')) {
       setLoading(true);
       if (job.status === 'revision_requested') {
         briefSubmit.textContent = "Revizyon hazırlanıyor...";
+      } else if (job.status === 'pending_retry') {
+        briefSubmit.textContent = "Yeniden denenecek...";
       } else {
         briefSubmit.textContent = "Önizleme hazırlanıyor...";
       }
@@ -540,6 +583,166 @@
           setStatus(briefStatus, "");
         }
       }
+    }
+
+    if (job && job.status === 'failed_dispatch') {
+      if (approveButton) approveButton.hidden = true;
+      if (reviseButton) reviseButton.hidden = true;
+      if (revisionBox) revisionBox.hidden = true;
+
+      if (resultPanel) resultPanel.style.opacity = "1";
+      resultTitle.textContent = "Bağlantı Hatası";
+      resultBrand.textContent = "-";
+      resultHeadline.textContent = "Tetikleme Başarısız";
+      resultMeta.textContent = `${job.format} · ${statusLabel(job.status)}`;
+      resultCreative.dataset.format = job.format.toLowerCase().replace(" ", "-");
+      resultCreative.dataset.status = job.status;
+
+      resultCreative.replaceChildren();
+
+      const errorContainer = document.createElement("div");
+      errorContainer.className = "creative-error-container";
+      errorContainer.style.display = "flex";
+      errorContainer.style.flexDirection = "column";
+      errorContainer.style.alignItems = "center";
+      errorContainer.style.justifyContent = "center";
+      errorContainer.style.height = "100%";
+      errorContainer.style.padding = "2rem";
+      errorContainer.style.textAlign = "center";
+      errorContainer.style.color = "var(--error, #e53e3e)";
+
+      const errorIcon = document.createElement("span");
+      errorIcon.textContent = "📡";
+      errorIcon.style.fontSize = "3rem";
+      errorIcon.style.marginBottom = "1rem";
+
+      const errorTitle = document.createElement("strong");
+      errorTitle.textContent = "Kreatif Üretim Hattı Başlatılamadı";
+      errorTitle.style.display = "block";
+      errorTitle.style.fontSize = "1.1rem";
+      errorTitle.style.marginBottom = "0.5rem";
+
+      const errorMsg = document.createElement("p");
+      errorMsg.textContent = job.last_error || "Otomasyon webhook'u çağrılırken bir ağ hatası oluştu.";
+      errorMsg.style.fontSize = "0.9rem";
+      errorMsg.style.color = "var(--muted)";
+      errorMsg.style.maxWidth = "80%";
+      errorMsg.style.margin = "0 auto 1.5rem auto";
+
+      const retryBtn = document.createElement("button");
+      retryBtn.className = "button primary compact-button";
+      retryBtn.textContent = "Yeniden Dene";
+      retryBtn.type = "button";
+      retryBtn.addEventListener("click", async () => {
+        try {
+          setStatus(briefStatus, "Yeniden tetikleniyor...");
+          setLoading(true);
+          await triggerBriefWorkflow({
+            jobId: job.id,
+            isRevision: job.revision_count > 0
+          });
+          setStatus(briefStatus, "Yeniden tetikleme başarılı. Akış başlatıldı.");
+          await fetchData();
+        } catch (err) {
+          console.error(err);
+          setStatus(briefStatus, "Yeniden deneme başarısız: " + err.message, "error");
+          setLoading(false);
+        }
+      });
+
+      errorContainer.append(errorIcon, errorTitle, errorMsg, retryBtn);
+      resultCreative.append(errorContainer);
+
+      const creativeDetailsBox = document.querySelector("#creativeDetailsBox");
+      if (creativeDetailsBox) {
+        creativeDetailsBox.replaceChildren();
+        creativeDetailsBox.hidden = true;
+      }
+      return;
+    }
+
+    if (job && job.status === 'pending_retry') {
+      if (approveButton) approveButton.hidden = true;
+      if (reviseButton) reviseButton.hidden = true;
+      if (revisionBox) revisionBox.hidden = true;
+
+      if (resultPanel) resultPanel.style.opacity = "1";
+      resultTitle.textContent = "Bağlantı Kesintisi";
+      resultBrand.textContent = "-";
+      resultHeadline.textContent = "Yeniden Tetiklenecek...";
+      resultMeta.textContent = `${job.format} · ${statusLabel(job.status)}`;
+      resultCreative.dataset.format = job.format.toLowerCase().replace(" ", "-");
+      resultCreative.dataset.status = job.status;
+
+      resultCreative.replaceChildren();
+
+      const retryContainer = document.createElement("div");
+      retryContainer.className = "creative-retry-container";
+      retryContainer.style.display = "flex";
+      retryContainer.style.flexDirection = "column";
+      retryContainer.style.alignItems = "center";
+      retryContainer.style.justifyContent = "center";
+      retryContainer.style.height = "100%";
+      retryContainer.style.padding = "2rem";
+      retryContainer.style.textAlign = "center";
+      retryContainer.style.color = "var(--primary, #d9962a)";
+
+      const retryIcon = document.createElement("span");
+      retryIcon.textContent = "⏳";
+      retryIcon.className = "loading-spinner";
+      retryIcon.style.fontSize = "3rem";
+      retryIcon.style.marginBottom = "1rem";
+
+      const retryTitle = document.createElement("strong");
+      retryTitle.textContent = "Ağ Hatası Alındı, Yeniden Tetiklenecek";
+      retryTitle.style.display = "block";
+      retryTitle.style.fontSize = "1.1rem";
+      retryTitle.style.marginBottom = "0.5rem";
+
+      const nextRetryDate = new Date(job.next_retry_at);
+      const remainingSeconds = Math.max(0, Math.ceil((nextRetryDate.getTime() - Date.now()) / 1000));
+      
+      const retryMsg = document.createElement("p");
+      retryMsg.textContent = `N8N webhook tetiklenirken hata alındı (${job.last_error || "Ağ hatası"}). ${remainingSeconds} saniye içinde otomatik olarak tekrar denenecek (Deneme #${job.retry_count}/${job.max_retries}).`;
+      retryMsg.style.fontSize = "0.9rem";
+      retryMsg.style.color = "var(--muted)";
+      retryMsg.style.maxWidth = "80%";
+      retryMsg.style.margin = "0 auto 1.5rem auto";
+
+      const manualRetryBtn = document.createElement("button");
+      manualRetryBtn.className = "button secondary compact-button";
+      manualRetryBtn.textContent = "Hemen Yeniden Dene";
+      manualRetryBtn.type = "button";
+      manualRetryBtn.style.marginTop = "0.5rem";
+      manualRetryBtn.addEventListener("click", async () => {
+        try {
+          setStatus(briefStatus, "Hemen yeniden tetikleniyor...");
+          setLoading(true);
+          await triggerBriefWorkflow({
+            jobId: job.id,
+            isRevision: job.revision_count > 0
+          });
+          setStatus(briefStatus, "Yeniden tetikleme başarılı.");
+          await fetchData();
+        } catch (err) {
+          console.error(err);
+          setStatus(briefStatus, "Tetikleme başarısız: " + err.message, "error");
+          setLoading(false);
+        }
+      });
+
+      retryContainer.append(retryIcon, retryTitle, retryMsg, manualRetryBtn);
+      resultCreative.append(retryContainer);
+
+      const creativeDetailsBox = document.querySelector("#creativeDetailsBox");
+      if (creativeDetailsBox) {
+        creativeDetailsBox.replaceChildren();
+        creativeDetailsBox.hidden = true;
+      }
+      
+      // Auto retry baslat
+      handlePendingRetryAutoTrigger(job);
+      return;
     }
 
     if (job && job.status === 'failed') {
