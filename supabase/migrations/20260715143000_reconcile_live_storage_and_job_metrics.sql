@@ -73,7 +73,8 @@ begin
   where o.bucket_id = 'generated-assets'
     and split_part(o.name, '/', 1) ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
     and not exists (
-      select 1 from public.jobs j
+      select 1
+      from public.jobs j
       where j.brand_id::text = split_part(o.name, '/', 1)
         and j.id::text = split_part(split_part(o.name, '/', 2), '_', 1)
     )
@@ -133,8 +134,10 @@ begin
 
   return query
   with claimed as (
-    select q.id from private.storage_cleanup_queue q
-    where q.status = 'pending' and q.next_attempt_at <= now()
+    select q.id
+    from private.storage_cleanup_queue q
+    where q.status = 'pending'
+      and q.next_attempt_at <= now()
     order by q.created_at
     for update skip locked
     limit greatest(1, least(batch_size, 200))
