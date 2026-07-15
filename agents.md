@@ -143,6 +143,14 @@ MCP ile `VitrinOS` araması sonucu 5 aktif workflow doğrulandı.
 - Rol: Mevcut görsel revizyonu.
 - İşlev: Revizyon notu, orijinal brief, format, prompt ve mevcut image path alır. Eski görseli Supabase Storage'dan indirir, GPT image edit ile revize eder, orijinal çözünürlüğe döndürür ve ana workflowa binary çıktı verir.
 
+## GitHub Commit, Push ve Deploy Disiplini
+
+- Düşük riskli değişikliklerde kullanıcıdan ayrıca onay bekleme: değişikliği uygula, ilgili kontrolleri çalıştır, mevcut dalda anlamlı bir commit oluştur ve GitHub'a pushla.
+- Düşük risk kapsamı: frontend HTML/CSS/JS düzeltmeleri, dokümantasyon, testler, hata düzeltmeleri ve geri alınabilir arayüz iyileştirmeleri.
+- Aşağıdaki durumlarda commit/push/deploy öncesi kullanıcı onayı iste: Supabase/n8n/hosting tarafında kalıcı değişiklik, migration veya RLS değişikliği, kimlik bilgileri/secret/config değişikliği, veri silme veya dönüşü olmayan işlemler, büyük kapsamı belirsiz değişiklikler.
+- Push sonrası Vercel gibi GitHub bağlı otomatik deploy sistemi varsa deploy'un push ile tetiklenmesini bekle ve sonucu kontrol et; bağımsız production deploy komutu çalıştırma.
+- Kullanıcı tarafından istenmeyen mevcut değişiklikleri geri alma veya üzerine yazma.
+
 ## Güvenlik ve Değişiklik Disiplini
 
 - Kullanıcı değişikliklerini geri alma.
