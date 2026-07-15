@@ -1,5 +1,9 @@
 drop policy if exists "Jobs are updatable by owner or admin" on public.jobs;
 
+-- GÜVENLİK TASARIMI: jobs tablosunda authenticated ve anon rolleri için doğrudan UPDATE yetkisi kaldırılmıştır.
+-- Kullanıcıların işlerin durumunu (status) veya revizyon limitini (revision_count) doğrudan client-side üzerinden
+-- manipüle etmesini önlemek amacıyla, tüm güncellemeler API/Edge Function (örn: job-actions) üzerinden
+-- service_role yetkisiyle kontrol edilerek gerçekleştirilir.
 revoke update on table public.jobs from anon;
 revoke update on table public.jobs from authenticated;
 grant update on table public.jobs to service_role;

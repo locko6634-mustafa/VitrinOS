@@ -52,6 +52,7 @@ Ana akış:
 - `SELECT *` kullanma; sadece gereken kolonları sorgula.
 - Public veya Data API'ye açık şemalarda RLS zorunludur.
 - `service_role` veya secret key frontend dosyalarına yazılamaz.
+- `public.jobs` tablosunda `authenticated` kullanıcılar için doğrudan `UPDATE` yetkisi verilmemiştir. Bu bilinçli bir güvenlik tasarımıdır. Kullanıcıların iş durumlarını veya revizyon sayılarını istemci üzerinden doğrudan manipüle etmelerini engellemek için, tüm güncellemeler `job-actions` Edge Function'ı ve `apply_job_revision_request` RPC'si üzerinden `service_role` ile gerçekleştirilir.
 
 ## Supabase Canlı Envanteri
 

@@ -37,5 +37,8 @@ end;
 $function$;
 
 -- İzinler
+-- GÜVENLİK TASARIMI: Bu fonksiyon, durum geçişlerini ve revizyon limitlerini kontrol ettiği için 
+-- doğrudan authenticated kullanıcılar tarafından çağrılamaz. Çağrı yetkisi sadece service_role'a verilmiştir 
+-- ve işlemler job-actions Edge Function'ı aracılığıyla doğrulanarak yürütülür.
 REVOKE EXECUTE ON FUNCTION public.apply_job_revision_request(uuid, uuid, text) FROM public, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.apply_job_revision_request(uuid, uuid, text) TO service_role;
