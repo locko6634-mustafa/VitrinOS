@@ -115,6 +115,12 @@ async function requireAdmin(req: Request) {
     return { error: json({ ok: false, message: "Yetkisiz islem." }, 403) };
   }
 
+  const accessToken = authorization.replace(/^Bearer\s+/i, "").trim();
+  const { data: assurance, error: assuranceError } = await userClient.auth.mfa.getAuthenticatorAssuranceLevel(accessToken);
+  if (assuranceError || assurance.currentLevel !== "aal2") {
+    return { error: json({ ok: false, message: "Yönetici işlemleri için MFA doğrulaması zorunlu." }, 403) };
+  }
+
   return { user: data.user };
 }
 

@@ -1,5 +1,5 @@
 (async function () {
-  const authContext = await window.VitrinOS.auth.requireAdmin({ redirectTo: "login.html", fallbackTo: "dashboard.html" });
+  const authContext = await window.VitrinOS.auth.requireAdmin({ redirectTo: "login.html", fallbackTo: "dashboard.html", requireMfa: false });
   if (!authContext) return;
 
   const client = window.VitrinOS.auth.getClient();

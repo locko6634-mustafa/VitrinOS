@@ -37,8 +37,22 @@
       }
 
       const role = window.VitrinOS.auth.getRole(data.user);
-      setStatus(role === "admin" ? "Admin paneline yonlendiriliyorsun." : "Panele yonlendiriliyorsun.");
-      window.location.href = role === "admin" ? "admin.html" : "dashboard.html";
+      if (role === "admin") {
+        const { data: assurance, error: assuranceError } = await window.VitrinOS.auth.getClient().auth.mfa.getAuthenticatorAssuranceLevel();
+        if (assuranceError) throw assuranceError;
+        if (assurance.currentLevel !== "aal2") {
+          const target = assurance.nextLevel === "aal2" ? "mfa-challenge.html" : "mfa-setup.html";
+          setStatus(target === "mfa-challenge.html" ? "MFA kodu bekleniyor." : "Önce yönetici MFA kurulumu tamamlanmalı.");
+          window.location.href = target;
+          return;
+        }
+        setStatus("Admin paneline yönlendiriliyorsun.");
+        window.location.href = "admin.html";
+        return;
+      }
+
+      setStatus("Panele yönlendiriliyorsun.");
+      window.location.href = "dashboard.html";
     } catch (error) {
       setStatus(error.message || "Supabase baglantisi kurulamadi.", "error");
     }

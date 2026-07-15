@@ -65,7 +65,16 @@
     } = await client.auth.getUser();
 
     if (error || !user) return null;
-    return { session, user, role: getRole(user) };
+    const { data: assurance, error: assuranceError } = await client.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (assuranceError) throw assuranceError;
+
+    return {
+      session,
+      user,
+      role: getRole(user),
+      currentLevel: assurance.currentLevel,
+      nextLevel: assurance.nextLevel
+    };
   }
 
   async function requireAuthenticated(options = {}) {
@@ -85,6 +94,9 @@
   async function requireAdmin(options = {}) {
     const redirectTo = options.redirectTo || "login.html";
     const fallbackTo = options.fallbackTo || "dashboard.html";
+    const requireMfa = options.requireMfa !== false;
+    const mfaSetupTo = options.mfaSetupTo || "mfa-setup.html";
+    const mfaChallengeTo = options.mfaChallengeTo || "mfa-challenge.html";
     const context = await getCurrentUser();
 
     if (!context) {
@@ -94,6 +106,11 @@
 
     if (context.role !== "admin") {
       window.location.replace(fallbackTo);
+      return null;
+    }
+
+    if (requireMfa && context.currentLevel !== "aal2") {
+      window.location.replace(context.nextLevel === "aal2" ? mfaChallengeTo : mfaSetupTo);
       return null;
     }
 
