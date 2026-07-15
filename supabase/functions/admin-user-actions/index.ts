@@ -179,40 +179,12 @@ async function removeUserGeneratedAssets(
   supabase: SupabaseClient<any, "public", any>,
   userId: string
 ) {
-  const { data: jobs, error: jobsError } = await supabase
-    .from("jobs")
-    .select("id, brand_id")
-    .eq("user_id", userId);
+  const { error } = await supabase.rpc("enqueue_user_storage_cleanup", {
+    target_user_id: userId
+  });
 
-  if (jobsError) {
-    throw new Error(`Kullanici asset listesi alinamadi: ${jobsError.message}`);
-  }
-
-  for (const job of jobs || []) {
-    const { data: files, error: listError } = await supabase.storage
-      .from("generated-assets")
-      .list(job.brand_id, {
-        limit: 1000,
-        search: `${job.id}_`
-      });
-
-    if (listError) {
-      throw new Error(`Job assetleri listelenemedi: ${listError.message}`);
-    }
-
-    const paths = (files || [])
-      .filter((file) => file.name && file.name.startsWith(`${job.id}_`))
-      .map((file) => `${job.brand_id}/${file.name}`);
-
-    if (!paths.length) continue;
-
-    const { error: removeError } = await supabase.storage
-      .from("generated-assets")
-      .remove(paths);
-
-    if (removeError) {
-      throw new Error(`Job assetleri silinemedi: ${removeError.message}`);
-    }
+  if (error) {
+    throw new Error(`Kullanici asset temizleme siraya alinamadi: ${error.message}`);
   }
 }
 
@@ -422,13 +394,26 @@ Deno.serve(async (req) => {
       console.error("Kullanici asset temizleme hatasi:", assetError);
       return json({
         ok: false,
-        message: "Kullanici silinmedi; uretilen dosyalar temizlenemedi."
+        message: "Kullanici silinmedi; uretilen dosyalar temizlik sirasina alinamadi."
       }, 500);
     }
 
     const { error: deleteError } = await supabase.auth.admin.deleteUser(userId);
     if (deleteError) {
+      const { error: cancelError } = await supabase.rpc("cancel_user_storage_cleanup", {
+        target_user_id: userId
+      });
+      if (cancelError) {
+        console.error("Kuyruk iptal hatasi:", cancelError);
+      }
       return json({ ok: false, message: deleteError.message }, deleteError.status || 400);
+    }
+
+    const { error: releaseError } = await supabase.rpc("release_user_storage_cleanup", {
+      target_user_id: userId
+    });
+    if (releaseError) {
+      console.error("Kuyruk serbest birakma hatasi:", releaseError);
     }
 
     try {
