@@ -27,15 +27,31 @@
       startButton.hidden = true;
       return true;
     }
-    setStatus(data.nextLevel === "aal2" ? "MFA kaydı mevcut. Yönetici işlemlerinden önce doğrulayıcı kodunu girmeniz gerekir." : "Henüz bir doğrulayıcı uygulaması bağlı değil.");
+    if (data.nextLevel === "aal2") {
+      setStatus("MFA zaten bağlı. Giriş sırasında doğrulayıcı uygulamanızdaki kod kullanılacak.");
+      enrollPanel.hidden = true;
+      startButton.hidden = true;
+      return true;
+    }
+    setStatus("Henüz bir doğrulayıcı uygulaması bağlı değil.");
     startButton.hidden = false;
     return false;
+  }
+
+  async function removePendingFactor() {
+    const { data, error } = await client.auth.mfa.listFactors();
+    if (error) throw error;
+    const pending = (data.totp || []).find((factor) => factor.status === "unverified" && factor.friendly_name === "VitrinOS yönetici");
+    if (!pending) return;
+    const { error: removeError } = await client.auth.mfa.unenroll({ factorId: pending.id });
+    if (removeError) throw removeError;
   }
 
   async function beginEnrollment() {
     startButton.disabled = true;
     setStatus("QR kod hazırlanıyor…");
     try {
+      await removePendingFactor();
       const { data, error } = await client.auth.mfa.enroll({ factorType: "totp", friendlyName: "VitrinOS yönetici" });
       if (error) throw error;
       if (!data?.id || !data.totp?.qr_code || !data.totp?.secret) throw new Error("MFA kayıt verisi alınamadı.");
