@@ -3,7 +3,8 @@
   "scripts": {
     "test": "node --test",
     "release-gate": "node scripts/release-gate.mjs",
-    "check": "npm test && npm run release-gate"
+    "ops-check": "node scripts/ops-contract.mjs",
+    "check": "npm test && npm run ops-check && npm run release-gate"
   },
   "devDependencies": {
     "supabase": "^2.109.1"
