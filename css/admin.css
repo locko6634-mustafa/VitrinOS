@@ -66,6 +66,7 @@
 }
 
 .mfa-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.mfa-setup-card [hidden] { display: none !important; }
 .admin-note.is-error { color: #ffb4a8; }
 
 .admin-topbar {
