@@ -1,9 +1,9 @@
 {
   "private": true,
   "scripts": {
-    "test": "node --test",
-    "release-gate": "node scripts/release-gate.mjs",
-    "ops-check": "node scripts/ops-contract.mjs",
+    "test": "node --test quality/tests/config.test.mjs",
+    "release-gate": "node quality/scripts/release-gate.mjs",
+    "ops-check": "node quality/scripts/ops-contract.mjs",
     "check": "npm test && npm run ops-check && npm run release-gate"
   },
   "devDependencies": {

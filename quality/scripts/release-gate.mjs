@@ -5,10 +5,10 @@ const required = [
   "package.json",
   ".github/workflows/ci.yml",
   "js/observability.js",
-  "tests/config.test.mjs",
-  "scripts/ops-contract.mjs",
-  "docs/ops-resilience-runbook.md",
-  "docs/restore-drill.md"
+  "quality/tests/config.test.mjs",
+  "quality/scripts/ops-contract.mjs",
+  "quality/docs/ops-resilience-runbook.md",
+  "quality/docs/restore-drill.md"
 ];
 
 for (const file of required) {
