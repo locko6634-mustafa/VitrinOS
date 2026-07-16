@@ -172,3 +172,9 @@ test("revision_requested pipeline aktif revizyon adimi olarak sunulur", async ()
   assert.match(source, /state\.currentJob\.status === "revision_requested"[\s\S]*Revizyon haz/);
   assert.doesNotMatch(source, /\["completed",\s*"revision_requested"\]/);
 });
+
+test("review kontrolleri job tamamlanana kadar varsayilan olarak kapalidir", async () => {
+  const html = await read("dashboard.html");
+  assert.match(html, /id=["']approveButton["'][^>]*\shidden(?:\s|>)/);
+  assert.match(html, /id=["']reviseButton["'][^>]*\shidden(?:\s|>)/);
+});
