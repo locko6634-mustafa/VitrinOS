@@ -68,7 +68,6 @@
       if (challengeError) throw challengeError;
       const { error: verifyError } = await client.auth.mfa.verify({ factorId, challengeId: challenge.id, code });
       if (verifyError) throw verifyError;
-      window.VitrinOS.auth.rememberAdminMfa(authContext.user);
       setStatus("Kimlik doğrulandı. Admin çalışma alanı açılıyor…", "success");
       window.location.replace("admin.html");
     } catch (error) {

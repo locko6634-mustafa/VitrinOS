@@ -43,34 +43,7 @@
     return user?.app_metadata?.role || null;
   }
 
-  const ADMIN_MFA_TRUST_KEY = "vitrinos_admin_mfa_trust";
-  const ADMIN_MFA_TRUST_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
   const REMEMBERED_LOGIN_KEY = "vitrinos_remembered_login";
-
-  function rememberAdminMfa(user) {
-    try {
-      localStorage.setItem(ADMIN_MFA_TRUST_KEY, JSON.stringify({
-        userId: user?.id || "",
-        verifiedAt: Date.now()
-      }));
-    } catch (error) {
-      console.warn("Admin MFA güveni tarayıcıya kaydedilemedi.", error);
-    }
-  }
-
-  function hasRecentAdminMfa(user) {
-    try {
-      const stored = JSON.parse(localStorage.getItem(ADMIN_MFA_TRUST_KEY) || "null");
-      return Boolean(
-        stored?.userId &&
-        stored.userId === user?.id &&
-        Number.isFinite(stored.verifiedAt) &&
-        Date.now() - stored.verifiedAt < ADMIN_MFA_TRUST_WINDOW_MS
-      );
-    } catch (error) {
-      return false;
-    }
-  }
 
   function rememberLogin(user, shouldRemember) {
     try {
@@ -159,7 +132,7 @@
       return null;
     }
 
-    const mfaSatisfied = context.currentLevel === "aal2" || hasRecentAdminMfa(context.user);
+    const mfaSatisfied = context.currentLevel === "aal2";
     if (requireMfa && !mfaSatisfied) {
       window.location.replace(context.nextLevel === "aal2" ? mfaChallengeTo : mfaSetupTo);
       return null;
@@ -226,10 +199,8 @@
     getClient,
     getCurrentUser,
     getRole,
-    hasRecentAdminMfa,
     hasRememberedLogin,
     rememberLogin,
-    rememberAdminMfa,
     normalizeLoginIdentifier,
     requireAdmin,
     requireAuthenticated,

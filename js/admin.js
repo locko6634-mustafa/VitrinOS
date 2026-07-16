@@ -81,7 +81,28 @@
 
   async function runAdminUserAction(payload) {
     const functionName = window.VitrinOS.config.adminUserActionFunction;
+    const { data: sessionData, error: sessionError } = await client.auth.getSession();
+
+    if (sessionError) throw sessionError;
+
+    let session = sessionData.session;
+    if (!session) {
+      throw new Error("Oturum bulunamadı. Lütfen yeniden giriş yapın.");
+    }
+
+    const expiresSoon = !session.expires_at || session.expires_at * 1000 - Date.now() < 60_000;
+    if (expiresSoon) {
+      const { data: refreshedData, error: refreshError } = await client.auth.refreshSession();
+      if (refreshError || !refreshedData.session) {
+        throw refreshError || new Error("Oturum yenilenemedi. Lütfen yeniden giriş yapın.");
+      }
+      session = refreshedData.session;
+    }
+
     const { data, error } = await client.functions.invoke(functionName, {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`
+      },
       body: {
         ...payload
       }

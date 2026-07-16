@@ -55,11 +55,8 @@
       if (!context || !window.VitrinOS.auth.hasRememberedLogin(context.user)) return;
 
       if (context.role === "admin") {
-        const mfaSatisfied = context.currentLevel === "aal2" || window.VitrinOS.auth.hasRecentAdminMfa(context.user);
-        if (!mfaSatisfied) {
-          window.location.replace(context.nextLevel === "aal2" ? "mfa-challenge.html" : "mfa-setup.html");
-          return;
-        }
+        window.VitrinOS.auth.rememberLogin(null, false);
+        return;
       }
 
       window.location.replace(context.role === "admin" ? "admin.html" : "dashboard.html");
@@ -105,13 +102,15 @@
         return;
       }
 
-      window.VitrinOS.auth.rememberLogin(data.user, Boolean(rememberInput?.checked));
-
       const role = window.VitrinOS.auth.getRole(data.user);
+      window.VitrinOS.auth.rememberLogin(
+        data.user,
+        role !== "admin" && Boolean(rememberInput?.checked)
+      );
       if (role === "admin") {
         const { data: assurance, error: assuranceError } = await window.VitrinOS.auth.getClient().auth.mfa.getAuthenticatorAssuranceLevel();
         if (assuranceError) throw assuranceError;
-        const mfaSatisfied = assurance.currentLevel === "aal2" || window.VitrinOS.auth.hasRecentAdminMfa(data.user);
+        const mfaSatisfied = assurance.currentLevel === "aal2";
         if (!mfaSatisfied) {
           const target = assurance.nextLevel === "aal2" ? "mfa-challenge.html" : "mfa-setup.html";
           setStatus(target === "mfa-challenge.html" ? "İkinci doğrulama adımına geçiliyor…" : "Yönetici güvenlik kurulumu açılıyor…", "mfa");

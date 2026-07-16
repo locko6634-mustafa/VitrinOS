@@ -80,6 +80,25 @@ test("auth yüzeylerinde kurgu müşteri kanıtı bulunmaz", async () => {
   assert.doesNotMatch(source, /NovaMarket|18\s+job/i);
 });
 
+test("admin MFA doğrulaması yalnızca güncel AAL2 oturumuna güvenir", async () => {
+  const authSource = await read("js/supabase.js");
+  const loginSource = await read("js/login.js");
+  const challengeSource = await read("js/mfa-challenge.js");
+  const adminSource = await read("js/admin.js");
+  const functionSource = await read("supabase/functions/admin-user-actions/index.ts");
+
+  assert.doesNotMatch(authSource, /ADMIN_MFA_TRUST|hasRecentAdminMfa|rememberAdminMfa/);
+  assert.doesNotMatch(loginSource, /hasRecentAdminMfa|rememberAdminMfa/);
+  assert.doesNotMatch(challengeSource, /rememberAdminMfa/);
+  assert.match(authSource, /context\.currentLevel === "aal2"/);
+  assert.match(loginSource, /assurance\.currentLevel === "aal2"/);
+  assert.match(loginSource, /role !== "admin" && Boolean\(rememberInput\?\.checked\)/);
+  assert.match(authSource, /REMEMBERED_LOGIN_KEY/);
+  assert.match(adminSource, /Authorization: `Bearer \$\{session\.access_token\}`/);
+  assert.match(functionSource, /@supabase\/supabase-js@2\.110\.7/);
+  assert.match(functionSource, /getAuthenticatorAssuranceLevel\(accessToken\)/);
+});
+
 test("admin geri bildirimleri erişilebilir dialog ve toast üzerinden yürür", async () => {
   const source = await read("js/admin.js");
   assert.doesNotMatch(source, /\b(?:alert|confirm|prompt)\s*\(/);

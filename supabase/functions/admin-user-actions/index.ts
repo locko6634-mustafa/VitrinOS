@@ -1,4 +1,4 @@
-import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.110.7";
 
 type AdminUserActionPayload = {
   action?: "invite_user" | "invite_lead" | "toggle_user_status" | "delete_user" | "send_password_recovery";
