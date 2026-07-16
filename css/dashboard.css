@@ -55,12 +55,14 @@ body[data-surface="workspace"] .skip-link {
 
 .app-shell {
   min-height: 100dvh;
+  padding-top: 72px;
 }
 
 .app-topbar {
-  position: sticky;
-  top: 0;
+  position: fixed;
+  inset: 0 0 auto;
   z-index: 80;
+  width: 100%;
   min-height: 72px;
   display: grid;
   grid-template-columns: 248px minmax(0, 1fr) auto auto;
@@ -1241,6 +1243,10 @@ body[data-surface="workspace"] button:disabled {
 }
 
 @media (max-width: 760px) {
+  .app-shell {
+    padding-top: 64px;
+  }
+
   .app-topbar {
     min-height: 64px;
     gap: 10px;
