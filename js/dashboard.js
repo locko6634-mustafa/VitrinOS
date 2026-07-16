@@ -74,7 +74,7 @@
   const barMetaPost = document.querySelector("#barMetaPost");
   const barStory = document.querySelector("#barStory");
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const appDrawerQuery = window.matchMedia("(max-width: 960px)");
+  const appDrawerQuery = window.matchMedia("(max-width: 1120px)");
 
   if (typeof document.startViewTransition === "function") {
     document.documentElement.classList.add("supports-view-transition");

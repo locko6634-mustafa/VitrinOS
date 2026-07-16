@@ -179,7 +179,7 @@
   }
 
   .admin-nav-button.is-active {
-    color: var(--vo-graphite);
+    color: var(--vo-ink);
     background: var(--vo-paper);
     box-shadow: inset 0 0 0 1px var(--vo-line), var(--vo-shadow-1);
   }
