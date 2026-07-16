@@ -1286,6 +1286,9 @@ body[data-surface="workspace"] button:disabled {
 
   .app-rail {
     top: 64px;
+    width: 100vw;
+    max-width: none;
+    border-right: 0;
   }
 
   .app-menu-scrim:not([hidden]) {
