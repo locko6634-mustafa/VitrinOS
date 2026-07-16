@@ -894,11 +894,12 @@ body[data-surface="marketing"] .pipeline-step li::before {
 
 body[data-surface="marketing"] .pipeline-stage-wrap {
   position: relative;
+  align-self: start;
 }
 
 body[data-surface="marketing"] .pipeline-stage {
   position: sticky;
-  top: 112px;
+  top: clamp(86px, 10vh, 112px);
   height: min(670px, calc(100svh - 142px));
   min-height: 520px;
   overflow: hidden;
