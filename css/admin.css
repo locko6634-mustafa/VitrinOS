@@ -126,12 +126,14 @@
   .admin-sidebar {
     grid-area: sidebar;
     position: fixed;
-    inset: var(--admin-topbar) auto 0 0;
+    top: var(--admin-topbar);
+    left: 0;
     z-index: 30;
     align-self: start;
     display: flex;
     width: var(--admin-rail);
-    height: auto;
+    height: calc(100dvh - var(--admin-topbar));
+    overflow-y: auto;
     flex-direction: column;
     padding: 22px 16px 18px;
     border-right: 1px solid var(--vo-line-strong);
@@ -869,7 +871,7 @@
       position: fixed;
       inset: var(--admin-topbar) auto 0 0;
       width: min(84vw, 310px);
-      height: calc(100vh - var(--admin-topbar));
+      height: calc(100dvh - var(--admin-topbar));
       transform: translateX(-104%);
       box-shadow: var(--vo-shadow-3);
       transition: transform 360ms var(--vo-ease-out);
