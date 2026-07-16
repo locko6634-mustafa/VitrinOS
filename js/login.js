@@ -88,7 +88,8 @@
       if (role === "admin") {
         const { data: assurance, error: assuranceError } = await window.VitrinOS.auth.getClient().auth.mfa.getAuthenticatorAssuranceLevel();
         if (assuranceError) throw assuranceError;
-        if (assurance.currentLevel !== "aal2") {
+        const mfaSatisfied = assurance.currentLevel === "aal2" || window.VitrinOS.auth.hasRecentAdminMfa(data.user);
+        if (!mfaSatisfied) {
           const target = assurance.nextLevel === "aal2" ? "mfa-challenge.html" : "mfa-setup.html";
           setStatus(target === "mfa-challenge.html" ? "İkinci doğrulama adımına geçiliyor…" : "Yönetici güvenlik kurulumu açılıyor…", "mfa");
           redirecting = true;
