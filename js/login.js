@@ -3,6 +3,7 @@
   const loginStatus = document.querySelector("#loginStatus");
   const identifierInput = document.querySelector("#loginEmail");
   const passwordInput = document.querySelector("#loginPassword");
+  const rememberInput = document.querySelector("#rememberLogin");
   const passwordToggle = document.querySelector("#loginPasswordToggle");
   const submitButton = document.querySelector("#loginSubmitButton");
   const submitLabel = submitButton?.querySelector(".button-label");
@@ -22,6 +23,7 @@
     loginForm?.setAttribute("aria-busy", String(isLoading));
     if (identifierInput) identifierInput.disabled = isLoading;
     if (passwordInput) passwordInput.disabled = isLoading;
+    if (rememberInput) rememberInput.disabled = isLoading;
     if (passwordToggle) passwordToggle.disabled = isLoading;
     if (submitButton) {
       submitButton.disabled = isLoading;
@@ -46,6 +48,25 @@
   }
 
   if (!loginForm) return;
+
+  (async function redirectRememberedUser() {
+    try {
+      const context = await window.VitrinOS.auth.getCurrentUser();
+      if (!context || !window.VitrinOS.auth.hasRememberedLogin(context.user)) return;
+
+      if (context.role === "admin") {
+        const mfaSatisfied = context.currentLevel === "aal2" || window.VitrinOS.auth.hasRecentAdminMfa(context.user);
+        if (!mfaSatisfied) {
+          window.location.replace(context.nextLevel === "aal2" ? "mfa-challenge.html" : "mfa-setup.html");
+          return;
+        }
+      }
+
+      window.location.replace(context.role === "admin" ? "admin.html" : "dashboard.html");
+    } catch (error) {
+      console.warn("Hatırlanan oturum otomatik açılamadı.", error);
+    }
+  })();
 
   passwordToggle?.addEventListener("click", togglePasswordVisibility);
   identifierInput?.addEventListener("input", () => setInvalid(identifierInput, false));
@@ -83,6 +104,8 @@
         loginStatus?.focus();
         return;
       }
+
+      window.VitrinOS.auth.rememberLogin(data.user, Boolean(rememberInput?.checked));
 
       const role = window.VitrinOS.auth.getRole(data.user);
       if (role === "admin") {

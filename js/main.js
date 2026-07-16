@@ -165,12 +165,34 @@
     syncMenuState(false, false);
   }
 
+  async function initAuthNavigation() {
+    const loginLink = document.querySelector("[data-auth-login]");
+    const pilotLink = document.querySelector("[data-auth-pilot]");
+    const dashboardLink = document.querySelector("[data-auth-dashboard]");
+    const adminLink = document.querySelector("[data-auth-admin]");
+
+    if (!loginLink || !pilotLink || !dashboardLink || !adminLink || !window.VitrinOS?.auth) return;
+
+    try {
+      const context = await window.VitrinOS.auth.getCurrentUser();
+      if (!context || !window.VitrinOS.auth.hasRememberedLogin(context.user)) return;
+
+      loginLink.hidden = true;
+      pilotLink.hidden = true;
+      dashboardLink.hidden = false;
+      adminLink.hidden = context.role !== "admin";
+    } catch (error) {
+      console.warn("Ana sayfa oturum durumu alınamadı.", error);
+    }
+  }
+
   function init() {
     window.VitrinOS?.initReveal?.();
     window.VitrinOS?.initLeadForm?.();
     initHeroMotion();
     initPipeline();
     initMobileMenu();
+    initAuthNavigation();
   }
 
   if (document.readyState === "loading") {

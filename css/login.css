@@ -345,6 +345,25 @@ body[data-surface="auth"] input:disabled {
   cursor: not-allowed;
 }
 
+.remember-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: fit-content;
+  margin-top: -0.15rem;
+  color: var(--auth-muted) !important;
+  cursor: pointer;
+  font-size: 0.8rem !important;
+  font-weight: 620 !important;
+}
+
+body[data-surface="auth"] .remember-option input {
+  width: 1rem;
+  min-height: 1rem;
+  margin: 0;
+  accent-color: var(--auth-orange);
+}
+
 .password-control {
   position: relative;
 }

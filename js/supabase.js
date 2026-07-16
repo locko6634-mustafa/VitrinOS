@@ -45,6 +45,7 @@
 
   const ADMIN_MFA_TRUST_KEY = "vitrinos_admin_mfa_trust";
   const ADMIN_MFA_TRUST_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+  const REMEMBERED_LOGIN_KEY = "vitrinos_remembered_login";
 
   function rememberAdminMfa(user) {
     try {
@@ -66,6 +67,27 @@
         Number.isFinite(stored.verifiedAt) &&
         Date.now() - stored.verifiedAt < ADMIN_MFA_TRUST_WINDOW_MS
       );
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function rememberLogin(user, shouldRemember) {
+    try {
+      if (shouldRemember) {
+        localStorage.setItem(REMEMBERED_LOGIN_KEY, JSON.stringify({ userId: user?.id || "" }));
+      } else {
+        localStorage.removeItem(REMEMBERED_LOGIN_KEY);
+      }
+    } catch (error) {
+      console.warn("Oturum hatırlama tercihi tarayıcıya kaydedilemedi.", error);
+    }
+  }
+
+  function hasRememberedLogin(user) {
+    try {
+      const stored = JSON.parse(localStorage.getItem(REMEMBERED_LOGIN_KEY) || "null");
+      return Boolean(stored?.userId && stored.userId === user?.id);
     } catch (error) {
       return false;
     }
@@ -148,6 +170,7 @@
 
   async function signOut(redirectTo = "login.html") {
     await getClient().auth.signOut();
+    rememberLogin(null, false);
     window.location.href = redirectTo;
   }
 
@@ -204,6 +227,8 @@
     getCurrentUser,
     getRole,
     hasRecentAdminMfa,
+    hasRememberedLogin,
+    rememberLogin,
     rememberAdminMfa,
     normalizeLoginIdentifier,
     requireAdmin,
