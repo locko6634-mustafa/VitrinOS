@@ -834,13 +834,14 @@
 
   @media (max-width: 1120px) {
     .admin-shell {
-      grid-template:
-        "topbar" var(--admin-topbar)
-        "main" minmax(calc(100vh - var(--admin-topbar)), auto)
-        / minmax(0, 1fr);
+      display: block;
+      padding-top: var(--admin-topbar);
     }
 
     .admin-topbar {
+      position: fixed;
+      inset: 0 0 auto;
+      width: 100%;
       grid-template-columns: auto minmax(0, 1fr) auto;
     }
 
