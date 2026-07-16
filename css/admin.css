@@ -60,9 +60,22 @@
 
   .admin-topbar .brand {
     color: var(--admin-ink);
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0;
+    width: max-content;
     font-size: 1.28rem;
     font-weight: 780;
     letter-spacing: -0.055em;
+  }
+
+  .admin-topbar .brand-os {
+    margin-left: 0.16em;
+    color: var(--accent-soft);
+    font-family: var(--vo-font-mono);
+    font-size: 0.74em;
+    font-weight: 800;
+    letter-spacing: -0.04em;
   }
 
   .admin-topbar .brand sup {
@@ -72,6 +85,7 @@
     color: var(--admin-muted);
     font-family: var(--vo-font-mono);
     font-size: 0.44em;
+    letter-spacing: 0;
   }
 
   .admin-context {
