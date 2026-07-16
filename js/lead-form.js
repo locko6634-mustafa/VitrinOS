@@ -1,13 +1,18 @@
 (function () {
   window.VitrinOS = window.VitrinOS || {};
-  const MIN_SUBMIT_SECONDS = window.VitrinOS.config.defaults.lead.minSubmitSeconds;
+  const MIN_SUBMIT_SECONDS = window.VitrinOS?.config?.defaults?.lead?.minSubmitSeconds || 3;
 
   function setError(field, message) {
     const errorEl = document.querySelector(`[data-error-for="${field.id}"]`);
     if (!errorEl) return;
 
     errorEl.textContent = message;
-    field.setAttribute("aria-invalid", message ? "true" : "false");
+
+    if (message) {
+      field.setAttribute("aria-invalid", "true");
+    } else {
+      field.removeAttribute("aria-invalid");
+    }
   }
 
   function isValidUrl(value) {
@@ -23,38 +28,42 @@
 
   function validateForm(form, formData) {
     let valid = true;
+    let firstInvalid = null;
 
     const checks = [
       [
         form.elements.name,
         formData.get("name").trim().length >= 2,
-        "Ad soyad en az 2 karakter olmali."
+        "Ad soyad en az 2 karakter olmalı."
       ],
       [
         form.elements.company,
         formData.get("company").trim().length >= 2,
-        "Sirket adi gerekli."
+        "Şirket adı gerekli."
       ],
       [
         form.elements.email,
         form.elements.email.validity.valid && formData.get("email").trim(),
-        "Gecerli bir e-posta girin."
+        "Geçerli bir e-posta girin."
       ],
       [
         form.elements.website,
         isValidUrl(formData.get("website")),
-        "Web sitesi https:// ile baslamali."
+        "Web sitesi http:// veya https:// ile başlamalı."
       ],
       [
         form.elements.need,
         Boolean(formData.get("need")),
-        "Bir aralik secin."
+        "Bir aralık seçin."
       ]
     ];
 
     checks.forEach(([field, passes, message]) => {
       setError(field, passes ? "" : message);
-      if (!passes) valid = false;
+      if (!passes) {
+        valid = false;
+        firstInvalid = firstInvalid || field;
+      }
     });
 
     const startedAt = Number(formData.get("startedAt") || "0");
@@ -70,7 +79,7 @@
       valid = false;
     }
 
-    return valid;
+    return { valid, firstInvalid };
   }
 
   function buildLeadPayload(formData) {
@@ -90,7 +99,7 @@
     const config = window.VitrinOS?.config;
     const functionName = window.VitrinOS?.config?.leadSubmitFunction;
     if (!config?.supabaseUrl || !config?.supabasePublishableKey || !functionName) {
-      throw new Error("Lead submit function tanimli degil.");
+      throw new Error("Başvuru servisi şu anda kullanılamıyor.");
     }
 
     const response = await fetch(`${config.supabaseUrl.replace(/\/$/, "")}/functions/v1/${functionName}`, {
@@ -113,7 +122,7 @@
     }
 
     if (!response.ok || !data?.ok) {
-      throw new Error(data?.message || "Basvuru kaydedilemedi.");
+      throw new Error(data?.message || "Başvuru kaydedilemedi.");
     }
   }
 
@@ -128,6 +137,13 @@
       startedAtInput.value = String(Date.now());
     }
 
+    form.addEventListener("input", (event) => {
+      const field = event.target;
+      if (field?.id && field.matches("input, select, textarea")) {
+        setError(field, "");
+      }
+    });
+
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
 
@@ -136,13 +152,17 @@
       statusEl.textContent = "";
       statusEl.removeAttribute("data-kind");
 
-      if (!validateForm(form, formData)) {
-        statusEl.textContent = "Alanlari kontrol edin; eksik veya hatali bilgi var.";
+      const validation = validateForm(form, formData);
+
+      if (!validation.valid) {
+        statusEl.textContent = "Alanları kontrol edin; eksik veya hatalı bilgi var.";
         statusEl.dataset.kind = "error";
+        validation.firstInvalid?.focus();
         return;
       }
 
       if (submitButton) {
+        submitButton.dataset.idleLabel = submitButton.textContent;
         submitButton.disabled = true;
         submitButton.textContent = "Kaydediliyor...";
       }
@@ -153,19 +173,19 @@
         if (startedAtInput) {
           startedAtInput.value = String(Date.now());
         }
-        statusEl.textContent = "Basvuru alindi. Ekibimiz kaydi inceleyip sizinle iletisime gececek.";
+        statusEl.textContent = "Başvurunuz alındı. Ekibimiz kaydı inceleyip sizinle iletişime geçecek.";
         statusEl.dataset.kind = "success";
       } catch (error) {
-        console.error("Lead kaydi basarisiz:", error);
+        console.error("Lead kaydı başarısız:", error);
         if (startedAtInput) {
           startedAtInput.value = String(Date.now());
         }
-        statusEl.textContent = error?.message || "Basvuru kaydedilemedi. Lutfen tekrar deneyin.";
+        statusEl.textContent = error?.message || "Başvuru kaydedilemedi. Lütfen tekrar deneyin.";
         statusEl.dataset.kind = "error";
       } finally {
         if (submitButton) {
           submitButton.disabled = false;
-          submitButton.textContent = "Basvuru gonder";
+          submitButton.textContent = submitButton.dataset.idleLabel || "Pilot görüşmesini planla";
         }
       }
     });

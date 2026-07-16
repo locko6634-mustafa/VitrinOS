@@ -3,283 +3,377 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>VitrinOS | Kreatif operasyon OS</title>
-    <meta name="description" content="VitrinOS, e-ticaret pazarlama ekipleri için brief, marka kuralları, reklam formatları, onay ve revizyonu tek üretim akışında toplar.">
-    <meta property="og:title" content="VitrinOS | Kreatif operasyon OS">
-    <meta property="og:description" content="Pazarlama ekipleri için marka bazlı reklam görseli üretim ve onay akışı.">
+    <title>VitrinOS | AI destekli kreatif operasyon sistemi</title>
+    <meta name="description" content="VitrinOS; ürün görselini, marka kurallarını, Banner, Meta Post ve Story üretimini, onay ve revizyonu tek bir kreatif üretim hattında birleştirir.">
+    <meta name="theme-color" content="#f8f4ec">
+    <meta property="og:title" content="VitrinOS | Kreatif üretim hattı">
+    <meta property="og:description" content="Brief'ten marka kurallarına, üç reklam formatından insan onayına uzanan kreatif operasyon sistemi.">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="assets/format-gallery.png">
-    <link rel="preload" as="image" href="assets/format-gallery.png">
-    <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="14" fill="%23161512"/%3E%3Cpath d="M16 16h10l7 23 7-23h8L37 48h-9L16 16Z" fill="%23d9962a"/%3E%3C/svg%3E'>
-    <link rel="stylesheet" href="css/style.css?v=1.1">
-    <link rel="stylesheet" href="css/index.css?v=1.1">
+    <meta property="og:image" content="assets/hero-operations.png">
+    <link rel="preload" as="image" href="assets/hero-operations-1600.avif" type="image/avif" media="(min-width: 721px)">
+    <link rel="preload" as="image" href="assets/hero-operations-960.avif" type="image/avif" media="(max-width: 720px)">
+    <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" fill="%23f8f4ec"/%3E%3Cpath d="M11 15h11l10 30 10-30h11L38 53H26L11 15Z" fill="%231d1e22"/%3E%3Cpath d="M46 42h9v9h-9z" fill="%23f46b22"/%3E%3C/svg%3E'>
+    <link rel="stylesheet" href="css/style.css?v=2.0">
+    <link rel="stylesheet" href="css/index.css?v=2.0">
   </head>
-  <body>
+  <body data-surface="marketing">
     <a class="skip-link" href="#main">İçeriğe geç</a>
 
     <header class="site-header" data-reveal>
       <nav class="nav-shell" id="navShell" aria-label="Ana menü">
         <a class="brand" href="#top" aria-label="VitrinOS ana sayfa">
-          <span class="brand-mark" aria-hidden="true">V</span>
-          <span>VitrinOS</span>
+          <span class="brand-vitrin">Vitrin</span><span class="brand-os">OS</span><sup aria-hidden="true">®</sup>
         </a>
-        <div class="nav-links" id="navLinks" aria-label="Sayfa bölümleri">
-          <a href="#akis">Akış</a>
-          <a href="#formatlar">Formatlar</a>
-          <a href="#marka-beyni">Marka beyni</a>
-          <a href="#basvuru">Başvuru</a>
+
+        <div class="nav-drawer" id="navMenu">
+          <div class="nav-links" id="navLinks" aria-label="Sayfa bölümleri">
+            <a href="#uretim-hatti">Üretim hattı</a>
+            <a href="#formatlar">Formatlar</a>
+            <a href="#guven">Sistem ilkeleri</a>
+            <a href="#basvuru">Başvuru</a>
+          </div>
+          <div class="nav-actions" id="navActions">
+            <a class="nav-login" href="login.html">Giriş yap</a>
+            <a class="nav-cta" href="#basvuru">Pilot akışı planla</a>
+          </div>
         </div>
-        <div class="nav-actions" id="navActions">
-          <a class="nav-login" href="login.html">Giriş yap</a>
-          <a class="nav-cta" href="#basvuru">Hemen başvur</a>
-        </div>
-        <button class="nav-toggle" id="navToggle" type="button" aria-label="Menüyü aç/kapat" aria-expanded="false">
-          <span class="bar"></span>
-          <span class="bar"></span>
-          <span class="bar"></span>
+
+        <button class="nav-toggle" id="navToggle" type="button" aria-label="Menüyü aç" aria-controls="navMenu" aria-expanded="false">
+          <span class="bar" aria-hidden="true"></span>
+          <span class="bar" aria-hidden="true"></span>
+          <span class="bar" aria-hidden="true"></span>
         </button>
       </nav>
     </header>
 
     <main id="main">
-      <section class="hero" id="top">
-        <div class="hero-ambient" aria-hidden="true"></div>
+      <section class="hero" id="top" aria-labelledby="hero-title">
+        <div class="hero-ambient" aria-hidden="true">
+          <span class="ambient-orbit orbit-one"></span>
+          <span class="ambient-orbit orbit-two"></span>
+          <span class="ambient-prism"></span>
+        </div>
+
         <div class="container hero-grid">
           <div class="hero-content">
-            <p class="kicker" data-reveal>Kreatif operasyon OS</p>
-            <h1 data-reveal>Reklam üretimi brief’ten onaya tek akışta.</h1>
+            <p class="kicker" data-reveal>AI destekli kreatif operasyon sistemi</p>
+            <h1 id="hero-title" data-reveal>Brief girer. Marka aklı çalışır. Görsel şekillenir.</h1>
             <p class="hero-copy" data-reveal>
-              VitrinOS; brief, ürün görseli, marka dili, format üretimi ve revizyonu e-ticaret ekipleri için aynı çalışma alanında toplar.
+              VitrinOS; ürün görselini, marka kurallarını, Banner, Meta Post ve Story üretimini, onay ve revizyonu tek bir kreatif üretim hattında birleştirir.
             </p>
             <div class="hero-actions" data-reveal>
-              <a class="button primary" href="#basvuru">Hemen başvur</a>
-              <a class="button secondary" href="#akis">Akışı incele</a>
+              <a class="button primary" href="#basvuru">
+                <span>Pilot akışı planla</span>
+                <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"/></svg>
+              </a>
+              <a class="button secondary" href="#uretim-hatti">Üretim hattını izle</a>
+            </div>
+            <div class="hero-proof" data-reveal aria-label="Sistemin temel kapsamı">
+              <span>Marka kuralları</span>
+              <span>3 üretim formatı</span>
+              <span>İnsan onayı</span>
             </div>
           </div>
 
-          <div class="hero-visual" data-reveal aria-label="Brief, format üretimi ve onay adımlarını gösteren soyut operasyon akışı">
-            <div class="operation-panel">
-              <div class="panel-topbar">
-                <span>operasyon akışı</span>
-                <strong>VitrinOS</strong>
+          <figure class="hero-visual" data-reveal aria-labelledby="hero-visual-caption">
+            <div class="hero-frame">
+              <picture>
+                <source type="image/avif" srcset="assets/hero-operations-960.avif 960w, assets/hero-operations-1600.avif 1600w" sizes="(max-width: 960px) calc(100vw - 28px), min(52vw, 760px)">
+                <source type="image/webp" srcset="assets/hero-operations-960.webp 960w, assets/hero-operations-1600.webp 1600w" sizes="(max-width: 960px) calc(100vw - 28px), min(52vw, 760px)">
+                <img src="assets/hero-operations.png" width="1672" height="941" alt="Brief, marka kuralları ve kreatif çıktıyı bir araya getiren VitrinOS operasyon sahnesi" fetchpriority="high" decoding="async">
+              </picture>
+
+              <div class="hero-scan" aria-hidden="true"></div>
+              <div class="brief-ticket" aria-hidden="true">
+                <span>BRF—072</span>
+                <strong>Yeni sezon / ürün odaklı</strong>
+                <small>3 format · marka profili bağlı</small>
               </div>
-              <div class="flow-strip" aria-label="Üretim adımları">
-                <article>
-                  <span>01</span>
-                  <h2>Brief</h2>
-                  <p>Kampanya, ürün, kanal ve marka notları ayrıştırılır.</p>
-                </article>
-                <article>
-                  <span>02</span>
-                  <h2>Format</h2>
-                  <p>Banner, post ve story için ayrı kompozisyon kurulur.</p>
-                </article>
-                <article>
-                  <span>03</span>
-                  <h2>Onay</h2>
-                  <p>Ekip revizyonu kısa mesajla aynı akışa geri taşır.</p>
-                </article>
+              <div class="hero-readout" aria-hidden="true">
+                <span class="readout-signal"></span>
+                <span>Atölye aktif</span>
+                <strong>04 / 04</strong>
               </div>
-              <div class="panel-grid">
-                <section class="panel-card brand-rules" aria-label="Marka kuralları">
-                  <span class="mini-label">Marka hafızası</span>
-                  <h3>Ton, renk ve yasaklı dil korunur.</h3>
-                  <div class="rule-list">
-                    <span>kampanya tonu</span>
-                    <span>güvenli alan</span>
-                    <span>revizyon geçmişi</span>
-                  </div>
-                </section>
-                <section class="panel-card format-queue" aria-label="Format kuyruğu">
-                  <span class="mini-label">Çıktı kuyruğu</span>
-                  <div class="queue-row"><span>1600x600</span><strong>hazır</strong></div>
-                  <div class="queue-row"><span>4:5 post</span><strong>kontrol</strong></div>
-                  <div class="queue-row"><span>9:16 story</span><strong>revizyon</strong></div>
-                </section>
-                <section class="panel-card approval-note" aria-label="Onay mesajı">
-                  <span class="mini-label">Onay</span>
-                  <p>Fiyat alanını büyüt, ürünü sağa al, aynı marka tonunu koru.</p>
-                </section>
-              </div>
+              <span class="tech-node node-a" aria-hidden="true"></span>
+              <span class="tech-node node-b" aria-hidden="true"></span>
+              <span class="tech-axis axis-x" aria-hidden="true"></span>
+              <span class="tech-axis axis-y" aria-hidden="true"></span>
             </div>
+            <figcaption id="hero-visual-caption">Brief'ten onaya uzanan kreatif üretim hattının optik görünümü.</figcaption>
+          </figure>
+        </div>
+
+        <a class="hero-index" href="#uretim-hatti" aria-label="Üretim hattına ilerle">
+          <span>01</span>
+          <i aria-hidden="true"></i>
+          <span>04</span>
+        </a>
+      </section>
+
+      <section class="system-line" aria-label="VitrinOS kapsam özeti">
+        <div class="container system-line-inner">
+          <p>Tekrarlanan kartlar değil; brief, marka hafızası, üretim ve kararın aynı hatta ilerlediği bir çalışma sistemi.</p>
+          <div aria-hidden="true">
+            <span>BRIEF</span><i></i><span>MARKA</span><i></i><span>ÜRETİM</span><i></i><span>ONAY</span>
           </div>
         </div>
       </section>
 
-      <section class="section intro-band" aria-label="Ürün özeti">
-        <div class="container intro-grid">
-          <p data-reveal>
-            Her marka için ayrı kurallar, ayrı metin tonu, ayrı görsel kompozisyon ve ayrı revizyon hafızası.
-          </p>
-          <div class="intro-facts" data-reveal>
-            <span>Banner</span>
-            <span>Meta post</span>
-            <span>Story</span>
-            <span>Onay akışı</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="section process-section" id="akis">
+      <section class="section pipeline-section" id="uretim-hatti" aria-labelledby="pipeline-title">
         <div class="container">
-          <div class="section-heading narrow" data-reveal>
-            <p class="kicker">Üretim hattı</p>
-            <h2>Brief girilir, marka kuralları çalışır, çıktı onaya düşer.</h2>
+          <div class="section-heading pipeline-heading" data-reveal>
+            <div>
+              <p class="kicker">Üretim hattı / 01—04</p>
+              <h2 id="pipeline-title">Bir brief'in kreatif karara dönüşmesini izleyin.</h2>
+            </div>
+            <p>Her aşama bir öncekinden bağlam alır. Marka bilgisi kaybolmaz; insan kararı hattın sonunda ve merkezinde kalır.</p>
           </div>
-          <div class="process-showcase" data-reveal>
-            <article>
-              <span class="step-index">01</span>
-              <h3>Doğal dil brief</h3>
-              <p>Ürün adı, kampanya, fiyat, indirim, hedef format ve ürün görseli tek mesajdan ayrıştırılır.</p>
-            </article>
-            <article>
-              <span class="step-index">02</span>
-              <h3>Marka kararı</h3>
-              <p>Renk tonu, görsel tema, metin yerleşimi ve kampanya hiyerarşisi markaya göre seçilir.</p>
-            </article>
-            <article>
-              <span class="step-index">03</span>
-              <h3>Format üretimi</h3>
-              <p>Banner, sosyal post ve story için ayrı kompozisyon kurallarıyla çıktı hazırlanır.</p>
-            </article>
-            <article>
-              <span class="step-index">04</span>
-              <h3>Onay ve revizyon</h3>
-              <p>Ekip çıktıyı onaylar ya da net revizyon notuyla aynı akışı tekrar çalıştırır.</p>
-            </article>
+
+          <div class="pipeline-story" data-pipeline>
+            <div class="pipeline-steps">
+              <article class="pipeline-step is-current" data-pipeline-step="0" data-reveal>
+                <div class="step-rail"><span>01</span><i aria-hidden="true"></i></div>
+                <div>
+                  <p class="step-eyebrow">Girdi / ayrıştırma</p>
+                  <h3>Brief ayrıştırma</h3>
+                  <p>Ürün, kampanya, fiyat, kanal, hedef format ve referans görsel doğal dildeki tek girdiden ayrıştırılır.</p>
+                  <ul aria-label="Brief ayrıştırma kapsamı">
+                    <li>Ürün ve kampanya bilgisi</li>
+                    <li>Format ve ölçü kararı</li>
+                  </ul>
+                </div>
+              </article>
+
+              <article class="pipeline-step" data-pipeline-step="1" data-reveal>
+                <div class="step-rail"><span>02</span><i aria-hidden="true"></i></div>
+                <div>
+                  <p class="step-eyebrow">Bağlam / marka hafızası</p>
+                  <h3>Marka kuralları</h3>
+                  <p>Ses tonu, renk yaklaşımı, yasaklı ifadeler ve görsel yerleşim tercihleri üretim kararına bağlanır.</p>
+                  <ul aria-label="Marka kuralı kapsamı">
+                    <li>Ton ve yasaklı dil</li>
+                    <li>Renk ve kompozisyon ilkeleri</li>
+                  </ul>
+                </div>
+              </article>
+
+              <article class="pipeline-step" data-pipeline-step="2" data-reveal>
+                <div class="step-rail"><span>03</span><i aria-hidden="true"></i></div>
+                <div>
+                  <p class="step-eyebrow">Çıktı / kanal mantığı</p>
+                  <h3>Banner, Meta Post ve Story</h3>
+                  <p>Aynı kampanya, her kanalın ölçüsü ve güvenli alanı için ayrı kompozisyon mantığıyla şekillenir.</p>
+                  <ul aria-label="Üretim formatları">
+                    <li>1600×600 web banner</li>
+                    <li>4:5 post ve 9:16 story</li>
+                  </ul>
+                </div>
+              </article>
+
+              <article class="pipeline-step" data-pipeline-step="3" data-reveal>
+                <div class="step-rail"><span>04</span><i aria-hidden="true"></i></div>
+                <div>
+                  <p class="step-eyebrow">Karar / kayıt</p>
+                  <h3>İnsan onayı ve revizyon</h3>
+                  <p>Ekip çıktıyı onaylar veya net bir revizyon notu verir. Yeni sonuç aynı brief ve önceki görsel bağlamıyla hazırlanır.</p>
+                  <ul aria-label="Onay kapsamı">
+                    <li>Onay veya revizyon kararı</li>
+                    <li>Sonuç ve revizyon kaydı</li>
+                  </ul>
+                </div>
+              </article>
+            </div>
+
+            <div class="pipeline-stage-wrap" aria-hidden="true">
+              <div class="pipeline-stage" data-pipeline-stage data-active-stage="0">
+                <div class="stage-topbar">
+                  <span>VOS / CREATIVE LINE</span>
+                  <div><i></i><span>Canlı bağlam</span></div>
+                  <strong>01—04</strong>
+                </div>
+                <div class="stage-viewport">
+                  <div class="stage-grid"></div>
+                  <section class="stage-panel is-active" data-stage="0">
+                    <span class="stage-code">INPUT.01</span>
+                    <div class="stage-brief">
+                      <span>YENİ BRIEF</span>
+                      <strong>Yaz sezonu / ürün lansmanı</strong>
+                      <p>Banner, Meta Post, Story</p>
+                    </div>
+                    <div class="stage-data">
+                      <span style="--level: 78%"></span><span style="--level: 46%"></span><span style="--level: 66%"></span>
+                    </div>
+                  </section>
+                  <section class="stage-panel" data-stage="1">
+                    <span class="stage-code">MEMORY.02</span>
+                    <div class="brand-spectrum">
+                      <i style="--swatch:#ec6b2d"></i><i style="--swatch:#1e2025"></i><i style="--swatch:#ece5d8"></i><i style="--swatch:#3155d9"></i>
+                    </div>
+                    <div class="rule-matrix">
+                      <span>TON <strong>Dengeli</strong></span>
+                      <span>DİL <strong>Yasaklar bağlı</strong></span>
+                      <span>ÜRÜN <strong>Kaynak görsel</strong></span>
+                    </div>
+                  </section>
+                  <section class="stage-panel" data-stage="2">
+                    <span class="stage-code">OUTPUT.03</span>
+                    <div class="format-frames">
+                      <i class="frame-banner"><b>16:6</b></i>
+                      <i class="frame-post"><b>4:5</b></i>
+                      <i class="frame-story"><b>9:16</b></i>
+                    </div>
+                    <p class="stage-caption">Tek kampanya / üç ayrı kompozisyon</p>
+                  </section>
+                  <section class="stage-panel" data-stage="3">
+                    <span class="stage-code">DECISION.04</span>
+                    <div class="decision-ring"><span>ONAY</span><strong>✓</strong></div>
+                    <div class="decision-note"><span>REVİZYON NOTU</span><p>Fiyatı büyüt, ürün odağını koru.</p></div>
+                  </section>
+                </div>
+                <div class="stage-footer">
+                  <span>Bağlam korunuyor</span>
+                  <div><i></i><i></i><i></i><i></i></div>
+                  <span data-stage-count>01</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="section format-section" id="formatlar">
-        <div class="container format-layout">
-          <div class="format-copy" data-reveal>
-            <p class="kicker">Çıktı ailesi</p>
-            <h2>Tek brief, kanala göre yeniden kurgulanan reklam görselleri.</h2>
-            <p>
-              Her format kendi ölçüsü, güvenli alanı ve kompozisyon mantığıyla hazırlanır. Marka dili korunur, görsel hiyerarşi kanala göre yeniden kurulur.
-            </p>
+      <section class="section campaign-section" id="formatlar" aria-labelledby="format-title">
+        <div class="container campaign-grid">
+          <div class="campaign-copy" data-reveal>
+            <p class="kicker">Campaign wall / üç format</p>
+            <h2 id="format-title">Aynı fikir kopyalanmaz. Her yüzey için yeniden kurulur.</h2>
+            <p>Banner, Meta Post ve Story aynı marka kararından beslenir; ölçü, odak ve güvenli alan her kanal için yeniden dengelenir.</p>
             <dl class="format-list">
-              <div>
-                <dt>Web banner</dt>
-                <dd>Yatay kompozisyon, metin alanı, ürün sahnesi ve kampanya kodu dengesi.</dd>
-              </div>
-              <div>
-                <dt>Meta post</dt>
-                <dd>4:5 sosyal akış formatı, logo boşluğu, caption ve görsel hiyerarşi.</dd>
-              </div>
-              <div>
-                <dt>Story</dt>
-                <dd>9:16 güvenli alanlar, mobil arayüz payı ve ürün odaklı yerleşim.</dd>
-              </div>
+              <div><dt>01 / Banner</dt><dd>Yatay hareket, ürün sahnesi ve kampanya mesajı.</dd></div>
+              <div><dt>02 / Meta Post</dt><dd>Akış içinde ürün odağı ve okunabilir mesaj hiyerarşisi.</dd></div>
+              <div><dt>03 / Story</dt><dd>Mobil güvenli alanlarda dikey, hızlı ve net kompozisyon.</dd></div>
             </dl>
           </div>
-          <figure class="format-visual" data-reveal>
-            <img src="assets/format-gallery.png" alt="Anonim banner, sosyal post ve story reklam formatlarından oluşan görsel kolaj">
+
+          <figure class="campaign-wall" data-reveal>
+            <div class="wall-coordinate coordinate-top" aria-hidden="true"><span>VOS—03</span><i></i><span>38° / 26°</span></div>
+            <picture>
+              <source type="image/avif" srcset="assets/format-gallery-768.avif 768w, assets/format-gallery-1440.avif 1440w" sizes="(max-width: 960px) calc(100vw - 28px), min(58vw, 760px)">
+              <source type="image/webp" srcset="assets/format-gallery-768.webp 768w, assets/format-gallery-1440.webp 1440w" sizes="(max-width: 960px) calc(100vw - 28px), min(58vw, 760px)">
+              <img src="assets/format-gallery.png" width="1536" height="1024" alt="Anonim bir ürün için hazırlanmış banner, Meta Post ve Story kreatiflerinden oluşan asimetrik kampanya duvarı" loading="lazy" decoding="async">
+            </picture>
+            <span class="wall-label label-banner" aria-hidden="true">BANNER / 1600×600</span>
+            <span class="wall-label label-post" aria-hidden="true">META / 1080×1350</span>
+            <span class="wall-label label-story" aria-hidden="true">STORY / 1080×1920</span>
+            <div class="wall-coordinate coordinate-bottom" aria-hidden="true"><span>OUTPUT FAMILY</span><i></i><span>03 FILES</span></div>
           </figure>
         </div>
       </section>
 
-      <section class="section brain-section" id="marka-beyni">
-        <div class="container brain-layout">
-          <div class="section-heading" data-reveal>
-            <p class="kicker">Marka beyni</p>
-            <h2>Her marka için ayrı kreatif hafıza kurulur.</h2>
-          </div>
-          <div class="brain-stack" data-reveal>
-            <article>
-              <span>Kurallar</span>
-              <h3>Marka tonu ve yasaklı dil</h3>
-              <p>Jenerik metinler engellenir. Her şirketin kampanya dili, başlık sınırı ve kaçınılacak ifadeleri ayrı tutulur.</p>
-            </article>
-            <article>
-              <span>Görsel mantık</span>
-              <h3>Ürün varsa gerçek ürün korunur</h3>
-              <p>Ürün görseli gelirse önce ürünsüz sahne üretilir, sonra gerçek ürün ışık ve perspektife oturtulur.</p>
-            </article>
-            <article>
-              <span>Hafıza</span>
-              <h3>Onay, revizyon ve son çıktı izlenir</h3>
-              <p>Son brief, görsel dosyası, intent ve revizyon sayısı operasyon kaydında tutulur.</p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="section approval-section" aria-labelledby="approval-title">
-        <div class="container approval-layout">
-          <div class="approval-panel" data-reveal>
-            <p class="mini-label">Pilot onay akışı</p>
-            <div class="message incoming">Yeni kampanya için 1600x600 banner hazırla. Ürün görseli ekte, indirim oranı yüzde 18.</div>
-            <div class="message system">Görsel üretildi. Onaylıyor musun?</div>
-            <div class="choice-row" aria-label="Örnek onay seçenekleri">
-              <span>Onayla</span>
-              <span>Revize et</span>
+      <section class="section trust-section" id="guven" aria-labelledby="trust-title">
+        <div class="container">
+          <div class="section-heading trust-heading" data-reveal>
+            <div>
+              <p class="kicker">Sistem ilkeleri / doğrulanabilir yetenekler</p>
+              <h2 id="trust-title">Görsel etki kadar, üretim disiplini de görünür.</h2>
             </div>
-            <div class="message incoming compact">Fiyatı büyüt, ürünü biraz sağa al.</div>
-            <div class="message system compact">Revizyon uygulandı. Yeni görsel onaya hazır.</div>
+            <p>VitrinOS güveni süslü vaatlerle değil, her üretimde çalışan açık kurallarla kurar.</p>
           </div>
-          <div class="approval-copy" data-reveal>
-            <p class="kicker">Operasyon kontrolü</p>
-            <h2 id="approval-title">Üretim otomatik, karar ekibin elinde.</h2>
-            <p>
-              Sistem önizleme üretir; final karar pazarlama ekibinde kalır. Revizyon notu, önceki görsel ve brief üzerinden uygulanır.
-            </p>
+
+          <div class="trust-ledger" data-reveal>
+            <article><span>01</span><div><h3>Marka tonu</h3><p>Her markanın ses tonu ve metin yaklaşımı üretim bağlamına alınır.</p></div><i aria-hidden="true">BAĞLI</i></article>
+            <article><span>02</span><div><h3>Yasaklı dil</h3><p>Kaçınılacak kelimeler ve ifadeler marka kurallarıyla birlikte kontrol edilir.</p></div><i aria-hidden="true">KONTROL</i></article>
+            <article><span>03</span><div><h3>Gerçek ürünün korunması</h3><p>Kaynak ürün görseli varsa sahne, ürünün kimliğini koruyacak biçimde kurulur.</p></div><i aria-hidden="true">KAYNAK</i></article>
+            <article><span>04</span><div><h3>Onay ve revizyon kaydı</h3><p>Karar, revizyon notu ve güncel çıktı aynı operasyon akışında izlenir.</p></div><i aria-hidden="true">İZLENİR</i></article>
+          </div>
+
+          <div class="approval-lab" aria-labelledby="approval-title">
+            <div class="approval-copy" data-reveal>
+              <p class="kicker">Karar noktası / insan kontrolü</p>
+              <h2 id="approval-title">Sistem üretir. Son sözü ekip söyler.</h2>
+              <p>Çıktı onaya gelir; ekip sonucu kabul eder veya net bir revizyon notuyla aynı bağlamı yeniden çalıştırır.</p>
+              <div class="approval-legend" aria-label="Onay akışının adımları"><span>Üretildi</span><i></i><span>İncelendi</span><i></i><span>Onaylandı</span></div>
+            </div>
+
+            <div class="approval-console" data-reveal aria-label="Örnek onay ve revizyon akışı">
+              <div class="console-head"><span>JOB / VOS-218</span><strong><i></i> ONAY BEKLİYOR</strong></div>
+              <div class="creative-preview" aria-hidden="true">
+                <div class="preview-copy"><span>YENİ SEZON</span><strong>Ürünü<br>öne çıkar.</strong></div>
+                <div class="preview-object"><i></i><b></b></div>
+                <div class="preview-guides"><i></i><i></i></div>
+              </div>
+              <div class="console-decision">
+                <div><span>EKİP NOTU</span><p>Fiyatı büyüt, ürünü biraz sağa al.</p></div>
+                <div class="decision-actions" aria-hidden="true"><span>Revize et</span><span>Onayla</span></div>
+              </div>
+              <div class="console-foot"><span>Brief + önceki çıktı bağlı</span><strong>REV / 01</strong></div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="section lead-section" id="basvuru">
+      <section class="section lead-section" id="basvuru" aria-labelledby="lead-title">
         <div class="container lead-layout">
           <div class="lead-copy" data-reveal>
-            <p class="kicker">Pilot başvuru</p>
-            <h2>Markanız için ilk üretim hattını birlikte çıkaralım.</h2>
-            <p>
-              Görüşmede mevcut kreatif sürecinizi, sık kullandığınız formatları ve marka kurallarınızı birlikte netleştiririz.
-            </p>
+            <p class="kicker">Pilot çalışma / başlangıç</p>
+            <h2 id="lead-title">İlk üretim hattını markanıza göre birlikte kuralım.</h2>
+            <p>Mevcut kreatif sürecinizi, sık kullandığınız formatları ve marka kurallarınızı kısa bir görüşmede netleştirelim.</p>
+            <div class="lead-note">
+              <span>Görüşme kapsamı</span>
+              <ul>
+                <li>Mevcut brief ve onay akışı</li>
+                <li>Öncelikli reklam formatları</li>
+                <li>Marka kuralı ve üretim ihtiyacı</li>
+              </ul>
+            </div>
           </div>
-          <form class="lead-form" id="leadForm" novalidate data-reveal>
-            <div class="form-row">
-              <label for="name">Ad soyad</label>
-              <input id="name" name="name" autocomplete="name" required>
-              <p class="field-error" data-error-for="name"></p>
+
+          <form class="lead-form" id="leadForm" novalidate data-reveal aria-labelledby="lead-form-title">
+            <div class="form-intro">
+              <span>BRF / PILOT</span>
+              <h3 id="lead-form-title">Pilot akışı planla</h3>
+              <p>Zorunlu alanlar * ile işaretlidir.</p>
             </div>
             <div class="form-row">
-              <label for="company">Şirket</label>
-              <input id="company" name="company" autocomplete="organization" required>
-              <p class="field-error" data-error-for="company"></p>
+              <label for="name">Ad soyad <span aria-hidden="true">*</span></label>
+              <input id="name" name="name" autocomplete="name" required aria-describedby="nameError">
+              <p class="field-error" id="nameError" data-error-for="name"></p>
             </div>
             <div class="form-row">
-              <label for="email">E-posta</label>
-              <input id="email" name="email" type="email" autocomplete="email" required>
-              <p class="field-error" data-error-for="email"></p>
+              <label for="company">Şirket <span aria-hidden="true">*</span></label>
+              <input id="company" name="company" autocomplete="organization" required aria-describedby="companyError">
+              <p class="field-error" id="companyError" data-error-for="company"></p>
+            </div>
+            <div class="form-row">
+              <label for="email">E-posta <span aria-hidden="true">*</span></label>
+              <input id="email" name="email" type="email" autocomplete="email" required aria-describedby="emailError">
+              <p class="field-error" id="emailError" data-error-for="email"></p>
             </div>
             <div class="form-row">
               <label for="website">Web sitesi</label>
-              <input id="website" name="website" type="url" autocomplete="url" placeholder="https://">
-              <p class="field-error" data-error-for="website"></p>
+              <input id="website" name="website" type="url" autocomplete="url" inputmode="url" placeholder="https://" aria-describedby="websiteError">
+              <p class="field-error" id="websiteError" data-error-for="website"></p>
             </div>
             <div class="form-row wide">
-              <label for="need">Aylık kreatif ihtiyacı</label>
-              <select id="need" name="need" required>
+              <label for="need">Aylık kreatif ihtiyacı <span aria-hidden="true">*</span></label>
+              <select id="need" name="need" required aria-describedby="needError">
                 <option value="">Seçiniz</option>
                 <option>50 adetten az</option>
                 <option>50-200 arası</option>
                 <option>200 adetten fazla</option>
               </select>
-              <p class="field-error" data-error-for="need"></p>
+              <p class="field-error" id="needError" data-error-for="need"></p>
             </div>
             <div class="form-row wide">
               <label for="note">Kısa not</label>
               <textarea id="note" name="note" rows="4" placeholder="Kullandığınız kanallar, marka sayısı veya mevcut darboğaz"></textarea>
             </div>
-            <button class="button primary form-submit" type="submit">Başvuru gönder</button>
+            <button class="button primary form-submit" type="submit">Pilot görüşmesini planla</button>
             <div class="form-row honeypot-row" aria-hidden="true">
               <label for="companyFax">Fax</label>
               <input id="companyFax" name="companyFax" type="text" tabindex="-1" autocomplete="off">
             </div>
             <input id="leadStartedAt" name="startedAt" type="hidden" value="">
-            <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+            <p class="form-status" id="formStatus" role="status" aria-live="polite" tabindex="-1"></p>
           </form>
         </div>
       </section>
@@ -287,15 +381,15 @@
 
     <footer class="site-footer">
       <div class="container footer-layout">
-        <a class="brand" href="#top">
-          <span class="brand-mark" aria-hidden="true">V</span>
-          <span>VitrinOS</span>
+        <a class="brand" href="#top" aria-label="VitrinOS ana sayfaya dön">
+          <span class="brand-vitrin">Vitrin</span><span class="brand-os">OS</span><sup aria-hidden="true">®</sup>
         </a>
-        <p>Marka özel reklam görseli otomasyonu için pilot çalışma alanı.</p>
+        <p>AI destekli kreatif operasyon sistemi.</p>
         <div class="footer-links">
-          <a href="#basvuru">Başvuru</a>
-          <a href="#basvuru">Başvuru formuna git</a>
+          <a href="#uretim-hatti">Üretim hattı</a>
+          <a href="#basvuru">Pilot başvuru</a>
         </div>
+        <p class="footer-code">VOS / IST / 2026</p>
       </div>
     </footer>
 
@@ -308,8 +402,8 @@
       crossorigin="anonymous"
     ></script>
     <script src="js/supabase.js"></script>
-    <script src="js/reveal.js"></script>
-    <script src="js/lead-form.js?v=20260708-secure-leads"></script>
-    <script src="js/main.js?v=1.1"></script>
+    <script src="js/reveal.js?v=2.0"></script>
+    <script src="js/lead-form.js?v=2.0"></script>
+    <script src="js/main.js?v=2.0"></script>
   </body>
 </html>

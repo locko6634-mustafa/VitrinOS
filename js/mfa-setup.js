@@ -3,38 +3,70 @@
   if (!authContext) return;
 
   const client = window.VitrinOS.auth.getClient();
+  const screen = document.querySelector("#mfa-setup-main");
   const status = document.querySelector("#mfaStatus");
   const enrollPanel = document.querySelector("#mfaEnrollPanel");
   const startButton = document.querySelector("#mfaStartButton");
   const verifyButton = document.querySelector("#mfaVerifyButton");
+  const startLabel = startButton?.querySelector(".button-label");
+  const verifyLabel = verifyButton?.querySelector(".button-label");
   const restartButton = document.querySelector("#mfaRestartButton");
+  const setupForm = document.querySelector("#mfaSetupForm");
   const codeInput = document.querySelector("#mfaCode");
   const qrCode = document.querySelector("#mfaQrCode");
   const manualSecret = document.querySelector("#mfaManualSecret");
   let factorId = "";
+  let isVerifying = false;
 
-  function setStatus(message, isError = false) {
+  function setStatus(message, kind = "") {
     status.textContent = message;
-    status.classList.toggle("is-error", isError);
+    status.classList.toggle("is-error", kind === "error");
+    status.setAttribute("role", kind === "error" ? "alert" : "status");
+    if (kind) status.dataset.kind = kind;
+    else status.removeAttribute("data-kind");
+  }
+
+  function updateVerifyState() {
+    const codeIsComplete = codeInput.value.replace(/\D/g, "").length === 6;
+    verifyButton.disabled = isVerifying || !factorId || !codeIsComplete;
+  }
+
+  function setStartBusy(busy) {
+    startButton.disabled = busy;
+    startButton.setAttribute("aria-busy", String(busy));
+    if (startLabel) startLabel.textContent = busy ? "Güvenli kod hazırlanıyor" : "Doğrulayıcı uygulamasını bağla";
+  }
+
+  function setVerifyBusy(busy) {
+    isVerifying = busy;
+    setupForm?.setAttribute("aria-busy", String(busy));
+    verifyButton.setAttribute("aria-busy", String(busy));
+    restartButton.disabled = busy;
+    codeInput.disabled = busy || !factorId;
+    if (verifyLabel) verifyLabel.textContent = busy ? "Kod doğrulanıyor" : "Doğrula ve etkinleştir";
+    updateVerifyState();
   }
 
   async function refreshStatus() {
     const { data, error } = await client.auth.mfa.getAuthenticatorAssuranceLevel();
     if (error) throw error;
     if (data.currentLevel === "aal2") {
-      setStatus("MFA doğrulandı. Bu oturum AAL2 güvenlik seviyesinde.");
+      setStatus("İkinci adım doğrulaması etkin. Bu oturum AAL2 güvenlik düzeyinde.", "success");
       enrollPanel.hidden = true;
       startButton.hidden = true;
+      codeInput.disabled = true;
       return true;
     }
     if (data.nextLevel === "aal2") {
-      setStatus("MFA zaten bağlı. Giriş sırasında doğrulayıcı uygulamanızdaki kod kullanılacak.");
+      setStatus("Doğrulayıcı zaten bağlı. Yönetici girişlerinde uygulamadaki kod istenecek.", "success");
       enrollPanel.hidden = true;
       startButton.hidden = true;
+      codeInput.disabled = true;
       return true;
     }
-    setStatus("Henüz bir doğrulayıcı uygulaması bağlı değil.");
+    setStatus("Henüz bir doğrulayıcı bağlı değil. Güvenli kurulumu başlatabilirsin.");
     startButton.hidden = false;
+    startButton.disabled = false;
     return false;
   }
 
@@ -48,8 +80,9 @@
   }
 
   async function beginEnrollment() {
-    startButton.disabled = true;
-    setStatus("QR kod hazırlanıyor…");
+    setStartBusy(true);
+    screen?.setAttribute("aria-busy", "true");
+    setStatus("Sana özel QR kod güvenli biçimde hazırlanıyor…", "loading");
     try {
       await removePendingFactor();
       const { data, error } = await client.auth.mfa.enroll({ factorType: "totp", friendlyName: "VitrinOS yönetici" });
@@ -65,29 +98,44 @@
       manualSecret.hidden = false;
       enrollPanel.hidden = false;
       startButton.hidden = true;
-      verifyButton.disabled = false;
-      setStatus("Kodu doğrulayıcı uygulamanızla tarayın; ardından 6 haneli kodu girin.");
+      codeInput.disabled = false;
+      updateVerifyState();
+      setStatus("QR kodu uygulamanla tara; ardından üretilen 6 haneli kodu gir.", "mfa");
       codeInput.focus();
     } catch (error) {
-      setStatus(error.message || "MFA kaydı başlatılamadı.", true);
-      startButton.disabled = false;
+      setStatus(error.message || "MFA kaydı başlatılamadı.", "error");
+      status?.focus();
+    } finally {
+      setStartBusy(false);
+      screen?.setAttribute("aria-busy", "false");
     }
   }
 
   async function verifyEnrollment() {
     const code = codeInput.value.replace(/\D/g, "");
-    if (!factorId || code.length !== 6) return setStatus("6 haneli doğrulama kodunu girin.", true);
-    verifyButton.disabled = true;
-    setStatus("Kod doğrulanıyor…");
+    if (!factorId || code.length !== 6) {
+      codeInput.setAttribute("aria-invalid", "true");
+      setStatus("6 haneli doğrulama kodunu gir.", "error");
+      codeInput.focus();
+      return;
+    }
+
+    setVerifyBusy(true);
+    setStatus("Kod ve cihaz bağı doğrulanıyor…", "loading");
     try {
       const { data: challenge, error: challengeError } = await client.auth.mfa.challenge({ factorId });
       if (challengeError) throw challengeError;
       const { error: verifyError } = await client.auth.mfa.verify({ factorId, challengeId: challenge.id, code });
       if (verifyError) throw verifyError;
+      factorId = "";
+      codeInput.value = "";
+      setVerifyBusy(false);
       await refreshStatus();
     } catch (error) {
-      setStatus(error.message || "Kod doğrulanamadı. Yeni bir kodla tekrar deneyin.", true);
-      verifyButton.disabled = false;
+      setVerifyBusy(false);
+      codeInput.setAttribute("aria-invalid", "true");
+      setStatus(error.message || "Kod doğrulanamadı. Güncel kodla yeniden dene.", "error");
+      codeInput.focus();
     }
   }
 
@@ -95,15 +143,36 @@
   restartButton.addEventListener("click", () => {
     enrollPanel.hidden = true;
     qrCode.hidden = true;
+    qrCode.removeAttribute("src");
     manualSecret.hidden = true;
+    manualSecret.textContent = "";
     codeInput.value = "";
+    codeInput.disabled = true;
+    codeInput.setAttribute("aria-invalid", "false");
     factorId = "";
     startButton.hidden = false;
     startButton.disabled = false;
-    setStatus("Yeni bir doğrulayıcı kaydı oluşturabilirsiniz.");
+    updateVerifyState();
+    setStatus("Yeni bir doğrulayıcı kaydı oluşturabilirsin.");
   });
-  verifyButton.addEventListener("click", verifyEnrollment);
-  codeInput.addEventListener("input", () => { codeInput.value = codeInput.value.replace(/\D/g, "").slice(0, 6); });
 
-  try { await refreshStatus(); } catch (error) { setStatus(error.message || "MFA durumu alınamadı.", true); }
+  setupForm?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    verifyEnrollment();
+  });
+
+  codeInput.addEventListener("input", () => {
+    codeInput.value = codeInput.value.replace(/\D/g, "").slice(0, 6);
+    codeInput.setAttribute("aria-invalid", "false");
+    updateVerifyState();
+  });
+
+  try {
+    await refreshStatus();
+  } catch (error) {
+    setStatus(error.message || "MFA durumu alınamadı.", "error");
+    status?.focus();
+  } finally {
+    screen?.setAttribute("aria-busy", "false");
+  }
 })();

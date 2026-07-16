@@ -3,56 +3,86 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>VitrinOS Giriş | Local ürün akışı</title>
+    <title>Güvenli giriş | VitrinOS</title>
     <meta name="description" content="VitrinOS kreatif operasyon paneline giriş yapın.">
     <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="14" fill="%23161512"/%3E%3Cpath d="M16 16h10l7 23 7-23h8L37 48h-9L16 16Z" fill="%23d9962a"/%3E%3C/svg%3E'>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/login.css?v=2.0">
   </head>
-  <body class="app-body">
+  <body class="app-body auth-body" data-surface="auth">
     <a class="skip-link" href="#login-main">İçeriğe geç</a>
 
     <main class="auth-screen" id="login-main" aria-labelledby="authTitle">
-      <div class="auth-panel">
+      <section class="auth-panel">
         <div class="auth-nav">
           <a class="brand auth-brand" href="index.html" aria-label="VitrinOS ana sayfa">
-            <span class="brand-mark" aria-hidden="true">V</span>
-            <span>VitrinOS</span>
+            <span class="brand-word">Vitrin</span><span class="brand-os">OS</span><sup class="brand-reg" aria-hidden="true">®</sup>
           </a>
-          <a class="auth-back" href="index.html">Ana sayfaya dön</a>
+          <a class="auth-back" href="index.html"><span aria-hidden="true">←</span> Ana sayfa</a>
         </div>
         <div class="auth-copy">
-          <p class="kicker">Local ürün akışı</p>
-          <h1 id="authTitle">Kreatif operasyon paneline gir.</h1>
+          <p class="kicker">Güvenli kreatif stüdyo</p>
+          <h1 id="authTitle">Operasyon masanı kaldığın yerden aç.</h1>
           <p>
-            Supabase Auth ile giriş yap. Admin hesabı admin paneline, diğer kullanıcılar ürün paneline yönlendirilir.
+            Brief, üretim ve onay akışına yalnızca yetkilendirilmiş hesabınla eriş. Yönetici oturumları ikinci doğrulama katmanıyla korunur.
           </p>
         </div>
-        <form class="auth-form" id="loginForm" novalidate>
+        <form class="auth-form" id="loginForm" novalidate aria-describedby="loginStatus">
           <div class="form-row">
             <label for="loginEmail">E-posta veya kullanıcı adı</label>
-            <input id="loginEmail" name="email" type="text" autocomplete="username" value="" required>
+            <input id="loginEmail" name="email" type="text" autocomplete="username" value="" required aria-invalid="false">
           </div>
           <div class="form-row">
             <label for="loginPassword">Şifre</label>
-            <input id="loginPassword" name="password" type="password" autocomplete="current-password" value="" required>
+            <div class="password-control">
+              <input id="loginPassword" name="password" type="password" autocomplete="current-password" value="" required aria-invalid="false">
+              <button class="password-toggle" id="loginPasswordToggle" type="button" aria-controls="loginPassword" aria-pressed="false" aria-label="Şifreyi göster">
+                <span class="password-toggle-icon" aria-hidden="true"></span>
+                <span class="password-toggle-text">Göster</span>
+              </button>
+            </div>
           </div>
-          <button class="button primary" type="submit">Panele gir</button>
-          <p class="form-status" id="loginStatus" role="status" aria-live="polite"></p>
+          <button class="button primary auth-submit" id="loginSubmitButton" type="submit">
+            <span class="button-label">Güvenli giriş yap</span>
+            <span class="button-loader" aria-hidden="true"></span>
+          </button>
+          <p class="form-status" id="loginStatus" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></p>
         </form>
-      </div>
-      <div class="auth-visual" aria-hidden="true">
-        <div class="auth-visual-card">
-          <span>NovaMarket</span>
-          <strong>18 job</strong>
-          <p>Brief, format, önizleme, onay ve revizyon tek panelde izlenir.</p>
+        <p class="auth-footnote"><span aria-hidden="true">⌁</span> Oturum ve yetki denetimi güvenli bağlantı üzerinden yapılır.</p>
+      </section>
+
+      <aside class="auth-visual auth-studio-scene" aria-labelledby="studioSceneTitle">
+        <div class="studio-grid" aria-hidden="true"></div>
+        <div class="studio-header">
+          <span class="scene-index">VOS / ACCESS 01</span>
+          <span class="scene-live"><i aria-hidden="true"></i> Korunan oturum</span>
         </div>
-        <div class="auth-visual-stack">
-          <span>Banner 1600x600</span>
-          <span>Meta post 1080x1350</span>
-          <span>Story 1080x1920</span>
+        <div class="studio-optic" aria-hidden="true">
+          <span class="optic-orbit optic-orbit-one"></span>
+          <span class="optic-orbit optic-orbit-two"></span>
+          <span class="optic-aperture"></span>
+          <span class="optic-prism"></span>
+          <span class="optic-beam"></span>
         </div>
-      </div>
+        <div class="studio-caption">
+          <p class="scene-label">Kontrollü üretim hattı</p>
+          <h2 id="studioSceneTitle">Bir fikir, üç kontrollü aşamada yayına hazırlanır.</h2>
+        </div>
+        <ol class="studio-flow">
+          <li class="is-current">
+            <span>01</span>
+            <div><strong>Brief</strong><small>Niyet ve marka bağlamı</small></div>
+          </li>
+          <li>
+            <span>02</span>
+            <div><strong>Çıktı</strong><small>Formatlara göre üretim</small></div>
+          </li>
+          <li>
+            <span>03</span>
+            <div><strong>Onay</strong><small>İnsan kontrolü ve kayıt</small></div>
+          </li>
+        </ol>
+      </aside>
     </main>
 
     <script
@@ -64,6 +94,6 @@
     <script src="js/config.js"></script>
     <script src="js/observability.js"></script>
     <script src="js/supabase.js"></script>
-    <script src="js/login.js"></script>
+    <script src="js/login.js?v=2.0"></script>
   </body>
 </html>

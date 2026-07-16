@@ -4,28 +4,74 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>VitrinOS | Yönetici MFA doğrulaması</title>
+    <meta name="description" content="VitrinOS yönetici oturumu için güvenli ikinci adım doğrulaması.">
     <link rel="stylesheet" href="css/style.css?v=1.1">
-    <link rel="stylesheet" href="css/admin.css?v=1.1">
+    <link rel="stylesheet" href="css/login.css?v=2.0">
   </head>
-  <body class="app-body admin-body">
-    <main class="mfa-setup-shell">
-      <section class="admin-card mfa-setup-card" aria-labelledby="mfaTitle">
-        <p class="kicker">Yönetici güvenliği</p>
-        <h1 id="mfaTitle">MFA kodunu gir</h1>
-        <p id="mfaStatus" class="admin-note" aria-live="polite">Doğrulayıcı hazırlanıyor…</p>
-        <label class="mfa-code-label" for="mfaCode">6 haneli doğrulama kodu</label>
-        <input id="mfaCode" class="mfa-code-input" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="123456">
-        <div class="mfa-actions">
-          <button id="mfaVerifyButton" class="button primary" type="button">Doğrula ve devam et</button>
-          <button id="mfaSignOutButton" class="button secondary" type="button">Çıkış yap</button>
+  <body class="app-body auth-body" data-surface="auth">
+    <a class="skip-link" href="#mfa-main">İçeriğe geç</a>
+
+    <main class="auth-screen auth-screen--mfa" id="mfa-main" aria-labelledby="mfaTitle">
+      <section class="auth-panel">
+        <div class="auth-nav">
+          <a class="brand auth-brand" href="index.html" aria-label="VitrinOS ana sayfa">
+            <span class="brand-word">Vitrin</span><span class="brand-os">OS</span><sup class="brand-reg" aria-hidden="true">®</sup>
+          </a>
+          <button id="mfaSignOutButton" class="auth-back auth-back-button" type="button"><span aria-hidden="true">←</span> Çıkış yap</button>
         </div>
+
+        <div class="auth-copy">
+          <p class="kicker">Yönetici güvenliği / 02</p>
+          <h1 id="mfaTitle">Kimliğini ikinci adımla doğrula.</h1>
+          <p>Doğrulayıcı uygulamandaki tek kullanımlık kod, bu oturumun gerçekten sana ait olduğunu doğrular.</p>
+        </div>
+
+        <form class="auth-form auth-form--mfa" id="mfaChallengeForm" novalidate aria-describedby="mfaStatus">
+          <div class="security-level" aria-label="Oturum güvenlik düzeyi">
+            <span class="security-level-mark" aria-hidden="true"></span>
+            <div><strong>AAL2 doğrulaması</strong><small>Yönetici yetkisi için zorunlu</small></div>
+          </div>
+          <p id="mfaStatus" class="form-status" data-kind="loading" role="status" aria-live="polite" aria-atomic="true" tabindex="-1">Doğrulayıcı hazırlanıyor…</p>
+          <div class="form-row">
+            <label class="mfa-code-label" for="mfaCode">6 haneli doğrulama kodu</label>
+            <input id="mfaCode" class="mfa-code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000 000" aria-describedby="mfaCodeHint mfaStatus" aria-invalid="false" required disabled>
+            <p class="field-hint" id="mfaCodeHint">Kod her 30 saniyede yenilenir.</p>
+          </div>
+          <button id="mfaVerifyButton" class="button primary auth-submit" type="submit" disabled>
+            <span class="button-label">Doğrula ve devam et</span>
+            <span class="button-loader" aria-hidden="true"></span>
+          </button>
+        </form>
       </section>
+
+      <aside class="auth-visual auth-studio-scene auth-security-scene" aria-labelledby="securitySceneTitle">
+        <div class="studio-grid" aria-hidden="true"></div>
+        <div class="studio-header">
+          <span class="scene-index">VOS / CLEARANCE 02</span>
+          <span class="scene-live"><i aria-hidden="true"></i> İkinci katman</span>
+        </div>
+        <div class="security-orbit" aria-hidden="true">
+          <span class="security-ring security-ring-one"></span>
+          <span class="security-ring security-ring-two"></span>
+          <span class="security-core"><b>02</b><small>AAL</small></span>
+          <span class="security-scan"></span>
+        </div>
+        <div class="studio-caption">
+          <p class="scene-label">Yetki protokolü</p>
+          <h2 id="securitySceneTitle">Erişim, iki bağımsız kanıt tamamlandığında açılır.</h2>
+        </div>
+        <ol class="studio-flow studio-flow--security">
+          <li class="is-done"><span>01</span><div><strong>Hesap</strong><small>Şifre doğrulandı</small></div></li>
+          <li class="is-current"><span>02</span><div><strong>Kod</strong><small>Doğrulama bekleniyor</small></div></li>
+          <li><span>03</span><div><strong>Yetki</strong><small>Güvenli erişim</small></div></li>
+        </ol>
+      </aside>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
     <script src="/api/runtime-config.js"></script>
     <script src="js/config.js?v=1.1"></script>
     <script src="js/observability.js?v=1.1"></script>
     <script src="js/supabase.js?v=1.1"></script>
-    <script src="js/mfa-challenge.js?v=1.0"></script>
+    <script src="js/mfa-challenge.js?v=2.0"></script>
   </body>
 </html>

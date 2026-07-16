@@ -6,42 +6,100 @@
     <title>VitrinOS | Yönetici MFA kurulumu</title>
     <meta name="description" content="VitrinOS yönetici hesabı için TOTP çok faktörlü doğrulama kurulumu.">
     <link rel="stylesheet" href="css/style.css?v=1.1">
-    <link rel="stylesheet" href="css/admin.css?v=1.1">
+    <link rel="stylesheet" href="css/login.css?v=2.0">
   </head>
-  <body class="app-body admin-body">
-    <main class="mfa-setup-shell">
-      <section class="admin-card mfa-setup-card" aria-labelledby="mfaTitle">
-        <p class="kicker">Yönetici güvenliği</p>
-        <h1 id="mfaTitle">Doğrulayıcı uygulamasını bağla</h1>
-        <p id="mfaStatus" class="admin-note" aria-live="polite">MFA durumu kontrol ediliyor…</p>
-        <div id="mfaEnrollPanel" hidden>
-          <ol class="mfa-steps">
-            <li>Google Authenticator, 1Password veya benzeri bir uygulama açın.</li>
-            <li>Kodu tarayın ve uygulamanın ürettiği 6 haneli kodu girin.</li>
-          </ol>
-          <img id="mfaQrCode" class="mfa-qr-code" alt="VitrinOS MFA QR kodu" hidden>
-          <details class="mfa-secret-details">
-            <summary>QR okunmazsa manuel anahtarı göster</summary>
-            <p id="mfaManualSecret" class="mfa-secret" hidden></p>
-          </details>
-          <label class="mfa-code-label" for="mfaCode">Doğrulama kodu</label>
-          <input id="mfaCode" class="mfa-code-input" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="123456">
-          <div class="mfa-actions">
-            <button id="mfaVerifyButton" class="button primary" type="button" disabled>Doğrula ve etkinleştir</button>
-            <button id="mfaRestartButton" class="button secondary" type="button">Yeni kod oluştur</button>
+  <body class="app-body auth-body" data-surface="auth">
+    <a class="skip-link" href="#mfa-setup-main">İçeriğe geç</a>
+
+    <main class="auth-screen auth-screen--mfa auth-screen--mfa-setup" id="mfa-setup-main" aria-labelledby="mfaTitle" aria-busy="true">
+      <section class="auth-panel">
+        <div class="auth-nav">
+          <a class="brand auth-brand" href="index.html" aria-label="VitrinOS ana sayfa">
+            <span class="brand-word">Vitrin</span><span class="brand-os">OS</span><sup class="brand-reg" aria-hidden="true">®</sup>
+          </a>
+          <a class="auth-back" href="admin.html"><span aria-hidden="true">←</span> Admin paneli</a>
+        </div>
+
+        <div class="auth-copy">
+          <p class="kicker">Yönetici güvenliği / kurulum</p>
+          <h1 id="mfaTitle">Doğrulayıcını güvenli biçimde bağla.</h1>
+          <p>Bu tek seferlik kurulumdan sonra yönetici erişimi, şifrene ek olarak doğrulayıcı uygulamandaki kodu da ister.</p>
+        </div>
+
+        <div class="auth-form auth-form--mfa auth-form--setup">
+          <div class="security-level" aria-label="Oturum güvenlik düzeyi">
+            <span class="security-level-mark" aria-hidden="true"></span>
+            <div><strong>İki adımlı doğrulama</strong><small>TOTP tabanlı ek erişim katmanı</small></div>
+          </div>
+          <p id="mfaStatus" class="form-status" data-kind="loading" role="status" aria-live="polite" aria-atomic="true" tabindex="-1">MFA durumu kontrol ediliyor…</p>
+
+          <button id="mfaStartButton" class="button primary auth-submit" type="button" hidden>
+            <span class="button-label">Doğrulayıcı uygulamasını bağla</span>
+            <span class="button-loader" aria-hidden="true"></span>
+          </button>
+
+          <div id="mfaEnrollPanel" class="mfa-enroll-panel" hidden>
+            <ol class="mfa-steps">
+              <li><span>01</span><p>Doğrulayıcı uygulamanda yeni hesap eklemeyi aç.</p></li>
+              <li><span>02</span><p>QR kodu tara ve üretilen 6 haneli kodu aşağıya gir.</p></li>
+            </ol>
+
+            <div class="mfa-qr-stage">
+              <span class="mfa-qr-corner" aria-hidden="true"></span>
+              <img id="mfaQrCode" class="mfa-qr-code" alt="VitrinOS MFA kurulum QR kodu" width="220" height="220" hidden>
+            </div>
+
+            <details class="mfa-secret-details">
+              <summary>QR okunmazsa manuel anahtarı göster</summary>
+              <p id="mfaManualSecret" class="mfa-secret" hidden></p>
+            </details>
+
+            <form id="mfaSetupForm" class="mfa-code-form" novalidate aria-describedby="mfaStatus">
+              <div class="form-row">
+                <label class="mfa-code-label" for="mfaCode">Doğrulama kodu</label>
+                <input id="mfaCode" class="mfa-code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000 000" aria-describedby="mfaSetupCodeHint mfaStatus" aria-invalid="false" required disabled>
+                <p class="field-hint" id="mfaSetupCodeHint">Uygulamada görünen güncel kodu kullan.</p>
+              </div>
+              <div class="mfa-actions">
+                <button id="mfaVerifyButton" class="button primary auth-submit" type="submit" disabled>
+                  <span class="button-label">Doğrula ve etkinleştir</span>
+                  <span class="button-loader" aria-hidden="true"></span>
+                </button>
+                <button id="mfaRestartButton" class="button secondary" type="button">Yeni kod oluştur</button>
+              </div>
+            </form>
           </div>
         </div>
-        <div class="mfa-actions">
-          <button id="mfaStartButton" class="button primary" type="button" hidden>Doğrulayıcı uygulamasını bağla</button>
-          <a class="button secondary" href="admin.html">Admin panele dön</a>
-        </div>
       </section>
+
+      <aside class="auth-visual auth-studio-scene auth-security-scene" aria-labelledby="setupSceneTitle">
+        <div class="studio-grid" aria-hidden="true"></div>
+        <div class="studio-header">
+          <span class="scene-index">VOS / ENROLLMENT</span>
+          <span class="scene-live"><i aria-hidden="true"></i> Kurulum protokolü</span>
+        </div>
+        <div class="security-orbit" aria-hidden="true">
+          <span class="security-ring security-ring-one"></span>
+          <span class="security-ring security-ring-two"></span>
+          <span class="security-core"><b>2×</b><small>CHECK</small></span>
+          <span class="security-scan"></span>
+        </div>
+        <div class="studio-caption">
+          <p class="scene-label">Güven mimarisi</p>
+          <h2 id="setupSceneTitle">Şifre hesabı açar. İkinci faktör yetkiyi doğrular.</h2>
+        </div>
+        <ol class="studio-flow studio-flow--security">
+          <li class="is-done"><span>01</span><div><strong>Hesap</strong><small>Kimlik bilgisi</small></div></li>
+          <li class="is-current"><span>02</span><div><strong>Cihaz</strong><small>Doğrulayıcı bağı</small></div></li>
+          <li><span>03</span><div><strong>Erişim</strong><small>Kontrollü oturum</small></div></li>
+        </ol>
+      </aside>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
     <script src="/api/runtime-config.js"></script>
     <script src="js/config.js?v=1.1"></script>
     <script src="js/observability.js?v=1.1"></script>
     <script src="js/supabase.js?v=1.1"></script>
-    <script src="js/mfa-setup.js?v=1.1"></script>
+    <script src="js/mfa-setup.js?v=2.0"></script>
   </body>
 </html>
