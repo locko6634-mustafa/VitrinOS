@@ -73,7 +73,7 @@
 
   .admin-topbar .brand-os {
     margin-left: 0.16em;
-    color: var(--accent-soft);
+    color: var(--admin-accent-soft);
     font-family: var(--vo-font-mono);
     font-size: 0.74em;
     font-weight: 800;
