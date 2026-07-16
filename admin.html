@@ -15,7 +15,7 @@
     <div class="admin-shell">
       <header class="admin-topbar" id="adminTopbar">
         <a class="brand" href="index.html" aria-label="VitrinOS ana sayfa">
-          <span class="brand-wordmark" aria-hidden="true">Vitrin<span class="brand-os">OS</span><sup>®</sup></span>
+          <span class="brand-word">Vitrin</span><span class="brand-os">OS</span><sup aria-hidden="true">®</sup>
         </a>
         <div class="admin-context">
           <span>Admin</span>
@@ -34,12 +34,16 @@
       </header>
  
       <aside class="admin-sidebar" id="adminSidebar" aria-label="Admin bölümleri">
+        <div class="admin-rail-intro">
+          <span>Creative command desk</span>
+          <strong>Operasyon merkezi</strong>
+        </div>
         <nav class="admin-nav" aria-label="Operasyon bölümleri" role="tablist" aria-orientation="vertical">
-          <button class="admin-nav-button is-active" id="admin-tab-overview" type="button" role="tab" aria-controls="admin-panel-overview" aria-selected="true" tabindex="0" data-admin-tab="overview">Kontrol merkezi</button>
-          <button class="admin-nav-button" id="admin-tab-brands" type="button" role="tab" aria-controls="admin-panel-brands" aria-selected="false" tabindex="-1" data-admin-tab="brands">Markalar</button>
-          <button class="admin-nav-button" id="admin-tab-users" type="button" role="tab" aria-controls="admin-panel-users" aria-selected="false" tabindex="-1" data-admin-tab="users">Kullanıcılar</button>
-          <button class="admin-nav-button" id="admin-tab-leads" type="button" role="tab" aria-controls="admin-panel-leads" aria-selected="false" tabindex="-1" data-admin-tab="leads">Başvurular</button>
-          <button class="admin-nav-button" id="admin-tab-jobs" type="button" role="tab" aria-controls="admin-panel-jobs" aria-selected="false" tabindex="-1" data-admin-tab="jobs">Job izleme</button>
+          <button class="admin-nav-button is-active" id="admin-tab-overview" type="button" role="tab" aria-controls="admin-panel-overview" aria-selected="true" tabindex="0" data-admin-tab="overview"><span>01</span>Kontrol merkezi</button>
+          <button class="admin-nav-button" id="admin-tab-brands" type="button" role="tab" aria-controls="admin-panel-brands" aria-selected="false" tabindex="-1" data-admin-tab="brands"><span>02</span>Markalar</button>
+          <button class="admin-nav-button" id="admin-tab-users" type="button" role="tab" aria-controls="admin-panel-users" aria-selected="false" tabindex="-1" data-admin-tab="users"><span>03</span>Kullanıcılar</button>
+          <button class="admin-nav-button" id="admin-tab-leads" type="button" role="tab" aria-controls="admin-panel-leads" aria-selected="false" tabindex="-1" data-admin-tab="leads"><span>04</span>Başvurular</button>
+          <button class="admin-nav-button" id="admin-tab-jobs" type="button" role="tab" aria-controls="admin-panel-jobs" aria-selected="false" tabindex="-1" data-admin-tab="jobs"><span>05</span>Job izleme</button>
         </nav>
         <div class="admin-sidebar-actions" aria-label="Admin hesap işlemleri">
           <a href="mfa-setup.html">MFA güvenliği</a>

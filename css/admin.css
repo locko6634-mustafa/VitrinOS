@@ -1,8 +1,16 @@
 @layer pages {
   .admin-body {
-    --admin-rail: 236px;
-    --admin-topbar: 76px;
-    background: var(--vo-porcelain);
+    --admin-rail: 248px;
+    --admin-topbar: 72px;
+    --admin-bg: var(--vo-canvas, hsl(38 32% 96%));
+    --admin-surface: var(--vo-paper, hsl(38 35% 99%));
+    --admin-ink: var(--vo-ink, hsl(220 15% 13%));
+    --admin-muted: var(--vo-muted, hsl(220 8% 42%));
+    --admin-line: var(--vo-line, hsla(220 15% 13% / 0.13));
+    background:
+      radial-gradient(circle at 88% 7%, hsla(222 78% 55% / 0.07), transparent 23rem),
+      radial-gradient(circle at 30% 0%, hsla(25 92% 53% / 0.07), transparent 26rem),
+      var(--admin-bg);
   }
 
   .admin-body::after {
@@ -36,21 +44,33 @@
     align-items: center;
     min-height: var(--admin-topbar);
     width: 100%;
-    border-bottom: 1px solid var(--vo-line-strong);
-    background: hsl(38 35% 99% / 0.92);
-    backdrop-filter: blur(18px) saturate(1.15);
+    border-bottom: 1px solid var(--admin-line);
+    background: color-mix(in srgb, var(--admin-surface) 92%, transparent);
+    backdrop-filter: blur(18px) saturate(125%);
   }
 
   .admin-topbar .brand {
     align-self: stretch;
     display: inline-flex;
     align-items: center;
-    padding-inline: 26px;
-    border-right: 1px solid var(--vo-line);
+    padding-inline: 24px;
+    border-right: 0;
   }
 
-  .admin-topbar .brand-wordmark {
-    font-size: 1.34rem;
+  .admin-topbar .brand {
+    color: var(--admin-ink);
+    font-size: 1.28rem;
+    font-weight: 780;
+    letter-spacing: -0.055em;
+  }
+
+  .admin-topbar .brand sup {
+    position: relative;
+    top: -0.46em;
+    margin-left: 0.28rem;
+    color: var(--admin-muted);
+    font-family: var(--vo-font-mono);
+    font-size: 0.44em;
   }
 
   .admin-context {
@@ -85,22 +105,42 @@
     padding-right: 18px;
   }
 
+  .admin-body .button {
+    min-height: 48px;
+    border-radius: 7px;
+    font-weight: 720;
+    letter-spacing: -0.015em;
+    box-shadow: none;
+  }
+
+  .admin-body .button.secondary {
+    border-color: var(--admin-line);
+    background: var(--admin-surface);
+    color: var(--admin-ink);
+  }
+
+  .admin-body .button.secondary:hover {
+    border-color: var(--vo-line-strong);
+    background: hsl(37 38% 97%);
+  }
+
   .admin-link-button {
     display: inline-flex;
-    min-height: 38px;
+    min-height: 39px;
     align-items: center;
     justify-content: center;
     padding: 0 12px;
-    border: 1px solid transparent;
-    color: var(--vo-ink-muted);
-    font: 600 0.72rem / 1 var(--vo-font-mono);
+    border: 1px solid var(--admin-line);
+    border-radius: 7px;
+    color: var(--admin-ink);
+    font: 720 0.84rem / 1 var(--vo-font-sans);
     transition: color var(--vo-duration-fast), border-color var(--vo-duration-fast), background var(--vo-duration-fast);
   }
 
   .admin-link-button:hover {
-    border-color: var(--vo-line);
-    color: var(--vo-graphite);
-    background: var(--vo-paper);
+    border-color: var(--vo-line-strong);
+    color: var(--admin-ink);
+    background: var(--admin-surface);
   }
 
   .admin-nav-toggle {
@@ -135,15 +175,34 @@
     height: calc(100dvh - var(--admin-topbar));
     overflow-y: auto;
     flex-direction: column;
-    padding: 22px 16px 18px;
-    border-right: 1px solid var(--vo-line-strong);
-    background: hsl(38 35% 99% / 0.8);
+    padding: 30px 20px 22px;
+    border-right: 1px solid var(--admin-line);
+    background: color-mix(in srgb, var(--admin-surface) 78%, transparent);
     backdrop-filter: blur(18px);
   }
 
   .admin-nav {
     display: grid;
     gap: 4px;
+  }
+
+  .admin-rail-intro {
+    display: grid;
+    gap: 5px;
+    padding: 0 10px 26px;
+  }
+
+  .admin-rail-intro span {
+    color: var(--vo-orange);
+    font: 720 0.68rem / 1.2 var(--vo-font-mono);
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+  }
+
+  .admin-rail-intro strong {
+    color: var(--admin-ink);
+    font-size: 1.04rem;
+    letter-spacing: -0.025em;
   }
 
   .admin-sidebar-actions {
@@ -153,28 +212,27 @@
   .admin-nav-button {
     position: relative;
     display: flex;
-    min-height: 46px;
+    min-height: 48px;
     align-items: center;
-    padding: 0 14px 0 20px;
+    grid-template-columns: 28px 1fr;
+    gap: 10px;
+    padding: 0 12px;
     overflow: hidden;
     border: 0;
-    border-radius: var(--vo-radius-xs);
+    border-radius: 6px;
     background: transparent;
     color: var(--vo-ink-muted);
-    font-size: 0.92rem;
-    font-weight: 580;
+    font-size: 0.94rem;
+    font-weight: 680;
     text-align: left;
     cursor: pointer;
   }
 
-  .admin-nav-button::before {
-    content: "";
-    position: absolute;
-    inset: 10px auto 10px 0;
-    width: 2px;
-    background: var(--vo-orange);
-    transform: scaleY(0);
-    transition: transform var(--vo-duration-fast) var(--vo-ease-out);
+  .admin-nav-button span {
+    width: 28px;
+    color: var(--vo-ink-muted);
+    font: 600 0.64rem / 1 var(--vo-font-mono);
+    letter-spacing: 0.08em;
   }
 
   .admin-nav-button:hover {
@@ -188,8 +246,8 @@
     box-shadow: inset 0 0 0 1px var(--vo-line), var(--vo-shadow-1);
   }
 
-  .admin-nav-button.is-active::before {
-    transform: scaleY(1);
+  .admin-nav-button.is-active span {
+    color: var(--vo-orange);
   }
 
   .admin-sidebar-note {
