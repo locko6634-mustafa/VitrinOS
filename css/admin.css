@@ -7,6 +7,8 @@
     --admin-ink: var(--vo-ink, hsl(220 15% 13%));
     --admin-muted: var(--vo-muted, hsl(220 8% 42%));
     --admin-line: var(--vo-line, hsla(220 15% 13% / 0.13));
+    --admin-accent: var(--vo-accent, hsl(25 92% 53%));
+    --admin-accent-soft: var(--vo-accent-strong, hsl(25 85% 42%));
     background:
       radial-gradient(circle at 88% 7%, hsla(222 78% 55% / 0.07), transparent 23rem),
       radial-gradient(circle at 30% 0%, hsla(25 92% 53% / 0.07), transparent 26rem),
@@ -214,7 +216,7 @@
   }
 
   .admin-rail-intro span {
-    color: var(--vo-orange);
+    color: var(--admin-accent-soft);
     font: 720 0.68rem / 1.2 var(--vo-font-mono);
     letter-spacing: 0.11em;
     text-transform: uppercase;
@@ -247,6 +249,7 @@
     font-weight: 680;
     text-align: left;
     cursor: pointer;
+    transition: background 180ms ease, color 180ms ease, transform 180ms ease;
   }
 
   .admin-nav-button span {
@@ -256,9 +259,21 @@
     letter-spacing: 0.08em;
   }
 
+  .admin-nav-button::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: -20px;
+    width: 2px;
+    background: transparent;
+    transition: background 180ms ease;
+  }
+
   .admin-nav-button:hover {
     color: var(--vo-graphite);
     background: hsl(220 15% 13% / 0.035);
+    transform: translateX(2px);
   }
 
   .admin-nav-button.is-active {
@@ -268,7 +283,11 @@
   }
 
   .admin-nav-button.is-active span {
-    color: var(--vo-orange);
+    color: var(--admin-accent-soft);
+  }
+
+  .admin-nav-button.is-active::after {
+    background: var(--admin-accent);
   }
 
   .admin-sidebar-note {
@@ -1177,7 +1196,7 @@
     }
 
     .admin-sidebar,
-    .admin-nav-button::before,
+    .admin-nav-button::after,
     .admin-table tbody tr {
       transition: none;
     }
