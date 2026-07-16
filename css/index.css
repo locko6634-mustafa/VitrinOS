@@ -894,7 +894,6 @@ body[data-surface="marketing"] .pipeline-step li::before {
 
 body[data-surface="marketing"] .pipeline-stage-wrap {
   position: relative;
-  align-self: start;
 }
 
 body[data-surface="marketing"] .pipeline-stage {
