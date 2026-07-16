@@ -1286,7 +1286,8 @@ body[data-surface="workspace"] button:disabled {
 
   .app-rail {
     top: 64px;
-    width: 100vw;
+    right: 0;
+    width: auto;
     max-width: none;
     border-right: 0;
   }
