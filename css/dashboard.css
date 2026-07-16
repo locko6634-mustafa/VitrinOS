@@ -223,10 +223,11 @@ body[data-surface="workspace"] .button.secondary:hover {
 }
 
 .app-rail {
-  position: sticky;
-  top: 72px;
+  position: fixed;
+  inset: 72px auto 0 0;
   align-self: start;
-  height: calc(100dvh - 72px);
+  width: 248px;
+  height: auto;
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--line);
@@ -1132,6 +1133,10 @@ body[data-surface="workspace"] button:disabled {
 
   .app-workspace {
     grid-template-columns: 218px minmax(0, 1fr);
+  }
+
+  .app-rail {
+    width: 218px;
   }
 
   .workspace-signal {

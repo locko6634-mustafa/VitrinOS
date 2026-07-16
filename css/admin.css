@@ -28,13 +28,14 @@
 
   .admin-topbar {
     grid-area: topbar;
-    position: sticky;
-    top: 0;
+    position: fixed;
+    inset: 0 0 auto;
     z-index: 40;
     display: grid;
     grid-template-columns: var(--admin-rail) minmax(220px, 1fr) auto;
     align-items: center;
     min-height: var(--admin-topbar);
+    width: 100%;
     border-bottom: 1px solid var(--vo-line-strong);
     background: hsl(38 35% 99% / 0.92);
     backdrop-filter: blur(18px) saturate(1.15);
@@ -124,12 +125,13 @@
 
   .admin-sidebar {
     grid-area: sidebar;
-    position: sticky;
-    top: var(--admin-topbar);
+    position: fixed;
+    inset: var(--admin-topbar) auto 0 0;
     z-index: 30;
     align-self: start;
     display: flex;
-    height: calc(100vh - var(--admin-topbar));
+    width: var(--admin-rail);
+    height: auto;
     flex-direction: column;
     padding: 22px 16px 18px;
     border-right: 1px solid var(--vo-line-strong);
