@@ -48,8 +48,20 @@
     const stage = document.querySelector("[data-pipeline-stage]");
     const stagePanels = Array.from(document.querySelectorAll("[data-stage]"));
     const stageCount = document.querySelector("[data-stage-count]");
+    const siteHeader = document.querySelector(".site-header");
 
     if (!story || !steps.length || !stage) return;
+
+    function syncStickyOffset() {
+      if (!siteHeader) return;
+
+      const headerBottom = siteHeader.getBoundingClientRect().bottom;
+      const breathingRoom = Math.max(12, Math.min(24, window.innerHeight * 0.02));
+      document.documentElement.style.setProperty(
+        "--pipeline-sticky-top",
+        `${Math.ceil(headerBottom + breathingRoom)}px`
+      );
+    }
 
     function activate(index) {
       const safeIndex = Math.min(steps.length - 1, Math.max(0, Number(index) || 0));
@@ -69,6 +81,13 @@
     }
 
     activate(0);
+    syncStickyOffset();
+    window.addEventListener("resize", syncStickyOffset, { passive: true });
+
+    if (siteHeader && "ResizeObserver" in window) {
+      const headerObserver = new ResizeObserver(syncStickyOffset);
+      headerObserver.observe(siteHeader);
+    }
 
     if (!("IntersectionObserver" in window) || reducedMotion.matches) return;
 

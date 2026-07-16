@@ -13,7 +13,7 @@ body[data-surface="marketing"] {
   --marketing-shadow-3: var(--vo-shadow-3, 0 42px 110px hsl(220 25% 12% / 0.18));
   margin: 0;
   min-width: 320px;
-  overflow-x: hidden;
+  overflow-x: clip;
   color: var(--marketing-graphite);
   background: var(--marketing-porcelain);
   font-family: var(--vo-font-sans, "Instrument Sans", "Segoe UI", system-ui, sans-serif);
@@ -899,9 +899,9 @@ body[data-surface="marketing"] .pipeline-stage-wrap {
 
 body[data-surface="marketing"] .pipeline-stage {
   position: sticky;
-  top: clamp(86px, 10vh, 112px);
-  height: min(670px, calc(100svh - 142px));
-  min-height: 520px;
+  top: var(--pipeline-sticky-top, 6rem);
+  height: min(670px, calc(100svh - var(--pipeline-sticky-top, 6rem) - 24px));
+  min-height: min(520px, calc(100svh - var(--pipeline-sticky-top, 6rem) - 24px));
   overflow: hidden;
   border: 1px solid hsl(220 15% 13% / 0.82);
   border-radius: 4px;
