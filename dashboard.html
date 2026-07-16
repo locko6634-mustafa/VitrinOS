@@ -3,78 +3,106 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>VitrinOS Panel | Local ürün akışı</title>
-    <meta name="description" content="VitrinOS local ürün akışı; brief, görsel önizleme, onay, revizyon ve geçmiş ekranlarını gösterir.">
-    <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="14" fill="%23161512"/%3E%3Cpath d="M16 16h10l7 23 7-23h8L37 48h-9L16 16Z" fill="%23d9962a"/%3E%3C/svg%3E'>
-    <link rel="stylesheet" href="css/style.css?v=1.1">
-    <link rel="stylesheet" href="css/dashboard.css?v=1.1">
+    <title>VitrinOS Command Desk | Kreatif operasyon</title>
+    <meta name="description" content="VitrinOS kreatif operasyon masası; brief, üretim takibi, görsel onayı, revizyon ve operasyon geçmişini tek yüzeyde toplar.">
+    <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" fill="%23f8f4ec"/%3E%3Cpath d="M11 15h11l10 30 10-30h11L38 53H26L11 15Z" fill="%231d1e22"/%3E%3Cpath d="M46 42h9v9h-9z" fill="%23f46b22"/%3E%3C/svg%3E'>
+    <link rel="stylesheet" href="css/style.css?v=2.1">
+    <link rel="stylesheet" href="css/dashboard.css?v=2.1">
   </head>
-  <body class="app-body">
+  <body class="app-body" data-surface="workspace">
     <a class="skip-link" href="#app-main">İçeriğe geç</a>
 
     <div class="app-shell" id="appShell">
       <header class="app-topbar">
         <a class="brand" href="index.html" aria-label="VitrinOS ana sayfa">
-          <span class="brand-mark" aria-hidden="true">V</span>
-          <span>VitrinOS</span>
+          <span class="brand-word">Vitrin</span><span class="brand-os">OS</span><sup aria-hidden="true">®</sup>
         </a>
         <div class="app-context">
           <span id="appContextBrand">-</span>
           <strong id="appContextUser">-</strong>
         </div>
         <div class="app-actions">
-          <button class="button secondary compact-button" id="logoutButton" type="button">Çıkış</button>
+          <button class="button secondary compact-button" id="logoutButton" type="button" data-dashboard-logout>Çıkış</button>
         </div>
-        <button class="app-menu-toggle" id="appMenuToggle" type="button" aria-label="Panel menüsünü aç" aria-controls="appTabs" aria-expanded="false">
+        <button class="app-menu-toggle" id="appMenuToggle" type="button" aria-label="Çalışma alanı menüsünü aç" aria-controls="dashboardNav" aria-expanded="false">
           <span></span>
           <span></span>
           <span></span>
         </button>
       </header>
 
-      <main class="app-main" id="app-main">
-        <section class="app-hero-panel" aria-labelledby="appTitle">
-          <div>
-            <p class="kicker">Ürün paneli</p>
-            <h1 id="appTitle">Brief’ten onaya uzanan üretim hattı.</h1>
-            <p>
-              VitrinOS Canlı Otomasyon Sistemi, brief hazırlığından üretim takibine kadar tüm pazarlama görseli akışını tek panelde toplar.
-            </p>
+      <div class="app-workspace" id="appMain">
+        <aside class="app-rail" id="dashboardNav" aria-label="Creative Command Desk navigasyonu">
+          <div class="rail-intro">
+            <span>Creative command desk</span>
+            <strong>Üretim merkezi</strong>
           </div>
-          <div class="app-hero-media">
-            <img src="assets/format-gallery.png" alt="Banner, sosyal post ve story formatlarından oluşan örnek çıktı kolajı">
+          <nav class="app-tabs" id="appTabs" role="tablist" aria-label="Çalışma alanı bölümleri" aria-orientation="vertical">
+            <button class="tab-button is-active" id="tab-brief" type="button" role="tab" tabindex="0" aria-selected="true" aria-controls="panel-brief" data-tab="brief"><span>01</span>Brief masası</button>
+            <button class="tab-button" id="tab-overview" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-overview" data-tab="overview"><span>02</span>Operasyon</button>
+            <button class="tab-button" id="tab-assets" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-assets" data-tab="assets"><span>03</span>Görseller</button>
+            <button class="tab-button" id="tab-history" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-history" data-tab="history"><span>04</span>Geçmiş</button>
+            <button class="tab-button" id="tab-settings" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-settings" data-tab="settings"><span>05</span>Marka hafızası</button>
+          </nav>
+          <div class="rail-account-actions">
+            <button type="button" id="mobileLogoutButton" data-dashboard-logout>Oturumu kapat</button>
           </div>
-        </section>
+          <div class="rail-foot">
+            <span class="status-dot" aria-hidden="true"></span>
+            <div><strong>Operasyon hattı</strong><small>Durumlar canlı veriden okunur</small></div>
+          </div>
+        </aside>
 
-        <nav class="app-tabs" id="appTabs" role="tablist" aria-label="Panel sekmeleri">
-          <button class="tab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-overview" data-tab="overview">Özet</button>
-          <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="panel-brief" data-tab="brief">Brief</button>
-          <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="panel-assets" data-tab="assets">Görseller</button>
-          <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="panel-history" data-tab="history">Geçmiş</button>
-          <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="panel-settings" data-tab="settings">Ayarlar</button>
-        </nav>
+        <button class="app-menu-scrim" id="appMenuScrim" type="button" tabindex="-1" aria-label="Menüyü kapat" hidden></button>
 
-        <section class="tab-panel is-active" id="panel-overview" role="tabpanel">
+        <main class="app-main" id="app-main">
+          <section class="app-command-bar" aria-labelledby="appTitle">
+            <div>
+              <p class="kicker">Kreatif operasyon / çalışma alanı</p>
+              <h1 id="appTitle">Brief gir. Hattı izle. Çıktıyı yönet.</h1>
+              <p>Yeni üretim emrini kur, aktif işi izle ve görsel hazır olduğunda aynı masada onayla ya da revize et.</p>
+            </div>
+            <div class="workspace-signal" aria-label="Operasyon akışı: brief, marka aklı, üretim ve onay">
+              <span><b>01</b>Brief</span>
+              <span><b>02</b>Marka aklı</span>
+              <span><b>03</b>Üretim</span>
+              <span><b>04</b>Onay</span>
+            </div>
+          </section>
+
+          <div class="dashboard-feedback" id="dashboardFeedback" role="alert" hidden>
+            <div>
+              <strong id="dashboardFeedbackTitle">Çalışma alanı verileri yenilenemedi.</strong>
+              <span id="dashboardFeedbackText">Bağlantıyı kontrol edip yeniden deneyin.</span>
+            </div>
+            <button class="button secondary compact-button" id="dashboardRetryButton" type="button">Yeniden dene</button>
+          </div>
+
+        <section class="tab-panel" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" tabindex="0" hidden>
+          <div class="section-heading">
+            <div><span class="mini-label">Yüklenen operasyon penceresi</span><h2>Üretim durumu</h2></div>
+            <p>Metrikler en son yüklenen iş grubunu gösterir; tüm zamanlar toplamı değildir.</p>
+          </div>
           <div class="metric-grid">
             <article class="metric-card">
-              <span>Bugünkü üretim</span>
+              <span>Yüklenen grupta bugün</span>
               <strong id="metricJobs">-</strong>
-              <p>3 format ailesi</p>
+              <p>En yeni işler içinde</p>
             </article>
             <article class="metric-card">
-              <span>Onay bekleyen</span>
+              <span>Yüklenen grupta aksiyon</span>
               <strong id="metricApprovals">-</strong>
-              <p>revizyon kuyruğu dahil</p>
+              <p>Onay ve işlem kuyruğu</p>
             </article>
             <article class="metric-card">
-              <span>Ortalama süre</span>
+              <span>Tamamlananlarda süre</span>
               <strong id="metricDuration">-</strong>
-              <p>brief’ten önizlemeye</p>
+              <p>Yüklenen grupta brief → çıktı</p>
             </article>
             <article class="metric-card">
-              <span>Marka uyumu</span>
+              <span>Sonuçlananlarda başarı</span>
               <strong id="metricMatch">-</strong>
-              <p>uyum skoru</p>
+              <p>Yüklenen veri kapsamında</p>
             </article>
           </div>
 
@@ -105,7 +133,11 @@
           </div>
         </section>
 
-        <section class="tab-panel" id="panel-brief" role="tabpanel" hidden>
+        <section class="tab-panel is-active" id="panel-brief" role="tabpanel" aria-labelledby="tab-brief" tabindex="0">
+          <div class="section-heading brief-section-heading">
+            <div><span class="mini-label">Aktif çalışma masası</span><h2>Yeni brief ve canlı çıktı</h2></div>
+            <p>Üretim talebini solda kur; iş durumu ve kreatif sonucu sağda takip et.</p>
+          </div>
           <div class="brief-layout">
             <form class="brief-composer" id="briefForm" novalidate>
               <div class="panel-heading">
@@ -160,37 +192,41 @@
                 <textarea id="revisionText" rows="3" placeholder="Fiyat alanını büyüt, ürünü sağa al, başlığı kısalt."></textarea>
                 <button class="button secondary compact-button" id="sendRevisionButton" type="button">Revizyonu çalıştır</button>
               </div>
-              <div class="creative-details-box" id="creativeDetailsBox" style="border-top: 1px solid rgba(245, 239, 228, 0.12); padding-top: 1rem; margin-top: 1rem; display: flex; flex-direction: column; gap: 10px;" hidden></div>
+              <div class="creative-details-box" id="creativeDetailsBox" hidden></div>
             </article>
           </div>
         </section>
 
-        <section class="tab-panel" id="panel-assets" role="tabpanel" hidden>
-          <div class="panel-heading">
-            <span class="mini-label">Görsel arşivi</span>
-            <strong>Son üretimler</strong>
+        <section class="tab-panel" id="panel-assets" role="tabpanel" aria-labelledby="tab-assets" tabindex="0" hidden>
+          <div class="section-heading">
+            <div><span class="mini-label">Görsel arşivi</span><h2>Onay ve inceleme çıktıları</h2></div>
+            <p>Sayfalama yalnızca görsel arşivini değiştirir.</p>
           </div>
           <div class="asset-grid" id="assetGrid" aria-live="polite"></div>
         </section>
 
-        <section class="tab-panel" id="panel-history" role="tabpanel" hidden>
-          <div class="panel-heading">
-            <span class="mini-label">Geçmiş briefler</span>
-            <strong>İzlenebilir operasyon kaydı</strong>
+        <section class="tab-panel" id="panel-history" role="tabpanel" aria-labelledby="tab-history" tabindex="0" hidden>
+          <div class="section-heading">
+            <div><span class="mini-label">Geçmiş briefler</span><h2>İzlenebilir operasyon kaydı</h2></div>
+            <p>Sayfalama yalnızca geçmiş kayıtlarını değiştirir.</p>
           </div>
           <div class="history-list" id="historyList" aria-live="polite"></div>
         </section>
 
-        <section class="tab-panel" id="panel-settings" role="tabpanel" hidden>
+        <section class="tab-panel" id="panel-settings" role="tabpanel" aria-labelledby="tab-settings" tabindex="0" hidden>
+          <div class="section-heading">
+            <div><span class="mini-label">Seçili marka bağlamı</span><h2>Marka hafızası ve sistem hazırlığı</h2></div>
+            <p>Bu görünüm brief formunda seçili marka üzerinden güncellenir.</p>
+          </div>
           <div class="settings-grid">
             <article class="work-panel">
               <div class="panel-heading">
                 <span class="mini-label">Marka hafızası</span>
-                <strong>NovaMarket kuralları</strong>
+                <strong id="settingsBrandTitle">Seçili marka kuralları</strong>
               </div>
               <div class="readiness-list">
-                <span>Marka dili ve kuralları workflow tarafından uygulanır</span>
-                <span>Ürün görseli varsa sahneye entegrasyon workflow tarafından uygulanır</span>
+                <span id="settingsToneRule">Marka dili seçili marka kaydından alınır</span>
+                <span id="settingsBannedWords">Yasaklı dil seçili marka kaydından uygulanır</span>
                 <span>Onay ve revizyon kaydı job akışında tutulur</span>
               </div>
             </article>
@@ -208,7 +244,8 @@
             </article>
           </div>
         </section>
-      </main>
+        </main>
+      </div>
     </div>
 
     <script
@@ -216,10 +253,10 @@
       integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug"
       crossorigin="anonymous"
     ></script>
-    <script src="/api/runtime-config.js"></script>
+    <script src="/api/runtime-config.js?v=2.1"></script>
     <script src="js/config.js?v=1.1"></script>
     <script src="js/observability.js?v=1.1"></script>
     <script src="js/supabase.js?v=1.1"></script>
-    <script src="js/dashboard.js?v=1.1"></script>
+    <script src="js/dashboard.js?v=2.1"></script>
   </body>
 </html>

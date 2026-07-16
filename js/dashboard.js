@@ -11,6 +11,7 @@
   const formatConfig = window.VitrinOS.config.defaults.formats;
   const colors = window.VitrinOS.config.defaults.colors;
   const JOB_PAGE_SIZE = dashboardConfig.jobPageSize;
+  const JOB_SELECT = 'id,user_id,brand_id,brief_text,format,status,image_url,revision_count,revision_note,brief_json,created_at,updated_at,last_error,retry_count,max_retries,next_retry_at';
   const state = {
     jobsToday: 0,
     approvals: 0,
@@ -18,15 +19,22 @@
     brandMatch: "-",
     currentJob: null,
     brands: [],
+    formatSample: [],
     assets: [],
     history: [],
-    jobPage: 0,
-    hasMoreJobs: false
+    assetPage: 0,
+    historyPage: 0,
+    hasMoreAssets: false,
+    hasMoreHistory: false
   };
 
-  const logoutButton = document.querySelector("#logoutButton");
+  const logoutButtons = Array.from(document.querySelectorAll("[data-dashboard-logout]"));
   const appShell = document.querySelector("#appShell");
+  const appMain = document.querySelector("#app-main");
+  const appRail = document.querySelector("#dashboardNav");
+  const appTopbar = document.querySelector(".app-topbar");
   const appMenuToggle = document.querySelector("#appMenuToggle");
+  const appMenuScrim = document.querySelector("#appMenuScrim");
   const tabButtons = Array.from(document.querySelectorAll("[data-tab]"));
   const panels = Array.from(document.querySelectorAll(".tab-panel"));
   const briefForm = document.querySelector("#briefForm");
@@ -51,6 +59,13 @@
   const resultCreative = document.querySelector("#resultCreative");
   const assetGrid = document.querySelector("#assetGrid");
   const historyList = document.querySelector("#historyList");
+  const dashboardFeedback = document.querySelector("#dashboardFeedback");
+  const dashboardFeedbackText = document.querySelector("#dashboardFeedbackText");
+  const dashboardFeedbackTitle = document.querySelector("#dashboardFeedbackTitle");
+  const dashboardRetryButton = document.querySelector("#dashboardRetryButton");
+  const settingsBrandTitle = document.querySelector("#settingsBrandTitle");
+  const settingsToneRule = document.querySelector("#settingsToneRule");
+  const settingsBannedWords = document.querySelector("#settingsBannedWords");
 
   const appContextBrand = document.querySelector("#appContextBrand");
   const appContextUser = document.querySelector("#appContextUser");
@@ -58,6 +73,12 @@
   const barBanner = document.querySelector("#barBanner");
   const barMetaPost = document.querySelector("#barMetaPost");
   const barStory = document.querySelector("#barStory");
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const appDrawerQuery = window.matchMedia("(max-width: 960px)");
+
+  if (typeof document.startViewTransition === "function") {
+    document.documentElement.classList.add("supports-view-transition");
+  }
 
   async function triggerBriefWorkflow(payload) {
     const functionName = window.VitrinOS.config.briefTriggerFunction;
@@ -94,20 +115,20 @@
       activeRetryTimeoutId = null;
     }
 
-    if (!job || job.status !== 'pending_retry' || !job.next_retry_at) return;
+    if (!job || job.status !== 'pending_retry' || !job.nextRetryAt) return;
 
-    const nextRetry = new Date(job.next_retry_at);
+    const nextRetry = new Date(job.nextRetryAt);
     const delay = Math.max(0, nextRetry.getTime() - Date.now());
 
     console.log(`Job ${job.id} will be retried in ${delay} ms`);
 
     activeRetryTimeoutId = setTimeout(async () => {
       try {
-        setStatus(briefStatus, `Yeniden deneniyor (Deneme #${job.retry_count + 1})...`);
+        setStatus(briefStatus, `Yeniden deneniyor (Deneme #${job.retryCount + 1})...`);
         setLoading(true);
         await triggerBriefWorkflow({
           jobId: job.id,
-          isRevision: job.revision_count > 0
+          isRevision: job.revisionCount > 0
         });
         setStatus(briefStatus, "Yeniden tetikleme başarılı. Akış başlatıldı.");
         await fetchData();
@@ -158,6 +179,35 @@
     cards.forEach(card => {
       card.classList.toggle("is-loading", isLoading);
     });
+    if (appMain) appMain.setAttribute("aria-busy", String(isLoading));
+    if (dashboardRetryButton) dashboardRetryButton.disabled = isLoading;
+  }
+
+  function setLoadFeedback(message = "", kind = "error") {
+    if (!dashboardFeedback || !dashboardFeedbackText) return;
+    const isVisible = Boolean(message);
+    dashboardFeedback.hidden = !isVisible;
+    dashboardFeedback.dataset.kind = kind;
+    dashboardFeedbackText.textContent = message;
+    if (dashboardFeedbackTitle) {
+      dashboardFeedbackTitle.textContent = kind === "warning"
+        ? "Bazı önizlemeler yüklenemedi."
+        : "Çalışma alanı verileri yenilenemedi.";
+    }
+  }
+
+  function getLoadErrorMessage(error) {
+    const rawMessage = String(error?.message || "");
+    const normalized = rawMessage.toLowerCase();
+    if (normalized.includes("jwt") || normalized.includes("auth") || normalized.includes("session")) {
+      return "Oturum doğrulanamadı. Sayfayı yenileyip yeniden giriş yapın.";
+    }
+    if (normalized.includes("network") || normalized.includes("fetch") || normalized.includes("timeout")) {
+      return "Sunucuya ulaşılamadı. Bağlantınızı kontrol edip yeniden deneyin.";
+    }
+    return rawMessage
+      ? `Veri servisi şu anda yanıt veremiyor: ${rawMessage}`
+      : "Veri servisi şu anda yanıt veremiyor. Kısa süre sonra yeniden deneyin.";
   }
 
   function renderFormatBars() {
@@ -170,7 +220,7 @@
     };
     let total = 0;
 
-    state.history.forEach(item => {
+    state.formatSample.forEach(item => {
       const fmt = item.format;
       if (formats[fmt] !== undefined) {
         formats[fmt]++;
@@ -243,136 +293,177 @@
     return `Kreatif üretim sırasında hata oluştu: ${rawError}`;
   }
 
-  // Supabase'den verileri çeken fonksiyon
+  let dataRequestId = 0;
+
+  // Operasyon özeti, görsel arşivi ve geçmiş bağımsız sayfalama pencereleriyle yüklenir.
   async function fetchData() {
+    const requestId = ++dataRequestId;
     setPageLoading(true);
+
     try {
-      // 1. Markaları çek
-      const { data: dbBrands, error: bErr } = await client
-        .from('brands')
-        .select('id,name,logo_url,website_url,color_palette,tone_rules,banned_words');
-      if (bErr) throw bErr;
+      const assetFrom = state.assetPage * JOB_PAGE_SIZE;
+      const historyFrom = state.historyPage * JOB_PAGE_SIZE;
+      const [brandsResponse, recentResponse, assetsResponse, historyResponse] = await Promise.all([
+        client
+          .from('brands')
+          .select('id,name,logo_url,website_url,color_palette,tone_rules,banned_words'),
+        client
+          .from('jobs')
+          .select(JOB_SELECT)
+          .order('created_at', { ascending: false })
+          .range(0, JOB_PAGE_SIZE),
+        client
+          .from('jobs')
+          .select(JOB_SELECT)
+          .in('status', ['completed', 'approved'])
+          .order('created_at', { ascending: false })
+          .range(assetFrom, assetFrom + JOB_PAGE_SIZE),
+        client
+          .from('jobs')
+          .select(JOB_SELECT)
+          .order('created_at', { ascending: false })
+          .range(historyFrom, historyFrom + JOB_PAGE_SIZE)
+      ]);
 
-      // 2. Jobları çek (sadece kullanıcıya ait olanlar RLS ile gelir ama yine de filtreliyoruz)
-      const from = state.jobPage * JOB_PAGE_SIZE;
-      const { data: jobPage, error: jErr } = await client
-        .from('jobs')
-        .select('id,user_id,brand_id,brief_text,format,status,image_url,revision_count,revision_note,brief_json,created_at,updated_at')
-        .order('created_at', { ascending: false })
-        .range(from, from + JOB_PAGE_SIZE);
-      if (jErr) throw jErr;
+      const queryError = brandsResponse.error || recentResponse.error || assetsResponse.error || historyResponse.error;
+      if (queryError) throw queryError;
 
-      state.hasMoreJobs = jobPage.length > JOB_PAGE_SIZE;
-      const dbJobs = jobPage.slice(0, JOB_PAGE_SIZE);
-      const jobsWithAssetUrls = await Promise.all(dbJobs.map(async (job) => {
+      const dbBrands = brandsResponse.data || [];
+      const recentPage = recentResponse.data || [];
+      const assetPage = assetsResponse.data || [];
+      const historyPage = historyResponse.data || [];
+      const recentJobs = recentPage.slice(0, JOB_PAGE_SIZE);
+      const assetJobs = assetPage.slice(0, JOB_PAGE_SIZE);
+      const historyJobs = historyPage.slice(0, JOB_PAGE_SIZE);
+      const signedUrlCache = new Map();
+      const assetLoadFailures = new Set();
+
+      const attachSignedImageUrl = async (job) => {
         let signedImageUrl = "";
-        if (!job.image_url || !['completed', 'approved'].includes(job.status)) return { ...job, signedImageUrl };
+        if (!job.image_url || !['completed', 'approved'].includes(job.status)) {
+          return { ...job, signedImageUrl };
+        }
+
         try {
-          signedImageUrl = await window.VitrinOS.storage.getGeneratedAssetUrl(job.image_url);
+          if (!signedUrlCache.has(job.image_url)) {
+            signedUrlCache.set(job.image_url, window.VitrinOS.storage.getGeneratedAssetUrl(job.image_url));
+          }
+          signedImageUrl = await signedUrlCache.get(job.image_url);
         } catch (assetErr) {
+          assetLoadFailures.add(job.id);
           console.error("Görsel signed URL hatası:", assetErr);
         }
         return { ...job, signedImageUrl };
-      }));
+      };
 
-      // State normalizasyonu
-      state.brands = dbBrands.map(b => ({
-        id: b.id,
-        name: b.name,
-        logoUrl: b.logo_url || "",
-        websiteUrl: b.website_url || "",
-        primary: b.color_palette?.primary || colors.primary,
-        secondary: b.color_palette?.secondary || colors.secondary,
-        theme: b.color_palette?.theme || "koyu",
-        toneRules: b.tone_rules || "",
-        bannedWords: b.banned_words || []
+      const [recentJobsWithUrls, assetJobsWithUrls] = await Promise.all([
+        Promise.all(recentJobs.map(attachSignedImageUrl)),
+        Promise.all(assetJobs.map(attachSignedImageUrl))
+      ]);
+
+      if (requestId !== dataRequestId) return false;
+
+      state.hasMoreAssets = assetPage.length > JOB_PAGE_SIZE;
+      state.hasMoreHistory = historyPage.length > JOB_PAGE_SIZE;
+      state.formatSample = recentJobsWithUrls.map((job) => ({ format: job.format }));
+      state.brands = dbBrands.map((brand) => ({
+        id: brand.id,
+        name: brand.name,
+        logoUrl: brand.logo_url || "",
+        websiteUrl: brand.website_url || "",
+        primary: brand.color_palette?.primary || colors.primary,
+        secondary: brand.color_palette?.secondary || colors.secondary,
+        theme: brand.color_palette?.theme || "koyu",
+        toneRules: brand.tone_rules || "",
+        bannedWords: brand.banned_words || []
       }));
 
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
-      state.jobsToday = jobsWithAssetUrls.filter(j => new Date(j.created_at) >= todayStart).length;
+      state.jobsToday = recentJobsWithUrls.filter((job) => new Date(job.created_at) >= todayStart).length;
+      state.approvals = recentJobsWithUrls.filter((job) => !['approved', 'failed', 'failed_dispatch'].includes(job.status)).length;
 
-      // Onay bekleyen metrikleri (approved veya failed olmayan, tamamlanmış veya işlenen işler)
-      state.approvals = jobsWithAssetUrls.filter(j => j.status !== 'approved' && j.status !== 'failed').length;
-
-      // Ortalama üretim süresi: yalnızca completed kayıtlarını kullan.
-      // approved kayıtlarında updated_at onay zamanına taşınabildiği için
-      // kullanıcı onay/revizyon gecikmesi üretim süresine dahil edilmemelidir.
-      const completedJobs = jobsWithAssetUrls.filter(j => j.status === 'completed');
+      const completedJobs = recentJobsWithUrls.filter((job) => job.status === 'completed');
       if (completedJobs.length > 0) {
-        const totalDuration = completedJobs.reduce((acc, j) => {
-          const diff = new Date(j.updated_at) - new Date(j.created_at); // ms
-          return acc + Math.max(0, diff / 1000 / 60); // minutes
+        const totalDuration = completedJobs.reduce((total, job) => {
+          const duration = new Date(job.updated_at) - new Date(job.created_at);
+          return total + Math.max(0, duration / 1000 / 60);
         }, 0);
-        const avg = totalDuration / completedJobs.length;
-        state.avgDuration = avg < 1 ? "1 dk altı" : `${avg.toFixed(1)} dk`;
+        const average = totalDuration / completedJobs.length;
+        state.avgDuration = average < 1 ? "1 dk altı" : `${average.toFixed(1)} dk`;
       } else {
         state.avgDuration = "-";
       }
 
-      // Marka uyumu: yalnızca sonuçlanmış işlerde başarılı sonuç oranı.
-      // pending/processing/revision_requested işleri henüz kalite sonucu değildir.
-      const finishedJobs = jobsWithAssetUrls.filter(j =>
-        ['completed', 'approved', 'failed'].includes(j.status)
-      );
+      const finishedJobs = recentJobsWithUrls.filter((job) => ['completed', 'approved', 'failed', 'failed_dispatch'].includes(job.status));
       if (finishedJobs.length > 0) {
-        const successfulJobs = finishedJobs.filter(j =>
-          j.status === 'completed' || j.status === 'approved'
-        ).length;
+        const successfulJobs = finishedJobs.filter((job) => ['completed', 'approved'].includes(job.status)).length;
         state.brandMatch = `${Math.round((successfulJobs / finishedJobs.length) * 100)}%`;
       } else {
         state.brandMatch = "-";
       }
 
-      const lastJob = jobsWithAssetUrls.find(j => j.status !== 'approved');
-      if (lastJob) {
-        const brand = state.brands.find(b => b.id === lastJob.brand_id);
+      const latestJob = recentJobsWithUrls.find((job) => job.status !== 'approved') || recentJobsWithUrls[0];
+      if (latestJob) {
+        const brand = state.brands.find((item) => item.id === latestJob.brand_id);
         state.currentJob = {
-          id: lastJob.id,
-          title: titleFor(lastJob.brief_text, lastJob.format),
-          brand: brand ? brand.name : "Bilinmeyen",
-          brandId: lastJob.brand_id,
-          format: lastJob.format,
-          dimensions: dimensionsFor(lastJob.format),
-          status: lastJob.status,
-          imageUrl: lastJob.signedImageUrl,
-          brief: lastJob.brief_text,
-          briefJson: lastJob.brief_json || {},
-          timeline: lastJob.brief_json?.timeline || ["pending", lastJob.status].filter(Boolean),
-          revisionCount: lastJob.revision_count || 0,
-          revisionNote: lastJob.revision_note || ""
+          id: latestJob.id,
+          title: titleFor(latestJob.brief_text, latestJob.format),
+          brand: brand?.name || "Bilinmeyen",
+          brandId: latestJob.brand_id,
+          format: latestJob.format,
+          dimensions: dimensionsFor(latestJob.format),
+          status: latestJob.status,
+          imageUrl: latestJob.signedImageUrl,
+          brief: latestJob.brief_text,
+          briefJson: latestJob.brief_json || {},
+          timeline: latestJob.brief_json?.timeline || ["pending", latestJob.status].filter(Boolean),
+          revisionCount: latestJob.revision_count || 0,
+          revisionNote: latestJob.revision_note || "",
+          lastError: latestJob.last_error || "",
+          retryCount: latestJob.retry_count || 0,
+          maxRetries: latestJob.max_retries || 3,
+          nextRetryAt: latestJob.next_retry_at || ""
         };
       } else {
         state.currentJob = null;
       }
 
-      state.assets = jobsWithAssetUrls.filter(j => j.status === 'approved' || j.status === 'completed').map(j => {
-        const brand = state.brands.find(b => b.id === j.brand_id);
+      state.assets = assetJobsWithUrls.map((job) => {
+        const brand = state.brands.find((item) => item.id === job.brand_id);
         return {
-          id: j.id,
-          title: titleFor(j.brief_text, j.format),
-          brand: brand ? brand.name : "Bilinmeyen",
-          format: j.format,
-          dimensions: dimensionsFor(j.format),
-          status: j.status,
-          imageUrl: j.signedImageUrl
+          id: job.id,
+          title: titleFor(job.brief_text, job.format),
+          brand: brand?.name || "Bilinmeyen",
+          format: job.format,
+          dimensions: dimensionsFor(job.format),
+          status: job.status,
+          imageUrl: job.signedImageUrl
         };
       });
 
-      state.history = jobsWithAssetUrls.map(j => ({
-        id: j.id,
-        brief: j.brief_text,
-        format: j.format,
-        status: j.status,
-        time: new Date(j.created_at).toLocaleString('tr-TR')
+      state.history = historyJobs.map((job) => ({
+        id: job.id,
+        brief: job.brief_text,
+        format: job.format,
+        status: job.status,
+        time: new Date(job.created_at).toLocaleString('tr-TR')
       }));
 
       populateBrandSelect();
-
+      setLoadFeedback(
+        assetLoadFailures.size ? `${assetLoadFailures.size} görsel için güvenli önizleme bağlantısı alınamadı. Yeniden deneyebilirsiniz.` : "",
+        assetLoadFailures.size ? "warning" : "error"
+      );
+      return true;
     } catch (err) {
-      console.error("Dashboard veri çekme hatası:", err);
+      if (requestId === dataRequestId) {
+        console.error("Dashboard veri çekme hatası:", err);
+        setLoadFeedback(getLoadErrorMessage(err), "error");
+      }
+      return false;
     } finally {
-      setPageLoading(false);
+      if (requestId === dataRequestId) setPageLoading(false);
     }
   }
 
@@ -381,6 +472,17 @@
     if (!select) return;
     const currentSelection = select.value;
     select.replaceChildren();
+
+    if (!state.brands.length) {
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = "Kullanılabilir marka bulunamadı";
+      option.disabled = true;
+      option.selected = true;
+      select.append(option);
+      return;
+    }
+
     state.brands.forEach((brand) => {
       const option = document.createElement("option");
       option.value = brand.id;
@@ -389,6 +491,34 @@
     });
     if (state.brands.some(b => b.id === currentSelection)) {
       select.value = currentSelection;
+    } else {
+      select.value = state.brands[0].id;
+    }
+  }
+
+  function renderBrandContext() {
+    const activeBrandId = document.querySelector("#briefBrand")?.value;
+    const brand = state.brands.find((item) => item.id === activeBrandId) || state.brands[0];
+
+    if (appContextBrand) appContextBrand.textContent = brand?.name || "Marka seçilmedi";
+    if (settingsBrandTitle) settingsBrandTitle.textContent = brand ? `${brand.name} kuralları` : "Seçili marka kuralları";
+
+    if (settingsToneRule) {
+      const toneValue = Array.isArray(brand?.toneRules)
+        ? brand.toneRules.join(", ")
+        : typeof brand?.toneRules === "object" && brand?.toneRules
+          ? Object.values(brand.toneRules).filter(Boolean).join(", ")
+          : String(brand?.toneRules || "").trim();
+      settingsToneRule.textContent = toneValue
+        ? `Marka tonu: ${toneValue.slice(0, 140)}${toneValue.length > 140 ? "…" : ""}`
+        : "Marka tonu için kayıtlı ek kural bulunmuyor";
+    }
+
+    if (settingsBannedWords) {
+      const bannedWordCount = Array.isArray(brand?.bannedWords) ? brand.bannedWords.length : 0;
+      settingsBannedWords.textContent = bannedWordCount
+        ? `${bannedWordCount} yasaklı ifade üretim sırasında denetlenir`
+        : "Bu marka için kayıtlı yasaklı ifade bulunmuyor";
     }
   }
 
@@ -417,33 +547,79 @@
 
   // Arayüz sekmeleri
   function activateTab(tabName) {
-    tabButtons.forEach((button) => {
-      const isActive = button.dataset.tab === tabName;
-      button.classList.toggle("is-active", isActive);
-      button.setAttribute("aria-selected", String(isActive));
-    });
- 
-    panels.forEach((panel) => {
-      const isActive = panel.id === `panel-${tabName}`;
-      panel.classList.toggle("is-active", isActive);
-      panel.hidden = !isActive;
-    });
-
-    closeAppMenu();
-
-    if (window.innerWidth <= dashboardConfig.mobileBreakpoint) {
-      const tabsContainer = document.querySelector(".app-tabs");
-      if (tabsContainer) {
-        tabsContainer.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+    const targetButton = tabButtons.find((button) => button.dataset.tab === tabName);
+    const targetPanel = panels.find((panel) => panel.id === `panel-${tabName}`);
+    if (!targetButton || !targetPanel || targetButton.classList.contains("is-active")) {
+      closeAppMenu({ restoreFocus: true });
+      return;
     }
+
+    const updateTab = () => {
+      tabButtons.forEach((button) => {
+        const isActive = button === targetButton;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-selected", String(isActive));
+        button.tabIndex = isActive ? 0 : -1;
+      });
+
+      panels.forEach((panel) => {
+        const isActive = panel === targetPanel;
+        panel.classList.toggle("is-active", isActive);
+        panel.hidden = !isActive;
+      });
+    };
+
+    if (typeof document.startViewTransition === "function" && !prefersReducedMotion.matches) {
+      document.startViewTransition(updateTab);
+    } else {
+      updateTab();
+    }
+
+    closeAppMenu({ restoreFocus: true });
   }
 
-  function closeAppMenu() {
-    if (!appShell || !appMenuToggle) return;
+  function openAppMenu() {
+    if (!appShell || !appMenuToggle || !appRail || !appDrawerQuery.matches) return;
+    appShell.classList.add("menu-open");
+    document.body.classList.add("app-menu-open");
+    appMenuToggle.setAttribute("aria-expanded", "true");
+    appMenuToggle.setAttribute("aria-label", "Çalışma alanı menüsünü kapat");
+    appRail.inert = false;
+    appRail.setAttribute("aria-hidden", "false");
+    [
+      appMain,
+      appTopbar?.querySelector(".brand"),
+      appTopbar?.querySelector(".app-context"),
+      appTopbar?.querySelector(".app-actions")
+    ].filter(Boolean).forEach((target) => {
+      target.inert = true;
+    });
+    if (appMenuScrim) appMenuScrim.hidden = false;
+    window.requestAnimationFrame(() => {
+      (tabButtons.find((button) => button.classList.contains("is-active")) || tabButtons[0])?.focus();
+    });
+  }
+
+  function closeAppMenu({ restoreFocus = false } = {}) {
+    if (!appShell || !appMenuToggle || !appRail) return;
+    const wasOpen = appShell.classList.contains("menu-open");
     appShell.classList.remove("menu-open");
+    document.body.classList.remove("app-menu-open");
     appMenuToggle.setAttribute("aria-expanded", "false");
-    appMenuToggle.setAttribute("aria-label", "Panel menüsünü aç");
+    appMenuToggle.setAttribute("aria-label", "Çalışma alanı menüsünü aç");
+    appRail.inert = appDrawerQuery.matches;
+    if (appDrawerQuery.matches) appRail.setAttribute("aria-hidden", "true");
+    else appRail.removeAttribute("aria-hidden");
+    [
+      appMain,
+      appTopbar?.querySelector(".brand"),
+      appTopbar?.querySelector(".app-context"),
+      appTopbar?.querySelector(".app-actions")
+    ].filter(Boolean).forEach((target) => {
+      target.inert = false;
+    });
+    if (appMenuScrim) appMenuScrim.hidden = true;
+    if (restoreFocus && wasOpen) appMenuToggle.focus();
   }
 
   function detectFormat(text, selectedFormat) {
@@ -473,19 +649,10 @@
     if (metricDuration) metricDuration.textContent = state.avgDuration;
     if (metricMatch) metricMatch.textContent = state.brandMatch;
 
-    // app-context alanını güncelle
     if (appContextUser && authContext && authContext.user) {
       appContextUser.textContent = authContext.user.email;
     }
-    if (appContextBrand && state.brands) {
-      if (state.brands.length > 0) {
-        const activeBrandId = document.querySelector("#briefBrand")?.value;
-        const brand = state.brands.find(b => b.id === activeBrandId) || state.brands[0];
-        appContextBrand.textContent = brand ? brand.name : "VitrinOS";
-      } else {
-        appContextBrand.textContent = "-";
-      }
-    }
+    renderBrandContext();
 
     // Pipeline listesini dinamik olarak güncelle
     if (state.currentJob) {
@@ -494,6 +661,10 @@
         state.currentJob.status === "approved" ? "Final çıktı hazır" : 
         state.currentJob.status === "completed" ? "Önizleme hazır" : statusLabel(state.currentJob.status);
 
+      if (state.currentJob.status === "revision_requested") {
+        pipelineCurrent.textContent = "Revizyon hazırlanıyor";
+      }
+
       if (pipelineList) {
         const steps = pipelineList.querySelectorAll("span");
         steps.forEach(step => {
@@ -501,23 +672,32 @@
           const stepName = step.dataset.step;
 
           if (stepName === "parsed") {
-            if (["pending", "processing", "completed", "approved", "revision_requested"].includes(state.currentJob.status)) {
+            if (["pending", "processing", "completed", "approved", "revision_requested", "pending_retry"].includes(state.currentJob.status)) {
               step.classList.add("is-done");
             }
           } else if (stepName === "format") {
-            if (["processing", "completed", "approved", "revision_requested"].includes(state.currentJob.status)) {
+            if (["processing", "completed", "approved", "revision_requested", "pending_retry"].includes(state.currentJob.status)) {
               step.classList.add("is-done");
             }
           } else if (stepName === "current") {
-            if (["pending", "processing"].includes(state.currentJob.status)) {
+            if (["pending", "processing", "revision_requested", "pending_retry"].includes(state.currentJob.status)) {
               step.classList.add("is-current");
-              step.textContent = state.currentJob.status === "processing" ? "Üretiliyor..." : "İşleme alındı";
-            } else if (["completed", "revision_requested"].includes(state.currentJob.status)) {
+              step.textContent = state.currentJob.status === "processing"
+                ? "Üretiliyor…"
+                : state.currentJob.status === "revision_requested"
+                  ? "Revizyon hazırlanıyor…"
+                : state.currentJob.status === "pending_retry"
+                  ? "Yeniden bağlantı kuruluyor…"
+                  : "İşleme alındı";
+            } else if (state.currentJob.status === "completed") {
               step.classList.add("is-done");
               step.textContent = "Önizleme hazır";
             } else if (state.currentJob.status === "approved") {
               step.classList.add("is-done");
               step.textContent = "Final çıktı hazır";
+            } else if (["failed", "failed_dispatch"].includes(state.currentJob.status)) {
+              step.classList.add("is-current");
+              step.textContent = "Müdahale gerekiyor";
             }
           } else if (stepName === "approval") {
             if (state.currentJob.status === "completed") {
@@ -547,9 +727,26 @@
     renderFormatBars();
   }
 
+  function setResultActionAvailability(job) {
+    const canReview = job?.status === "completed";
+    if (approveButton) {
+      approveButton.hidden = !canReview;
+      approveButton.disabled = !canReview;
+      approveButton.setAttribute("aria-disabled", String(!canReview));
+    }
+    if (reviseButton) {
+      reviseButton.hidden = !canReview;
+      reviseButton.disabled = !canReview;
+      reviseButton.setAttribute("aria-disabled", String(!canReview));
+    }
+    if (!canReview && revisionBox) revisionBox.hidden = true;
+    return canReview;
+  }
+
   function renderResult() {
     const job = state.currentJob;
     const resultPanel = document.querySelector("#briefResult");
+    const canReview = setResultActionAvailability(job);
 
     // Eger durum pending_retry degilse zamanlayiciyi temizle
     if (!job || job.status !== 'pending_retry') {
@@ -623,7 +820,7 @@
       errorTitle.style.marginBottom = "0.5rem";
 
       const errorMsg = document.createElement("p");
-      errorMsg.textContent = job.last_error || "Otomasyon webhook'u çağrılırken bir ağ hatası oluştu.";
+      errorMsg.textContent = job.lastError || "Otomasyon webhook'u çağrılırken bir ağ hatası oluştu.";
       errorMsg.style.fontSize = "0.9rem";
       errorMsg.style.color = "var(--muted)";
       errorMsg.style.maxWidth = "80%";
@@ -639,7 +836,7 @@
           setLoading(true);
           await triggerBriefWorkflow({
             jobId: job.id,
-            isRevision: job.revision_count > 0
+            isRevision: job.revisionCount > 0
           });
           setStatus(briefStatus, "Yeniden tetikleme başarılı. Akış başlatıldı.");
           await fetchData();
@@ -699,11 +896,11 @@
       retryTitle.style.fontSize = "1.1rem";
       retryTitle.style.marginBottom = "0.5rem";
 
-      const nextRetryDate = new Date(job.next_retry_at);
+      const nextRetryDate = new Date(job.nextRetryAt);
       const remainingSeconds = Math.max(0, Math.ceil((nextRetryDate.getTime() - Date.now()) / 1000));
       
       const retryMsg = document.createElement("p");
-      retryMsg.textContent = `N8N webhook tetiklenirken hata alındı (${job.last_error || "Ağ hatası"}). ${remainingSeconds} saniye içinde otomatik olarak tekrar denenecek (Deneme #${job.retry_count}/${job.max_retries}).`;
+      retryMsg.textContent = `Otomasyon hattına bağlanırken hata alındı (${job.lastError || "Ağ hatası"}). ${remainingSeconds} saniye içinde otomatik olarak tekrar denenecek (Deneme #${job.retryCount}/${job.maxRetries}).`;
       retryMsg.style.fontSize = "0.9rem";
       retryMsg.style.color = "var(--muted)";
       retryMsg.style.maxWidth = "80%";
@@ -720,7 +917,7 @@
           setLoading(true);
           await triggerBriefWorkflow({
             jobId: job.id,
-            isRevision: job.revision_count > 0
+            isRevision: job.revisionCount > 0
           });
           setStatus(briefStatus, "Yeniden tetikleme başarılı.");
           await fetchData();
@@ -822,8 +1019,8 @@
       return;
     }
 
-    if (approveButton) approveButton.hidden = false;
-    if (reviseButton) reviseButton.hidden = false;
+    if (approveButton) approveButton.hidden = !canReview;
+    if (reviseButton) reviseButton.hidden = !canReview;
 
     if (resultPanel) resultPanel.style.opacity = "1";
     resultTitle.textContent = job.title;
@@ -839,10 +1036,7 @@
       img.src = job.imageUrl;
       img.alt = `${job.format} önizlemesi`;
       img.className = "result-creative-img";
-      img.style.maxWidth = "100%";
-      img.style.height = "100%";
-      img.style.objectFit = "cover";
-      img.style.borderRadius = "6px";
+      img.decoding = "async";
       resultCreative.append(img);
     } else {
       const brand = createTextElement("span", job.brand);
@@ -902,16 +1096,24 @@
     }
 
     // Revizyon limit kontrolü
+    if (!canReview) {
+      reviseButton.disabled = true;
+      reviseButton.setAttribute("aria-disabled", "true");
+      reviseButton.textContent = "Revize et";
+      reviseButton.title = "Revizyon yalnızca önizleme hazır olduğunda kullanılabilir.";
+      return;
+    }
+
     const revisionLimitReached = (job.revisionCount >= dashboardConfig.revisionLimit);
     if (revisionLimitReached) {
       reviseButton.disabled = true;
+      reviseButton.setAttribute("aria-disabled", "true");
       reviseButton.textContent = `Limit ulaşıldı (${dashboardConfig.revisionLimit}/${dashboardConfig.revisionLimit})`;
-      reviseButton.style.opacity = "0.5";
       reviseButton.title = "Maksimum revizyon limitine ulaşıldı.";
     } else {
       reviseButton.disabled = false;
+      reviseButton.setAttribute("aria-disabled", "false");
       reviseButton.textContent = "Revize et";
-      reviseButton.style.opacity = "1";
       reviseButton.title = "";
     }
   }
@@ -928,10 +1130,8 @@
       const img = document.createElement("img");
       img.src = asset.imageUrl;
       img.alt = asset.title;
-      img.style.width = "100%";
-      img.style.height = "100%";
-      img.style.objectFit = "cover";
-      img.style.borderRadius = "6px";
+      img.loading = "lazy";
+      img.decoding = "async";
       preview.appendChild(img);
     } else {
       const brand = document.createElement("span");
@@ -961,12 +1161,14 @@
     if (!state.assets.length) {
       const empty = document.createElement("p");
       empty.className = "empty-state";
-      empty.textContent = "Henüz görsel yok. Brief sekmesinden ilk üretimi başlat.";
+      empty.textContent = state.assetPage > 0
+        ? "Bu görsel sayfasında kayıt bulunmuyor. Önceki sayfaya dönebilirsiniz."
+        : "Henüz görsel yok. Brief masasından ilk üretimi başlatın.";
       assetGrid.append(empty);
-      return;
+    } else {
+      state.assets.forEach((asset) => assetGrid.append(createAssetCard(asset)));
     }
-    state.assets.forEach((asset) => assetGrid.append(createAssetCard(asset)));
-    renderJobPager(assetGrid);
+    renderJobPager(assetGrid, "assets");
   }
 
   function createHistoryItem(item) {
@@ -993,33 +1195,47 @@
     if (!state.history.length) {
       const empty = document.createElement("p");
       empty.className = "empty-state";
-      empty.textContent = "Henüz brief geçmişi yok.";
+      empty.textContent = state.historyPage > 0
+        ? "Bu geçmiş sayfasında kayıt bulunmuyor. Önceki sayfaya dönebilirsiniz."
+        : "Henüz brief geçmişi yok.";
       historyList.append(empty);
-      return;
+    } else {
+      state.history.forEach((item) => historyList.append(createHistoryItem(item)));
     }
-    state.history.forEach((item) => historyList.append(createHistoryItem(item)));
-    renderJobPager(historyList);
+    renderJobPager(historyList, "history");
   }
 
-  function renderJobPager(container) {
+  function renderJobPager(container, kind) {
+    const isAssets = kind === "assets";
+    const currentPage = isAssets ? state.assetPage : state.historyPage;
+    const hasMore = isAssets ? state.hasMoreAssets : state.hasMoreHistory;
     const pager = document.createElement('div');
     pager.className = 'list-pager';
+    pager.setAttribute('aria-label', isAssets ? 'Görsel arşivi sayfalama' : 'Geçmiş kayıtları sayfalama');
+    const pageLabel = document.createElement('span');
+    pageLabel.textContent = `${isAssets ? 'Görsel arşivi' : 'Geçmiş'} · Sayfa ${currentPage + 1}`;
     const previous = document.createElement('button');
     previous.type = 'button';
     previous.textContent = 'Önceki';
-    previous.disabled = state.jobPage === 0;
+    previous.disabled = currentPage === 0;
     const next = document.createElement('button');
     next.type = 'button';
     next.textContent = 'Sonraki';
-    next.disabled = !state.hasMoreJobs;
+    next.disabled = !hasMore;
     const changePage = async (delta) => {
-      state.jobPage += delta;
-      await fetchData();
+      const nextPage = Math.max(0, currentPage + delta);
+      if (isAssets) state.assetPage = nextPage;
+      else state.historyPage = nextPage;
+      const loaded = await fetchData();
+      if (!loaded) {
+        if (isAssets) state.assetPage = currentPage;
+        else state.historyPage = currentPage;
+      }
       renderAll();
     };
     previous.addEventListener('click', () => changePage(-1));
     next.addEventListener('click', () => changePage(1));
-    pager.append(previous, next);
+    pager.append(pageLabel, previous, next);
     container.append(pager);
   }
 
@@ -1036,22 +1252,69 @@
     resultCreative.classList.toggle("is-loading", isLoading);
   }
 
-  logoutButton.addEventListener("click", () => {
-    window.VitrinOS.auth.signOut("login.html");
+  logoutButtons.forEach((button) => {
+    button.addEventListener("click", () => window.VitrinOS.auth.signOut("login.html"));
   });
 
   appMenuToggle?.addEventListener("click", () => {
-    const isOpen = appShell.classList.toggle("menu-open");
-    appMenuToggle.setAttribute("aria-expanded", String(isOpen));
-    appMenuToggle.setAttribute("aria-label", isOpen ? "Panel menüsünü kapat" : "Panel menüsünü aç");
+    if (appShell.classList.contains("menu-open")) closeAppMenu({ restoreFocus: true });
+    else openAppMenu();
   });
+
+  appMenuScrim?.addEventListener("click", () => closeAppMenu({ restoreFocus: true }));
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeAppMenu();
+    if (event.key === "Escape") {
+      closeAppMenu({ restoreFocus: true });
+      return;
+    }
+
+    if (event.key === "Tab" && appShell?.classList.contains("menu-open")) {
+      const focusable = [
+        appMenuToggle,
+        ...appRail.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])')
+      ].filter((element) => element.getClientRects().length > 0);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
   });
 
-  tabButtons.forEach((button) => {
+  tabButtons.forEach((button, index) => {
     button.addEventListener("click", () => activateTab(button.dataset.tab));
+    button.addEventListener("keydown", (event) => {
+      const keyActions = {
+        ArrowRight: Math.min(index + 1, tabButtons.length - 1),
+        ArrowDown: Math.min(index + 1, tabButtons.length - 1),
+        ArrowLeft: Math.max(index - 1, 0),
+        ArrowUp: Math.max(index - 1, 0),
+        Home: 0,
+        End: tabButtons.length - 1
+      };
+      if (!(event.key in keyActions)) return;
+      event.preventDefault();
+      const target = tabButtons[keyActions[event.key]];
+      target.focus();
+      activateTab(target.dataset.tab);
+    });
+  });
+
+  window.addEventListener("resize", () => closeAppMenu());
+
+  closeAppMenu();
+
+  document.querySelector("#briefBrand")?.addEventListener("change", renderBrandContext);
+
+  dashboardRetryButton?.addEventListener("click", async () => {
+    const loaded = await fetchData();
+    if (loaded) renderAll();
   });
 
   briefForm.addEventListener("submit", async (event) => {
@@ -1128,7 +1391,7 @@
   });
 
   approveButton.addEventListener("click", async () => {
-    if (!state.currentJob) return;
+    if (!state.currentJob || state.currentJob.status !== "completed") return;
     
     setStatus(briefStatus, "Onaylanıyor...");
 
@@ -1147,13 +1410,14 @@
   });
 
   reviseButton.addEventListener("click", () => {
+    if (!state.currentJob || state.currentJob.status !== "completed" || reviseButton.disabled) return;
     revisionBox.hidden = false;
     revisionText.focus();
     setStatus(briefStatus, "Revizyon notunu yazıp üretimi tekrar tetikleyin.");
   });
 
   sendRevisionButton.addEventListener("click", async (event) => {
-    if (!state.currentJob) return;
+    if (!state.currentJob || state.currentJob.status !== "completed") return;
     
     const note = revisionText.value.trim();
 
@@ -1202,43 +1466,16 @@
       .channel('public:jobs')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'jobs', filter: userFilter }, async (payload) => {
         console.log("Realtime dashboard jobs güncellemesi alındı:", payload);
-        const changedId = payload.new?.id || payload.old?.id;
-        const isVisible = state.history.some((job) => job.id === changedId);
-        if (!isVisible && !(payload.eventType === 'INSERT' && state.jobPage === 0)) return;
-
-        if (payload.eventType === 'DELETE') {
-          state.history = state.history.filter((job) => job.id !== changedId);
-          state.assets = state.assets.filter((job) => job.id !== changedId);
-        } else {
-          const job = payload.new;
-          const historyItem = {
-            id: job.id,
-            brief: job.brief_text,
-            format: job.format,
-            status: job.status,
-            time: new Date(job.created_at).toLocaleString('tr-TR')
-          };
-          state.history = [historyItem, ...state.history.filter((item) => item.id !== job.id)].slice(0, JOB_PAGE_SIZE);
-
-          if (['completed', 'approved'].includes(job.status)) {
-            let imageUrl = '';
-            if (job.image_url) imageUrl = await window.VitrinOS.storage.getGeneratedAssetUrl(job.image_url);
-            const brand = state.brands.find((item) => item.id === job.brand_id);
-            const asset = { id: job.id, title: titleFor(job.brief_text, job.format), brand: brand?.name || 'Bilinmeyen', format: job.format, dimensions: dimensionsFor(job.format), status: job.status, imageUrl };
-            state.assets = [asset, ...state.assets.filter((item) => item.id !== job.id)].slice(0, JOB_PAGE_SIZE);
-          } else {
-            state.assets = state.assets.filter((item) => item.id !== job.id);
-          }
-        }
-        renderAll();
+        const loaded = await fetchData();
+        if (loaded) renderAll();
       })
       .subscribe();
 
     client
       .channel('public:brands')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'brands', filter: userFilter }, async () => {
-        await fetchData();
-        renderAll();
+        const loaded = await fetchData();
+        if (loaded) renderAll();
       })
       .subscribe();
   }

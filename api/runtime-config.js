@@ -13,7 +13,7 @@ const PRODUCTION_DEFAULTS = {
   release: "vitrinos-web@0.1.0"
 };
 
-module.exports = function handler(_request, response) {
+function handler(_request, response) {
   const appUrl = toAppUrl(process.env.PUBLIC_APP_URL || process.env.VERCEL_URL);
   const isProduction = (process.env.VERCEL_ENV || "development") === "production";
   const defaults = isProduction ? PRODUCTION_DEFAULTS : {
@@ -38,4 +38,11 @@ module.exports = function handler(_request, response) {
       release: process.env.RELEASE || process.env.VERCEL_GIT_COMMIT_SHA || defaults.release || ""
     })};`
   );
-};
+}
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = handler;
+} else if (typeof window !== "undefined") {
+  // Yerel statik sunucuda serverless kaynak dosyası doğrudan yüklenirse güvenli fallback.
+  window.VitrinOSRuntimeConfig = window.VitrinOSRuntimeConfig || {};
+}

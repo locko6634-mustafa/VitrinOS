@@ -67,7 +67,16 @@
     jobDetail: $("#jobDetail"),
     jobBrandFilter: $("#jobBrandFilter"),
     jobFormatFilter: $("#jobFormatFilter"),
-    jobStatusFilter: $("#jobStatusFilter")
+    jobStatusFilter: $("#jobStatusFilter"),
+    confirmDialog: $("#adminConfirmDialog"),
+    confirmTitle: $("#adminConfirmTitle"),
+    confirmMessage: $("#adminConfirmMessage"),
+    confirmButton: $("#adminConfirmButton"),
+    inviteDialog: $("#adminInviteDialog"),
+    inviteForm: $("#adminInviteForm"),
+    inviteEmail: $("#adminInviteEmail"),
+    inviteName: $("#adminInviteName"),
+    toastRegion: $("#adminToastRegion")
   };
 
   async function runAdminUserAction(payload) {
@@ -200,6 +209,7 @@
       if (!state.selectedJobId && state.jobs.length > 0) state.selectedJobId = state.jobs[0].id;
     } catch (err) {
       console.error("Veri çekme hatası:", err);
+      notify("Operasyon verileri yüklenemedi. Bağlantıyı kontrol edip yeniden deneyin.", "error");
     }
   }
 
@@ -271,33 +281,124 @@
     else element.removeAttribute("data-kind");
   }
 
+  function notify(message, kind = "info") {
+    if (!nodes.toastRegion) return;
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.dataset.kind = kind;
+    toast.setAttribute("role", kind === "error" ? "alert" : "status");
+    toast.append(textElement("span", message));
+    nodes.toastRegion.append(toast);
+    window.setTimeout(() => toast.remove(), 4800);
+  }
+
+  function askConfirmation({ title, message, confirmLabel = "Onayla", danger = false }) {
+    if (!nodes.confirmDialog?.showModal) {
+      notify("Onay penceresi bu tarayıcıda açılamadı.", "error");
+      return Promise.resolve(false);
+    }
+
+    nodes.confirmTitle.textContent = title;
+    nodes.confirmMessage.textContent = message;
+    nodes.confirmButton.textContent = confirmLabel;
+    nodes.confirmButton.dataset.danger = String(danger);
+    nodes.confirmDialog.returnValue = "cancel";
+
+    return new Promise((resolve) => {
+      nodes.confirmDialog.addEventListener("close", () => {
+        nodes.confirmButton.removeAttribute("data-danger");
+        resolve(nodes.confirmDialog.returnValue === "confirm");
+      }, { once: true });
+      nodes.confirmDialog.showModal();
+    });
+  }
+
+  function askInviteDetails() {
+    if (!nodes.inviteDialog?.showModal) {
+      notify("Davet penceresi bu tarayıcıda açılamadı.", "error");
+      return Promise.resolve(null);
+    }
+
+    nodes.inviteForm.reset();
+    nodes.inviteDialog.returnValue = "cancel";
+
+    return new Promise((resolve) => {
+      nodes.inviteDialog.addEventListener("close", () => {
+        if (nodes.inviteDialog.returnValue !== "confirm") {
+          resolve(null);
+          return;
+        }
+        resolve({
+          email: nodes.inviteEmail.value.trim(),
+          name: nodes.inviteName.value.trim()
+        });
+      }, { once: true });
+      nodes.inviteDialog.showModal();
+    });
+  }
+
   function normalize(value) {
     return String(value || "").toLocaleLowerCase("tr-TR");
   }
 
-  function activateTab(tabName) {
-    $$(".admin-nav-button").forEach((button) => {
-      const active = button.dataset.adminTab === tabName;
-      button.classList.toggle("is-active", active);
-    });
-    $$(".admin-panel").forEach((panel) => {
-      const active = panel.dataset.adminPanel === tabName;
-      panel.classList.toggle("is-active", active);
-      panel.hidden = !active;
+  function setAdminDrawerState(isOpen, { restoreFocus = false } = {}) {
+    const sidebar = document.getElementById("adminSidebar");
+    const topbar = document.getElementById("adminTopbar");
+    const toggle = document.getElementById("adminNavToggle");
+    if (!sidebar || !topbar || !toggle) return;
+
+    const isDrawerViewport = window.innerWidth <= adminConfig.mobileBreakpoint;
+    const drawerIsOpen = isDrawerViewport && isOpen;
+    const wasOpen = document.body.classList.contains("admin-sidebar-open");
+
+    sidebar.classList.toggle("is-open", drawerIsOpen);
+    topbar.classList.toggle("is-open", drawerIsOpen);
+    document.body.classList.toggle("admin-sidebar-open", drawerIsOpen);
+    toggle.setAttribute("aria-expanded", String(drawerIsOpen));
+    toggle.setAttribute("aria-label", drawerIsOpen ? "Operasyon menüsünü kapat" : "Operasyon menüsünü aç");
+    sidebar.inert = isDrawerViewport && !drawerIsOpen;
+    if (isDrawerViewport && !drawerIsOpen) sidebar.setAttribute("aria-hidden", "true");
+    else sidebar.removeAttribute("aria-hidden");
+
+    [
+      document.getElementById("admin-main"),
+      topbar.querySelector(".brand"),
+      topbar.querySelector(".admin-context"),
+      topbar.querySelector(".admin-topbar-actions")
+    ].filter(Boolean).forEach((target) => {
+      target.inert = drawerIsOpen;
     });
 
-    const adminSidebar = document.getElementById("adminSidebar");
-    const adminTopbar = document.getElementById("adminTopbar");
-    if (adminSidebar && adminSidebar.classList.contains("is-open")) {
-      adminSidebar.classList.remove("is-open");
-      adminTopbar.classList.remove("is-open");
-      document.body.classList.remove("admin-sidebar-open");
-      const toggleBtn = document.getElementById("adminNavToggle");
-      if (toggleBtn) toggleBtn.setAttribute("aria-expanded", "false");
+    if (restoreFocus && wasOpen) toggle.focus();
+  }
+
+  function activateTab(tabName) {
+    const updatePanels = () => {
+      $$(".admin-nav-button").forEach((button) => {
+        const active = button.dataset.adminTab === tabName;
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-selected", String(active));
+        button.tabIndex = active ? 0 : -1;
+      });
+      $$(".admin-panel").forEach((panel) => {
+        const active = panel.dataset.adminPanel === tabName;
+        panel.classList.toggle("is-active", active);
+        panel.hidden = !active;
+      });
+    };
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (document.startViewTransition && !reduceMotion) {
+      document.startViewTransition(updatePanels);
+    } else {
+      updatePanels();
     }
 
+    const drawerWasOpen = document.body.classList.contains("admin-sidebar-open");
+    if (drawerWasOpen) setAdminDrawerState(false, { restoreFocus: true });
+
     if (window.innerWidth <= adminConfig.mobileBreakpoint) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: "auto" });
     }
   }
 
@@ -305,10 +406,10 @@
     const activeJobs = state.jobs.filter((job) => job.status === "pending" || job.status === "processing").length;
     const waitingLeads = state.leads.filter((lead) => lead.status === "new").length;
     const metrics = [
-      ["Marka", state.brands.length, "sistemde kayıtlı"],
-      ["Kullanıcı", state.users.length, `${state.users.filter((user) => user.status === "active").length} aktif`],
-      ["Aktif job", activeJobs, "üretim kuyruğunda"],
-      ["Bekleyen lead", waitingLeads, "onay bekliyor"]
+      ["Marka", state.brands.length, "yüklenen görünümde"],
+      ["Kullanıcı", state.users.length, `${state.users.filter((user) => user.status === "active").length} aktif · yüklenen görünüm`],
+      ["Aktif job", activeJobs, "yüklenen job sayfasında"],
+      ["Bekleyen lead", waitingLeads, "yüklenen lead sayfasında"]
     ];
 
     nodes.metrics.replaceChildren(...metrics.map(([label, value, note]) => {
@@ -383,10 +484,16 @@
 
       const nameCell = document.createElement("td");
       nameCell.dataset.label = "Marka";
-      nameCell.append(
+      const selectButton = document.createElement("button");
+      selectButton.type = "button";
+      selectButton.className = "admin-row-selector";
+      selectButton.dataset.brandSelect = brand.id;
+      selectButton.setAttribute("aria-label", `${brand.name} marka detayını aç`);
+      selectButton.append(
         textElement("strong", brand.name),
         textElement("small", brand.websiteUrl || "web sitesi yok")
       );
+      nameCell.append(selectButton);
 
       row.append(nameCell);
       appendTextCell(row, brand.userEmail, "Kullanıcı");
@@ -397,7 +504,7 @@
     }));
   }
 
-  function fillBrandForm(id) {
+  function fillBrandForm(id, { focusForm = false } = {}) {
     const brand = state.brands.find((item) => item.id === id);
     if (!brand) return;
     state.selectedBrandId = id;
@@ -425,6 +532,7 @@
     nodes.brandFormTitle.textContent = brand.name;
     setStatus(nodes.brandStatus, "");
     renderBrands();
+    if (focusForm) $("#brandName")?.focus();
   }
 
   async function saveBrand(event) {
@@ -591,6 +699,7 @@
 
     if (!leads.length) {
       nodes.leadRows.replaceChildren(createEmptyRow(6, "Bu filtreye uyan başvuru yok."));
+      renderPager(nodes.leadRows, 'lead');
       return;
     }
 
@@ -679,6 +788,7 @@
 
     if (!jobs.length) {
       nodes.jobRows.replaceChildren(createEmptyRow(6, "Bu filtreye uyan job yok."));
+      renderPager(nodes.jobRows, 'job');
       return;
     }
 
@@ -689,7 +799,13 @@
 
       const idCell = document.createElement("td");
       idCell.dataset.label = "Job ID";
-      idCell.append(textElement("strong", job.id.substring(0, 8)), textElement("small", job.userEmail));
+      const selectButton = document.createElement("button");
+      selectButton.type = "button";
+      selectButton.className = "admin-row-selector";
+      selectButton.dataset.jobSelect = job.id;
+      selectButton.setAttribute("aria-label", `${job.id.substring(0, 8)} job detayını aç`);
+      selectButton.append(textElement("strong", job.id.substring(0, 8)), textElement("small", job.userEmail));
+      idCell.append(selectButton);
       row.append(idCell);
       appendTextCell(row, brandName(job.brandId), "Marka");
       appendTextCell(row, job.format, "Format");
@@ -733,7 +849,7 @@
     tableWrap.after(pager);
   }
 
-  function renderJobDetail(id) {
+  function renderJobDetail(id, { focusDetail = false } = {}) {
     const job = state.jobs.find((item) => item.id === id);
     state.selectedJobId = id;
     if (!job) {
@@ -797,6 +913,7 @@
 
     nodes.jobDetail.replaceChildren(head, preview, briefBlock, jsonBlock, timelineBlock);
     renderJobs();
+    if (focusDetail) nodes.jobDetail.focus();
   }
 
   function renderAll() {
@@ -816,10 +933,9 @@
 
     if (adminNavToggle && adminSidebar && adminTopbar) {
       adminNavToggle.addEventListener("click", () => {
-        const isOpen = adminSidebar.classList.toggle("is-open");
-        adminTopbar.classList.toggle("is-open", isOpen);
-        document.body.classList.toggle("admin-sidebar-open", isOpen);
-        adminNavToggle.setAttribute("aria-expanded", String(isOpen));
+        const isOpen = !adminSidebar.classList.contains("is-open");
+        setAdminDrawerState(isOpen);
+        if (isOpen) adminSidebar.querySelector(".admin-nav-button.is-active")?.focus();
       });
 
       document.body.addEventListener("click", (event) => {
@@ -829,21 +945,62 @@
           !event.target.closest("#adminNavToggle") &&
           !event.target.closest("#adminTopbar")
         ) {
-          adminSidebar.classList.remove("is-open");
-          adminTopbar.classList.remove("is-open");
-          document.body.classList.remove("admin-sidebar-open");
-          adminNavToggle.setAttribute("aria-expanded", "false");
+          setAdminDrawerState(false);
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && document.body.classList.contains("admin-sidebar-open")) {
+          setAdminDrawerState(false, { restoreFocus: true });
+          return;
+        }
+
+        if (event.key === "Tab" && document.body.classList.contains("admin-sidebar-open")) {
+          const focusable = [
+            adminNavToggle,
+            ...adminSidebar.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])')
+          ].filter((element) => element.getClientRects().length > 0);
+          if (!focusable.length) return;
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+          }
         }
       });
     }
 
-    $$(".admin-nav-button").forEach((button) => {
+    const navButtons = $$(".admin-nav-button");
+    navButtons.forEach((button, index) => {
       button.addEventListener("click", () => activateTab(button.dataset.adminTab));
+      button.addEventListener("keydown", (event) => {
+        const direction = event.key === "ArrowDown" || event.key === "ArrowRight"
+          ? 1
+          : event.key === "ArrowUp" || event.key === "ArrowLeft"
+            ? -1
+            : 0;
+        let targetIndex = index;
+        if (event.key === "Home") targetIndex = 0;
+        else if (event.key === "End") targetIndex = navButtons.length - 1;
+        else if (direction) targetIndex = (index + direction + navButtons.length) % navButtons.length;
+        else return;
+
+        event.preventDefault();
+        navButtons[targetIndex].focus();
+        activateTab(navButtons[targetIndex].dataset.adminTab);
+      });
     });
 
-    $("#adminLogout").addEventListener("click", () => {
-      window.VitrinOS.auth.signOut("login.html");
+    $$('[data-admin-logout]').forEach((button) => {
+      button.addEventListener("click", () => window.VitrinOS.auth.signOut("login.html"));
     });
+
+    window.addEventListener("resize", () => setAdminDrawerState(false));
+    setAdminDrawerState(false);
 
     $("#newBrandButton").addEventListener("click", () => {
       state.selectedBrandId = "";
@@ -863,7 +1020,7 @@
 
     nodes.brandRows.addEventListener("click", (event) => {
       const row = event.target.closest("[data-brand-id]");
-      if (row) fillBrandForm(row.dataset.brandId);
+      if (row) fillBrandForm(row.dataset.brandId, { focusForm: event.detail === 0 });
     });
 
     nodes.brandForm.addEventListener("submit", saveBrand);
@@ -902,14 +1059,18 @@
       if (resetButton) {
         const user = state.users.find((item) => item.id === resetButton.dataset.resetUser);
         if (!user) return;
-        const confirmed = confirm(`${user.email} kullanicisine sifre sifirlama e-postasi gonderilsin mi?`);
+        const confirmed = await askConfirmation({
+          title: "Şifre sıfırlama bağlantısı gönderilsin mi?",
+          message: `${user.email} kullanıcısına güvenli şifre sıfırlama e-postası gönderilecek.`,
+          confirmLabel: "Bağlantıyı gönder"
+        });
         if (!confirmed) return;
         try {
           resetButton.disabled = true;
           await runAdminUserAction({ action: "send_password_recovery", userId: user.id });
-          alert("Sifre sifirlama e-postasi gonderildi.");
+          notify("Şifre sıfırlama e-postası gönderildi.", "success");
         } catch (err) {
-          alert("Sifre sifirlama e-postasi gonderilemedi: " + err.message);
+          notify("Şifre sıfırlama e-postası gönderilemedi: " + err.message, "error");
         } finally {
           resetButton.disabled = false;
         }
@@ -919,15 +1080,21 @@
       if (deleteButton) {
         const user = state.users.find((item) => item.id === deleteButton.dataset.deleteUser);
         if (!user || user.id === authContext.user.id) return;
-        const confirmed = confirm(`${user.email} kullanıcısı silinsin mi? Bu kullanıcıya ait job kayıtları da silinir, marka kayıtları sahipsiz kalır.`);
+        const confirmed = await askConfirmation({
+          title: "Kullanıcı kalıcı olarak silinsin mi?",
+          message: `${user.email} kullanıcısının job kayıtları da silinir ve marka kayıtları sahipsiz kalır. Bu işlem geri alınamaz.`,
+          confirmLabel: "Kullanıcıyı sil",
+          danger: true
+        });
         if (!confirmed) return;
         try {
           deleteButton.disabled = true;
           await runAdminUserAction({ action: "delete_user", userId: user.id });
           await fetchData();
           renderAll();
+          notify("Kullanıcı ve ilişkili kayıtlar silindi.", "success");
         } catch (err) {
-          alert("Kullanıcı silinemedi: " + err.message);
+          notify("Kullanıcı silinemedi: " + err.message, "error");
           deleteButton.disabled = false;
         }
         return;
@@ -936,33 +1103,40 @@
       if (!button) return;
       const userId = button.dataset.toggleUser;
       try {
+        button.disabled = true;
         await runAdminUserAction({
           action: "toggle_user_status",
           userId
         });
         await fetchData();
         renderAll();
+        notify("Kullanıcı durumu güncellendi.", "success");
       } catch (err) {
-        alert("Kullanıcı durumu değiştirilemedi: " + err.message);
+        notify("Kullanıcı durumu değiştirilemedi: " + err.message, "error");
+      } finally {
+        if (button.isConnected) button.disabled = false;
       }
     });
 
-    $("#inviteUserButton").addEventListener("click", async () => {
-      const email = prompt("Davet edilecek e-posta adresini girin:");
-      if (!email) return;
-      const name = prompt("Kullanıcı adını girin:");
-      if (!name) return;
+    const inviteUserButton = $("#inviteUserButton");
+    inviteUserButton.addEventListener("click", async () => {
+      if (inviteUserButton.disabled) return;
+      inviteUserButton.disabled = true;
       try {
+        const invite = await askInviteDetails();
+        if (!invite) return;
         await runAdminUserAction({
           action: "invite_user",
-          email,
-          name
+          email: invite.email,
+          name: invite.name
         });
-        alert("Kullanıcı başarıyla davet edildi.");
+        notify("Kullanıcı başarıyla davet edildi.", "success");
         await fetchData();
         renderAll();
       } catch (err) {
-        alert("Davet gönderilemedi: " + err.message);
+        notify("Davet gönderilemedi: " + err.message, "error");
+      } finally {
+        inviteUserButton.disabled = false;
       }
     });
 
@@ -972,12 +1146,16 @@
       const leadId = select.dataset.leadStatus;
       const newStatus = select.value;
       try {
+        select.disabled = true;
         const { error } = await client.from('leads').update({ status: newStatus }).eq('id', leadId);
         if (error) throw error;
         await fetchData();
         renderAll();
+        notify("Başvuru durumu güncellendi.", "success");
       } catch (err) {
-        alert("Durum güncellenemedi: " + err.message);
+        notify("Durum güncellenemedi: " + err.message, "error");
+      } finally {
+        if (select.isConnected) select.disabled = false;
       }
     });
 
@@ -988,21 +1166,24 @@
       const lead = state.leads.find((item) => item.id === leadId);
       if (!lead) return;
       try {
+        button.disabled = true;
         await runAdminUserAction({
           action: "invite_lead",
           leadId
         });
-        alert("Başvuru onaylandı ve kullanıcı davet edildi.");
+        notify("Başvuru onaylandı ve kullanıcı davet edildi.", "success");
         await fetchData();
         renderAll();
       } catch (err) {
-        alert("İşlem gerçekleştirilemedi: " + err.message);
+        notify("İşlem gerçekleştirilemedi: " + err.message, "error");
+      } finally {
+        if (button.isConnected) button.disabled = false;
       }
     });
 
     nodes.jobRows.addEventListener("click", (event) => {
       const row = event.target.closest("[data-job-id]");
-      if (row) renderJobDetail(row.dataset.jobId);
+      if (row) renderJobDetail(row.dataset.jobId, { focusDetail: event.detail === 0 });
     });
 
     $$("[data-sort-jobs]").forEach((button) => {

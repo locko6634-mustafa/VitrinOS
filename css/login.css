@@ -1,3 +1,4 @@
+@layer pages {
 body[data-surface="auth"] {
   --auth-paper: var(--vo-paper, hsl(38 35% 99%));
   --auth-porcelain: var(--vo-porcelain, hsl(38 32% 96%));
@@ -1500,4 +1501,5 @@ body[data-surface="auth"] .mfa-code-input {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
 }

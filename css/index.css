@@ -1,4 +1,4 @@
-@layer tokens, base, components, pages, motion;
+@layer pages {
 
 body[data-surface="marketing"] {
   --marketing-paper: var(--vo-paper, hsl(38 35% 99%));
@@ -2483,4 +2483,5 @@ body[data-surface="marketing"] .orbit-two {
   body[data-surface="marketing"] .pipeline-steps {
     grid-template-columns: 1fr;
   }
+}
 }

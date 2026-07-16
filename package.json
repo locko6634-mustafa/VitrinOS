@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "test": "node --test quality/tests/config.test.mjs",
+    "test": "node --test quality/tests/config.test.mjs quality/tests/frontend-contract.test.mjs",
     "release-gate": "node quality/scripts/release-gate.mjs",
     "release-manifest": "node quality/scripts/generate-release-manifest.mjs",
     "ops-check": "node quality/scripts/ops-contract.mjs",

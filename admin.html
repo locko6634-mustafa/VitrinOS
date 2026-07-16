@@ -5,18 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>VitrinOS Admin | Operasyon paneli</title>
     <meta name="description" content="VitrinOS admin paneli; marka, kullanıcı, başvuru ve job yönetimi için canlı operasyon arayüzü.">
-    <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="14" fill="%23161512"/%3E%3Cpath d="M16 16h10l7 23 7-23h8L37 48h-9L16 16Z" fill="%23d9962a"/%3E%3C/svg%3E'>
-    <link rel="stylesheet" href="css/style.css?v=1.1">
-    <link rel="stylesheet" href="css/admin.css?v=1.1">
+    <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" fill="%23f8f4ec"/%3E%3Cpath d="M11 15h11l10 30 10-30h11L38 53H26L11 15Z" fill="%231d1e22"/%3E%3Cpath d="M46 42h9v9h-9z" fill="%23f46b22"/%3E%3C/svg%3E'>
+    <link rel="stylesheet" href="css/style.css?v=2.1">
+    <link rel="stylesheet" href="css/admin.css?v=2.1">
   </head>
-  <body class="app-body admin-body">
+  <body class="app-body admin-body" data-surface="admin">
     <a class="skip-link" href="#admin-main">İçeriğe geç</a>
 
     <div class="admin-shell">
       <header class="admin-topbar" id="adminTopbar">
         <a class="brand" href="index.html" aria-label="VitrinOS ana sayfa">
-          <span class="brand-mark" aria-hidden="true">V</span>
-          <span>VitrinOS</span>
+          <span class="brand-wordmark" aria-hidden="true">Vitrin<span class="brand-os">OS</span><sup>®</sup></span>
         </a>
         <div class="admin-context">
           <span>Admin</span>
@@ -25,9 +24,9 @@
         <div class="admin-topbar-actions">
           <a class="admin-link-button" href="mfa-setup.html">MFA güvenliği</a>
           <a class="admin-link-button" href="dashboard.html">Kullanıcı paneli</a>
-          <button class="button secondary compact-button" type="button" id="adminLogout">Çıkış</button>
+          <button class="button secondary compact-button" type="button" id="adminLogout" data-admin-logout>Çıkış</button>
         </div>
-        <button class="admin-nav-toggle" id="adminNavToggle" type="button" aria-label="Menüyü aç/kapat" aria-expanded="false">
+        <button class="admin-nav-toggle" id="adminNavToggle" type="button" aria-label="Operasyon menüsünü aç" aria-controls="adminSidebar" aria-expanded="false">
           <span class="bar"></span>
           <span class="bar"></span>
           <span class="bar"></span>
@@ -35,13 +34,18 @@
       </header>
  
       <aside class="admin-sidebar" id="adminSidebar" aria-label="Admin bölümleri">
-        <nav class="admin-nav">
-          <button class="admin-nav-button is-active" type="button" data-admin-tab="overview">Kontrol merkezi</button>
-          <button class="admin-nav-button" type="button" data-admin-tab="brands">Markalar</button>
-          <button class="admin-nav-button" type="button" data-admin-tab="users">Kullanıcılar</button>
-          <button class="admin-nav-button" type="button" data-admin-tab="leads">Başvurular</button>
-          <button class="admin-nav-button" type="button" data-admin-tab="jobs">Job izleme</button>
+        <nav class="admin-nav" aria-label="Operasyon bölümleri" role="tablist" aria-orientation="vertical">
+          <button class="admin-nav-button is-active" id="admin-tab-overview" type="button" role="tab" aria-controls="admin-panel-overview" aria-selected="true" tabindex="0" data-admin-tab="overview">Kontrol merkezi</button>
+          <button class="admin-nav-button" id="admin-tab-brands" type="button" role="tab" aria-controls="admin-panel-brands" aria-selected="false" tabindex="-1" data-admin-tab="brands">Markalar</button>
+          <button class="admin-nav-button" id="admin-tab-users" type="button" role="tab" aria-controls="admin-panel-users" aria-selected="false" tabindex="-1" data-admin-tab="users">Kullanıcılar</button>
+          <button class="admin-nav-button" id="admin-tab-leads" type="button" role="tab" aria-controls="admin-panel-leads" aria-selected="false" tabindex="-1" data-admin-tab="leads">Başvurular</button>
+          <button class="admin-nav-button" id="admin-tab-jobs" type="button" role="tab" aria-controls="admin-panel-jobs" aria-selected="false" tabindex="-1" data-admin-tab="jobs">Job izleme</button>
         </nav>
+        <div class="admin-sidebar-actions" aria-label="Admin hesap işlemleri">
+          <a href="mfa-setup.html">MFA güvenliği</a>
+          <a href="dashboard.html">Kullanıcı paneli</a>
+          <button type="button" id="adminSidebarLogout" data-admin-logout>Çıkış yap</button>
+        </div>
         <div class="admin-sidebar-note">
           <span>Canlı sistem</span>
           <p>VitrinOS Canlı Otomasyon Sistemi için marka, kullanıcı, başvuru ve üretim operasyonlarını yönetin.</p>
@@ -57,7 +61,7 @@
           <p class="admin-note">Marka ayarları, kullanıcı yönetimi, başvurular ve job akışı tek merkezden izlenir.</p>
         </section>
 
-        <section class="admin-panel is-active" id="admin-panel-overview" data-admin-panel="overview">
+        <section class="admin-panel is-active" id="admin-panel-overview" role="tabpanel" aria-labelledby="admin-tab-overview" data-admin-panel="overview">
           <div class="admin-metric-grid" id="adminMetrics"></div>
           <div class="admin-split-grid">
             <article class="admin-card">
@@ -77,11 +81,11 @@
           </div>
         </section>
 
-        <section class="admin-panel" id="admin-panel-brands" data-admin-panel="brands" hidden>
+        <section class="admin-panel" id="admin-panel-brands" role="tabpanel" aria-labelledby="admin-tab-brands" data-admin-panel="brands" hidden>
           <div class="admin-toolbar">
             <label class="admin-search">
               <span>Marka ara</span>
-              <input id="brandSearch" type="search" placeholder="NovaMarket, Evora...">
+              <input id="brandSearch" type="search" placeholder="Marka adı veya kullanıcı">
             </label>
             <label>
               <span>Tema</span>
@@ -184,7 +188,7 @@
           </div>
         </section>
 
-        <section class="admin-panel" id="admin-panel-users" data-admin-panel="users" hidden>
+        <section class="admin-panel" id="admin-panel-users" role="tabpanel" aria-labelledby="admin-tab-users" data-admin-panel="users" hidden>
           <div class="admin-toolbar">
             <label class="admin-search"><span>Kullanıcı ara</span><input id="userSearch" type="search" placeholder="e-posta veya marka"></label>
             <label><span>Durum</span><select id="userStatusFilter"><option value="all">Tümü</option><option value="active">Aktif</option><option value="inactive">Pasif</option></select></label>
@@ -201,7 +205,7 @@
           </article>
         </section>
 
-        <section class="admin-panel" id="admin-panel-leads" data-admin-panel="leads" hidden>
+        <section class="admin-panel" id="admin-panel-leads" role="tabpanel" aria-labelledby="admin-tab-leads" data-admin-panel="leads" hidden>
           <div class="admin-toolbar">
             <label class="admin-search"><span>Başvuru ara</span><input id="leadSearch" type="search" placeholder="ad, şirket veya e-posta"></label>
             <label><span>Durum</span><select id="leadStatusFilter"><option value="all">Tümü</option><option value="new">Yeni</option><option value="reviewed">İncelendi</option><option value="approved">Onaylandı</option><option value="rejected">Reddedildi</option></select></label>
@@ -217,7 +221,7 @@
           </article>
         </section>
 
-        <section class="admin-panel" id="admin-panel-jobs" data-admin-panel="jobs" hidden>
+        <section class="admin-panel" id="admin-panel-jobs" role="tabpanel" aria-labelledby="admin-tab-jobs" data-admin-panel="jobs" hidden>
           <div class="admin-toolbar">
             <label><span>Marka</span><select id="jobBrandFilter"><option value="all">Tümü</option></select></label>
             <label><span>Format</span><select id="jobFormatFilter"><option value="all">Tümü</option><option value="Banner">Banner</option><option value="Meta Post">Meta Post</option><option value="Story">Story</option></select></label>
@@ -242,7 +246,7 @@
                 </table>
               </div>
             </article>
-            <aside class="admin-card admin-detail" id="jobDetail" aria-live="polite">
+            <aside class="admin-card admin-detail" id="jobDetail" tabindex="-1" aria-live="polite">
               <div class="admin-card-head"><span>Job detayı</span><strong>Seçim bekliyor</strong></div>
               <p class="admin-empty">Tablodan bir job seç.</p>
             </aside>
@@ -251,15 +255,42 @@
       </main>
     </div>
 
+    <dialog class="admin-dialog" id="adminConfirmDialog" aria-labelledby="adminConfirmTitle" aria-describedby="adminConfirmMessage">
+      <form method="dialog">
+        <p class="kicker">Operasyon onayı</p>
+        <h2 id="adminConfirmTitle">İşlemi onayla</h2>
+        <p id="adminConfirmMessage"></p>
+        <div class="admin-dialog-actions">
+          <button class="button secondary" type="submit" value="cancel">Vazgeç</button>
+          <button class="button primary" id="adminConfirmButton" type="submit" value="confirm">Onayla</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="admin-dialog" id="adminInviteDialog" aria-labelledby="adminInviteTitle">
+      <form method="dialog" id="adminInviteForm">
+        <p class="kicker">Güvenli davet</p>
+        <h2 id="adminInviteTitle">Yeni kullanıcı davet et</h2>
+        <label>E-posta adresi<input id="adminInviteEmail" type="email" autocomplete="email" required></label>
+        <label>Kullanıcı adı<input id="adminInviteName" autocomplete="name" required></label>
+        <div class="admin-dialog-actions">
+          <button class="button secondary" type="submit" value="cancel" formnovalidate>Vazgeç</button>
+          <button class="button primary" type="submit" value="confirm">Daveti gönder</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast-region" id="adminToastRegion" role="status" aria-live="polite" aria-atomic="false"></div>
+
     <script
       src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"
       integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug"
       crossorigin="anonymous"
     ></script>
-    <script src="/api/runtime-config.js"></script>
+    <script src="/api/runtime-config.js?v=2.1"></script>
     <script src="js/config.js?v=1.1"></script>
     <script src="js/observability.js?v=1.1"></script>
     <script src="js/supabase.js?v=1.1"></script>
-    <script src="js/admin.js?v=1.1"></script>
+    <script src="js/admin.js?v=2.1"></script>
   </body>
 </html>
