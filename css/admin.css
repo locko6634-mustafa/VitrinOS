@@ -44,6 +44,7 @@
     align-items: center;
     min-height: var(--admin-topbar);
     width: 100%;
+    padding: 0 clamp(18px, 2.5vw, 36px);
     border-bottom: 1px solid var(--admin-line);
     background: color-mix(in srgb, var(--admin-surface) 92%, transparent);
     backdrop-filter: blur(18px) saturate(125%);
@@ -53,7 +54,7 @@
     align-self: stretch;
     display: inline-flex;
     align-items: center;
-    padding-inline: 24px;
+    padding-inline: 0;
     border-right: 0;
   }
 
@@ -101,8 +102,8 @@
   .admin-topbar-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding-right: 18px;
+    gap: 10px;
+    padding-right: 0;
   }
 
   .admin-body .button {
@@ -122,6 +123,12 @@
   .admin-body .button.secondary:hover {
     border-color: var(--vo-line-strong);
     background: hsl(37 38% 97%);
+  }
+
+  .admin-body .compact-button {
+    min-height: 39px !important;
+    padding-inline: 14px;
+    font-size: 0.84rem;
   }
 
   .admin-link-button {
@@ -908,7 +915,7 @@
     }
 
     .admin-topbar .brand {
-      padding-inline: 18px;
+      padding-inline: 0;
       border-right: 0;
     }
 
