@@ -335,6 +335,11 @@ body[data-surface="workspace"] .button.secondary:hover {
   display: none;
 }
 
+.admin-panel-link,
+.rail-admin-link {
+  text-decoration: none;
+}
+
 .rail-foot div {
   display: grid;
   gap: 3px;
@@ -1205,6 +1210,18 @@ body[data-surface="workspace"] button:disabled {
     color: var(--ink);
     font: 700 0.76rem / 1 var(--font-mono);
     cursor: pointer;
+  }
+
+  .rail-admin-link {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg-soft);
+    color: var(--ink);
+    font: 700 0.76rem / 1 var(--font-mono);
   }
 
   .app-menu-scrim:not([hidden]) {

@@ -35,6 +35,8 @@
   const appTopbar = document.querySelector(".app-topbar");
   const appMenuToggle = document.querySelector("#appMenuToggle");
   const appMenuScrim = document.querySelector("#appMenuScrim");
+  const adminPanelLink = document.querySelector("#adminPanelLink");
+  const mobileAdminPanelLink = document.querySelector("#mobileAdminPanelLink");
   const tabButtons = Array.from(document.querySelectorAll("[data-tab]"));
   const panels = Array.from(document.querySelectorAll(".tab-panel"));
   const briefForm = document.querySelector("#briefForm");
@@ -75,6 +77,12 @@
   const barStory = document.querySelector("#barStory");
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const appDrawerQuery = window.matchMedia("(max-width: 1120px)");
+
+  if (authContext.role === "admin") {
+    [adminPanelLink, mobileAdminPanelLink].filter(Boolean).forEach((link) => {
+      link.hidden = false;
+    });
+  }
 
   if (typeof document.startViewTransition === "function") {
     document.documentElement.classList.add("supports-view-transition");
