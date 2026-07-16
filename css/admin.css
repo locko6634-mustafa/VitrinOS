@@ -51,7 +51,7 @@
   }
 
   .admin-topbar .brand {
-    align-self: stretch;
+    align-self: center;
     display: inline-flex;
     align-items: center;
     padding-inline: 0;
