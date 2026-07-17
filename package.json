@@ -1,5 +1,6 @@
 {
   "private": true,
+  "version": "1.0.0",
   "scripts": {
     "test": "node --test quality/tests/config.test.mjs quality/tests/frontend-contract.test.mjs",
     "release-gate": "node quality/scripts/release-gate.mjs",

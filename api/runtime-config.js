@@ -10,7 +10,7 @@ const PRODUCTION_DEFAULTS = {
   supabaseProjectRef: "wrzalebhnlwppufdcmiz",
   sentryDsn: "",
   observabilitySampleRate: 1.0,
-  release: "vitrinos-web@0.1.0"
+  release: "vitrinos-web@1.0.0"
 };
 
 function handler(_request, response) {
@@ -19,7 +19,7 @@ function handler(_request, response) {
   const defaults = isProduction ? PRODUCTION_DEFAULTS : {
     sentryDsn: "",
     observabilitySampleRate: 1.0,
-    release: "vitrinos-web@0.1.0"
+    release: "vitrinos-web@1.0.0"
   };
 
   response.setHeader("Cache-Control", "no-store, max-age=0");

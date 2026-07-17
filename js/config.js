@@ -28,7 +28,7 @@
     },
     sentryDsn: "",
     observabilitySampleRate: 1,
-    release: "vitrinos-web@0.1.0",
+    release: "vitrinos-web@1.0.0",
     defaults: {
       colors: {
         primary: "#d9962a",
