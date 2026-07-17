@@ -128,7 +128,6 @@
     const nextRetry = new Date(job.nextRetryAt);
     const delay = Math.max(0, nextRetry.getTime() - Date.now());
 
-    console.log(`Job ${job.id} will be retried in ${delay} ms`);
 
     activeRetryTimeoutId = setTimeout(async () => {
       try {
@@ -1473,7 +1472,6 @@
     client
       .channel('public:jobs')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'jobs', filter: userFilter }, async (payload) => {
-        console.log("Realtime dashboard jobs güncellemesi alındı:", payload);
         const loaded = await fetchData();
         if (loaded) renderAll();
       })

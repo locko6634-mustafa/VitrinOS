@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /login.html
+Disallow: /dashboard.html
+Disallow: /admin.html
+Disallow: /mfa-challenge.html
+Disallow: /mfa-setup.html
+Disallow: /set-password.html
+
+Sitemap: https://vitrin-os.vercel.app/sitemap.xml
