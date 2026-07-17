@@ -242,7 +242,33 @@
 
 @layer components {
   .skip-link {
-    display: none !important;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 200;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    transform: translateY(-160%);
+    border: 1px solid var(--vo-line-strong);
+    border-radius: var(--vo-radius-sm);
+    background: var(--vo-graphite);
+    color: var(--vo-paper);
+    padding: 0 1rem;
+    font-weight: 650;
+    box-shadow: var(--vo-shadow-2);
+    transition: transform 0.2s ease;
+  }
+
+  .skip-link:focus-visible {
+    transform: translateY(0);
+    outline: 2px solid var(--vo-orange);
+    outline-offset: 2px;
+  }
+
+  /* Fare tıklamalarında veya otomatik odaklanmalarda gizli kalmasını garantile */
+  .skip-link:focus:not(:focus-visible) {
+    transform: translateY(-160%);
   }
 
   .brand,
