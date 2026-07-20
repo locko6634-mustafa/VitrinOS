@@ -44,4 +44,4 @@ web_modules/
 # Supabase local files
 supabase/.temp/
 
-.md
+*.md
