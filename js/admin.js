@@ -907,14 +907,9 @@
       img.src = job.imageUrl;
       img.alt = `${job.format} çıktısı`;
       img.className = "admin-preview-img";
-      img.style.maxWidth = "100%";
-      img.style.marginTop = "1rem";
-      img.style.borderRadius = "4px";
-      img.style.border = "1px solid var(--border)";
       preview.append(img);
     } else {
       const empty = textElement("p", "Görsel henüz üretilmedi.", "admin-empty");
-      empty.style.marginTop = "1rem";
       preview.append(empty);
     }
 

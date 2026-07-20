@@ -806,32 +806,15 @@
 
       const errorContainer = document.createElement("div");
       errorContainer.className = "creative-error-container";
-      errorContainer.style.display = "flex";
-      errorContainer.style.flexDirection = "column";
-      errorContainer.style.alignItems = "center";
-      errorContainer.style.justifyContent = "center";
-      errorContainer.style.height = "100%";
-      errorContainer.style.padding = "2rem";
-      errorContainer.style.textAlign = "center";
-      errorContainer.style.color = "var(--error, #e53e3e)";
 
       const errorIcon = document.createElement("span");
       errorIcon.textContent = "📡";
-      errorIcon.style.fontSize = "3rem";
-      errorIcon.style.marginBottom = "1rem";
 
       const errorTitle = document.createElement("strong");
       errorTitle.textContent = "Kreatif Üretim Hattı Başlatılamadı";
-      errorTitle.style.display = "block";
-      errorTitle.style.fontSize = "1.1rem";
-      errorTitle.style.marginBottom = "0.5rem";
 
       const errorMsg = document.createElement("p");
       errorMsg.textContent = job.lastError || "Otomasyon webhook'u çağrılırken bir ağ hatası oluştu.";
-      errorMsg.style.fontSize = "0.9rem";
-      errorMsg.style.color = "var(--muted)";
-      errorMsg.style.maxWidth = "80%";
-      errorMsg.style.margin = "0 auto 1.5rem auto";
 
       const retryBtn = document.createElement("button");
       retryBtn.className = "button primary compact-button";
@@ -882,42 +865,24 @@
 
       const retryContainer = document.createElement("div");
       retryContainer.className = "creative-retry-container";
-      retryContainer.style.display = "flex";
-      retryContainer.style.flexDirection = "column";
-      retryContainer.style.alignItems = "center";
-      retryContainer.style.justifyContent = "center";
-      retryContainer.style.height = "100%";
-      retryContainer.style.padding = "2rem";
-      retryContainer.style.textAlign = "center";
-      retryContainer.style.color = "var(--primary, #d9962a)";
 
       const retryIcon = document.createElement("span");
       retryIcon.textContent = "⏳";
       retryIcon.className = "loading-spinner";
-      retryIcon.style.fontSize = "3rem";
-      retryIcon.style.marginBottom = "1rem";
 
       const retryTitle = document.createElement("strong");
       retryTitle.textContent = "Ağ Hatası Alındı, Yeniden Tetiklenecek";
-      retryTitle.style.display = "block";
-      retryTitle.style.fontSize = "1.1rem";
-      retryTitle.style.marginBottom = "0.5rem";
 
       const nextRetryDate = new Date(job.nextRetryAt);
       const remainingSeconds = Math.max(0, Math.ceil((nextRetryDate.getTime() - Date.now()) / 1000));
       
       const retryMsg = document.createElement("p");
       retryMsg.textContent = `Otomasyon hattına bağlanırken hata alındı (${job.lastError || "Ağ hatası"}). ${remainingSeconds} saniye içinde otomatik olarak tekrar denenecek (Deneme #${job.retryCount}/${job.maxRetries}).`;
-      retryMsg.style.fontSize = "0.9rem";
-      retryMsg.style.color = "var(--muted)";
-      retryMsg.style.maxWidth = "80%";
-      retryMsg.style.margin = "0 auto 1.5rem auto";
 
       const manualRetryBtn = document.createElement("button");
       manualRetryBtn.className = "button secondary compact-button";
       manualRetryBtn.textContent = "Hemen Yeniden Dene";
       manualRetryBtn.type = "button";
-      manualRetryBtn.style.marginTop = "0.5rem";
       manualRetryBtn.addEventListener("click", async () => {
         try {
           setStatus(briefStatus, "Hemen yeniden tetikleniyor...");
@@ -966,32 +931,15 @@
 
       const errorContainer = document.createElement("div");
       errorContainer.className = "creative-error-container";
-      errorContainer.style.display = "flex";
-      errorContainer.style.flexDirection = "column";
-      errorContainer.style.alignItems = "center";
-      errorContainer.style.justifyContent = "center";
-      errorContainer.style.height = "100%";
-      errorContainer.style.padding = "2rem";
-      errorContainer.style.textAlign = "center";
-      errorContainer.style.color = "var(--error, #e53e3e)";
 
       const errorIcon = document.createElement("span");
       errorIcon.textContent = "⚠️";
-      errorIcon.style.fontSize = "3rem";
-      errorIcon.style.marginBottom = "1rem";
 
       const errorTitle = document.createElement("strong");
       errorTitle.textContent = "Yapay Zeka Görsel Üretimi Sırasında Hata Oluştu";
-      errorTitle.style.display = "block";
-      errorTitle.style.fontSize = "1.1rem";
-      errorTitle.style.marginBottom = "0.5rem";
 
       const errorMsg = document.createElement("p");
       errorMsg.textContent = getFriendlyErrorMessage(job.revisionNote);
-      errorMsg.style.fontSize = "0.9rem";
-      errorMsg.style.color = "var(--muted)";
-      errorMsg.style.maxWidth = "80%";
-      errorMsg.style.margin = "0 auto";
 
       errorContainer.append(errorIcon, errorTitle, errorMsg);
       resultCreative.append(errorContainer);
@@ -1061,19 +1009,10 @@
         const campaign = details.campaign || {};
 
         const title = createTextElement("span", "Üretilen Kreatif Detayları");
-        title.style.color = "var(--accent-soft)";
-        title.style.fontFamily = "var(--font-mono)";
-        title.style.fontSize = "0.76rem";
-        title.style.fontWeight = "800";
-        title.style.letterSpacing = "0.12em";
-        title.style.textTransform = "uppercase";
+        title.className = "creative-details-title";
 
         const grid = document.createElement("div");
-        grid.style.display = "grid";
-        grid.style.gridTemplateColumns = "1fr 1fr";
-        grid.style.gap = "12px";
-        grid.style.fontSize = "0.9rem";
-        grid.style.marginTop = "8px";
+        grid.className = "creative-details-grid";
 
         grid.append(
           createDetailItem("Ürün Adı:", details.product_name),

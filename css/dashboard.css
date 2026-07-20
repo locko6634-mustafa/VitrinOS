@@ -55,7 +55,7 @@ body[data-surface="workspace"] .skip-link {
 
 .app-shell {
   min-height: 100dvh;
-  padding-top: 72px;
+  padding-top: var(--shell-header-size);
 }
 
 .app-topbar {
@@ -63,9 +63,9 @@ body[data-surface="workspace"] .skip-link {
   inset: 0 0 auto;
   z-index: 80;
   width: 100%;
-  min-height: 72px;
+  min-height: var(--shell-header-size);
   display: grid;
-  grid-template-columns: 248px minmax(0, 1fr) auto auto;
+  grid-template-columns: var(--shell-rail-size) minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 20px;
   border-bottom: 1px solid var(--line);
@@ -220,17 +220,17 @@ body[data-surface="workspace"] .button.secondary:hover {
 
 .app-workspace {
   display: grid;
-  grid-template-columns: 248px minmax(0, 1fr);
-  min-height: calc(100dvh - 72px);
+  grid-template-columns: var(--shell-rail-size) minmax(0, 1fr);
+  min-height: calc(100dvh - var(--shell-header-size));
 }
 
 .app-rail {
   position: fixed;
-  top: 72px;
+  top: var(--shell-header-size);
   left: 0;
   align-self: start;
-  width: 248px;
-  height: calc(100dvh - 72px);
+  width: var(--shell-rail-size);
+  height: calc(100dvh - var(--shell-header-size));
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -517,7 +517,7 @@ body[data-surface="workspace"] .button.secondary:hover {
 }
 
 .tab-panel {
-  min-height: 440px;
+  min-height: clamp(300px, 45svh, 440px);
   padding-top: clamp(26px, 3vw, 42px);
 }
 
@@ -700,7 +700,7 @@ body[data-surface="workspace"] .button.secondary:hover {
 }
 
 .brief-layout {
-  grid-template-columns: minmax(310px, 0.78fr) minmax(390px, 1.22fr);
+  grid-template-columns: minmax(min(100%, 310px), 0.78fr) minmax(min(100%, 390px), 1.22fr);
   align-items: start;
   margin-top: 0;
 }
@@ -873,7 +873,7 @@ body[data-surface="workspace"] .form-status[data-kind="error"] {
 }
 
 .result-creative {
-  min-height: clamp(330px, 42vw, 540px);
+  min-height: clamp(240px, 42vw, 540px);
 }
 
 .result-creative[data-format="story"] {
@@ -1138,23 +1138,23 @@ body[data-surface="workspace"] button:disabled {
 
 @media (max-width: 1180px) {
   .app-topbar {
-    grid-template-columns: 218px minmax(0, 1fr) auto auto;
+    grid-template-columns: var(--shell-rail-size) minmax(0, 1fr) auto auto;
   }
 
   .app-workspace {
-    grid-template-columns: 218px minmax(0, 1fr);
+    grid-template-columns: var(--shell-rail-size) minmax(0, 1fr);
   }
 
   .app-rail {
-    width: 218px;
+    width: var(--shell-rail-size);
   }
 
   .workspace-signal {
-    min-width: 270px;
+    min-width: min(100%, 270px);
   }
 
   .brief-layout {
-    grid-template-columns: minmax(290px, 0.82fr) minmax(350px, 1.18fr);
+    grid-template-columns: minmax(min(100%, 290px), 0.82fr) minmax(min(100%, 350px), 1.18fr);
   }
 }
 
@@ -1173,7 +1173,7 @@ body[data-surface="workspace"] button:disabled {
 
   .app-rail {
     position: fixed;
-    top: 72px;
+    top: var(--shell-header-size);
     bottom: 0;
     left: 0;
     z-index: 72;
@@ -1226,7 +1226,7 @@ body[data-surface="workspace"] button:disabled {
 
   .app-menu-scrim:not([hidden]) {
     position: fixed;
-    inset: 72px 0 0;
+    inset: var(--shell-header-size) 0 0;
     z-index: 70;
     display: block;
     width: 100%;
@@ -1461,3 +1461,66 @@ body[data-surface="workspace"] button:disabled {
   }
 }
 }
+
+/* JS Dinamik Hata ve Detay Blokları */
+.creative-error-container,
+.creative-retry-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+}
+
+.creative-error-container {
+  color: var(--vo-danger, #e53e3e);
+}
+
+.creative-retry-container {
+  color: var(--vo-accent, #d9962a);
+}
+
+.creative-error-container span,
+.creative-retry-container span {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.creative-error-container strong,
+.creative-retry-container strong {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.creative-error-container p,
+.creative-retry-container p {
+  font-size: 0.9rem;
+  color: var(--muted);
+  max-width: 80%;
+  margin: 0 auto 1.5rem auto;
+}
+
+.creative-error-container p {
+  margin: 0 auto;
+}
+
+.creative-details-title {
+  color: var(--accent-soft);
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.creative-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
+  gap: 12px;
+  font-size: 0.9rem;
+  margin-top: 8px;
+}
+

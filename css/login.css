@@ -84,7 +84,7 @@ body[data-surface="auth"] .skip-link {
   margin-inline: auto;
   padding: clamp(2rem, 4vw, 4.5rem) 0;
   display: grid;
-  grid-template-columns: minmax(360px, 0.9fr) minmax(480px, 1.1fr);
+  grid-template-columns: minmax(min(100%, 360px), 0.9fr) minmax(min(100%, 480px), 1.1fr);
   align-items: center;
   gap: clamp(3rem, 6vw, 6rem);
 }
@@ -1170,7 +1170,7 @@ body[data-surface="auth"] .mfa-code-input {
 }
 
 .auth-screen--mfa-setup {
-  grid-template-columns: minmax(470px, 1.03fr) minmax(420px, 0.97fr);
+  grid-template-columns: minmax(min(100%, 470px), 1.03fr) minmax(min(100%, 420px), 0.97fr);
 }
 
 .auth-screen--mfa-setup .auth-panel {
@@ -1295,7 +1295,7 @@ body[data-surface="auth"] .mfa-code-input {
   }
 
   .auth-studio-scene {
-    min-height: 650px;
+    min-height: clamp(400px, 60svh, 650px);
   }
 
   .optic-orbit-one,
@@ -1377,7 +1377,7 @@ body[data-surface="auth"] .mfa-code-input {
   }
 
   .auth-studio-scene {
-    min-height: 560px;
+    min-height: clamp(340px, 50svh, 560px);
     padding: 1.25rem;
     grid-template-rows: auto minmax(220px, 1fr) auto auto;
   }

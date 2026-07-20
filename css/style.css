@@ -84,6 +84,12 @@
     --vo-radius-lg: 26px;
     --vo-radius-xl: 38px;
     --vo-container: 1240px;
+    --layout-content-max: 77.5rem;
+    --layout-gutter: clamp(0.875rem, 3vi, 2.25rem);
+    --space-section: clamp(4rem, 9vb, 9rem);
+    --control-min-size: 2.75rem;
+    --shell-header-size: 4.5rem;
+    --shell-rail-size: clamp(13.5rem, 18vi, 15.5rem);
     --vo-font-sans: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
     --vo-font-mono: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
     --vo-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -128,7 +134,6 @@
   }
 
   html {
-    overflow-x: hidden;
     scroll-behavior: smooth;
     scroll-padding-top: 96px;
   }
@@ -171,9 +176,7 @@
 
 @layer base {
   body[data-surface] {
-    min-width: 320px;
     min-height: 100vh;
-    overflow-x: hidden;
     color: var(--vo-graphite);
     background:
       radial-gradient(circle at 82% -8%, hsl(25 92% 53% / 0.13), transparent 30rem),
@@ -235,8 +238,9 @@
   }
 
   .container {
-    width: min(calc(100% - 40px), var(--vo-container));
+    inline-size: min(100% - (2 * var(--layout-gutter)), var(--layout-content-max));
     margin-inline: auto;
+    min-inline-size: 0;
   }
 }
 

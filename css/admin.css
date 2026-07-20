@@ -1,7 +1,7 @@
 @layer pages {
   .admin-body {
-    --admin-rail: 248px;
-    --admin-topbar: 72px;
+    --admin-rail: var(--shell-rail-size);
+    --admin-topbar: var(--shell-header-size);
     --admin-bg: var(--vo-canvas, hsl(38 32% 96%));
     --admin-surface: var(--vo-paper, hsl(38 35% 99%));
     --admin-ink: var(--vo-ink, hsl(220 15% 13%));
@@ -42,7 +42,7 @@
     inset: 0 0 auto;
     z-index: 40;
     display: grid;
-    grid-template-columns: var(--admin-rail) minmax(220px, 1fr) auto;
+    grid-template-columns: var(--admin-rail) minmax(min(100%, 220px), 1fr) auto;
     align-items: center;
     min-height: var(--admin-topbar);
     width: 100%;
@@ -324,7 +324,7 @@
 
   .admin-page-head {
     display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.6fr);
+    grid-template-columns: minmax(0, 1.1fr) minmax(min(100%, 260px), 0.6fr);
     gap: 32px;
     align-items: end;
     margin-bottom: 32px;
@@ -407,7 +407,7 @@
   }
 
   .admin-grid-with-detail {
-    grid-template-columns: minmax(0, 1.2fr) minmax(330px, 0.8fr);
+    grid-template-columns: minmax(0, 1.2fr) minmax(min(100%, 330px), 0.8fr);
     align-items: start;
   }
 
@@ -915,7 +915,7 @@
 
   @media (max-width: 1180px) {
     .admin-body {
-      --admin-rail: 214px;
+      --admin-rail: var(--shell-rail-size);
     }
 
     .admin-metric-grid {
@@ -1120,7 +1120,7 @@
 
     .admin-table td {
       display: grid;
-      grid-template-columns: minmax(90px, 0.45fr) minmax(0, 1fr);
+      grid-template-columns: minmax(min(100%, 90px), 0.45fr) minmax(0, 1fr);
       gap: 12px;
       padding: 9px 0;
       border-bottom: 1px solid var(--vo-line);
@@ -1200,5 +1200,17 @@
     .admin-table tbody tr {
       transition: none;
     }
+  }
+
+  /* JS Dinamik Önizleme ve Boş Durum Stilleri */
+  .admin-preview-img {
+    max-width: 100%;
+    margin-top: 1rem;
+    border-radius: 4px;
+    border: 1px solid var(--admin-line);
+  }
+
+  .admin-empty {
+    margin-top: 1rem;
   }
 }
