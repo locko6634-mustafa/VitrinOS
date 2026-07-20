@@ -33,6 +33,7 @@
             <a href="#uretim-hatti">Üretim hattı</a>
             <a href="#formatlar">Formatlar</a>
             <a href="#guven">Sistem ilkeleri</a>
+            <a href="#fiyatlandirma">Ücretlendirme</a>
             <a href="#basvuru">Başvuru</a>
           </div>
           <div class="nav-actions" id="navActions">
@@ -316,6 +317,101 @@
         </div>
       </section>
 
+    <section class="section pricing-section" id="fiyatlandirma" aria-labelledby="pricing-title">
+      <div class="container">
+        <div class="section-heading pricing-heading" data-reveal>
+          <div>
+            <p class="kicker">Ücretlendirme / Seçeceğiniz Plan</p>
+            <h2 id="pricing-title">Markanıza en uygun üretim planını belirleyin.</h2>
+          </div>
+          <p>Arka planda çalışan n8n ve yapay zeka altyapısıyla şeffaf fiyatlandırma. Kart bilgisi girmeden 3 brief kredisiyle ücretsiz başlayın.</p>
+        </div>
+
+        <!-- Billing Toggle -->
+        <div class="billing-toggle-wrap" data-reveal>
+          <span class="toggle-label active" id="label-monthly">Aylık</span>
+          <button class="billing-toggle" id="billingToggle" type="button" aria-checked="false" role="switch" aria-label="Faturalama periyodunu değiştir">
+            <span class="toggle-handle"></span>
+          </button>
+          <span class="toggle-label" id="label-yearly">Yıllık <span class="discount-badge">%20 İndirim</span></span>
+        </div>
+
+        <!-- Pricing Grid -->
+        <div class="pricing-grid" data-reveal>
+          <!-- Starter Plan -->
+          <article class="pricing-card" data-pricing-tier="starter">
+            <div class="card-header">
+              <h3>Starter</h3>
+              <p class="card-description">Kreatif operasyonunu AI ile başlatmak isteyen butik markalar için.</p>
+            </div>
+            <div class="card-price-wrap">
+              <span class="price-currency">$</span>
+              <span class="price-value" data-monthly="49" data-yearly="39">49</span>
+              <span class="price-period">/ ay</span>
+            </div>
+            <p class="price-billing-hint" data-billing-yearly hidden>Yıllık faturalandırılır (toplam $468)</p>
+            <p class="price-billing-hint" data-billing-monthly>Aylık faturalandırılır</p>
+            
+            <ul class="card-features" aria-label="Starter planı özellikleri">
+              <li><strong>1 Aktif</strong> Marka Profili</li>
+              <li>Aylık <strong>15 Brief</strong> Üretim Hakkı</li>
+              <li><strong>45 Görsel Çıktısı</strong> (Her brief 3 format üretir)</li>
+              <li>Standart n8n Üretim Sırası</li>
+              <li>Temel Revizyon ve Onay Arayüzü</li>
+            </ul>
+            <a class="button secondary card-cta" href="login.html?plan=starter">Ücretsiz başlayın</a>
+          </article>
+
+          <!-- Growth Plan (Vurgulu) -->
+          <article class="pricing-card growth" data-pricing-tier="growth">
+            <div class="card-badge">En Popüler</div>
+            <div class="card-header">
+              <h3>Growth</h3>
+              <p class="card-description">Birden fazla markayı yöneten e-ticaret siteleri ve hızlı büyüyen ekipler için.</p>
+            </div>
+            <div class="card-price-wrap">
+              <span class="price-currency">$</span>
+              <span class="price-value" data-monthly="149" data-yearly="119">149</span>
+              <span class="price-period">/ ay</span>
+            </div>
+            <p class="price-billing-hint" data-billing-yearly hidden>Yıllık faturalandırılır (toplam $1428)</p>
+            <p class="price-billing-hint" data-billing-monthly>Aylık faturalandırılır</p>
+            
+            <ul class="card-features" aria-label="Growth planı özellikleri">
+              <li><strong>3 Aktif</strong> Marka Profili</li>
+              <li>Aylık <strong>60 Brief</strong> Üretim Hakkı</li>
+              <li><strong>180 Görsel Çıktısı</strong> (Her brief 3 format üretir)</li>
+              <li>Öncelikli / Hızlı n8n Kreatif Hattı</li>
+              <li>Sınırsız Revizyon Hakkı</li>
+              <li>Gelişmiş Marka Hafızası</li>
+            </ul>
+            <a class="button primary card-cta" href="login.html?plan=growth">Growth ile başlayın</a>
+          </article>
+        </div>
+
+        <!-- Enterprise (Bento Hücresi) -->
+        <div class="pricing-enterprise-card" data-reveal>
+          <div class="enterprise-content">
+            <span class="kicker">Kurumsal & Ajans</span>
+            <h3>Özel Entegrasyon & Sınırsız Kreatif Gücü</h3>
+            <p>Çok sayıda markayı yöneten ajanslar veya kendi özel n8n sunucusunda özel görsel modelleriyle çalışmak isteyen markalar için özel üretim hattı kuruyoruz.</p>
+            <ul class="enterprise-features">
+              <li>Sınırsız Marka Profili</li>
+              <li>Özel API ve Webhook Entegrasyonu</li>
+              <li>Özel Tasarım Kuralları & LLM İnce Ayarı</li>
+              <li>7/24 Teknik Destek & SLA</li>
+            </ul>
+          </div>
+          <div class="enterprise-action">
+            <a class="button secondary" href="#basvuru">
+              <span>Pilot Görüşmesi Planla</span>
+              <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
       <section class="section lead-section" id="basvuru" aria-labelledby="lead-title">
         <div class="container lead-layout">
           <div class="lead-copy" data-reveal>
@@ -392,6 +488,7 @@
         <p>AI destekli kreatif operasyon sistemi.</p>
         <div class="footer-links">
           <a href="#uretim-hatti">Üretim hattı</a>
+          <a href="#fiyatlandirma">Ücretlendirme</a>
           <a href="#basvuru">Pilot başvuru</a>
         </div>
         <p class="footer-code">VOS / IST / 2026</p>
