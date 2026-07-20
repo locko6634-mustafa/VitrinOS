@@ -1,0 +1,20 @@
+{
+  "name": "@vitrinos/worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "zod": "^3.23.8",
+    "@vitrinos/db": "*",
+    "@vitrinos/security": "*"
+  },
+  "devDependencies": {
+    "tsx": "^4.16.2"
+  }
+}
