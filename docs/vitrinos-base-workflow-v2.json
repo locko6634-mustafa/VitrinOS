@@ -1,0 +1,3051 @@
+{
+  "id": "Iw2pZ3MXze7yofqI",
+  "name": "VitrinOS_BASE",
+  "active": true,
+  "isArchived": false,
+  "versionId": "965c3f28-5c94-48bd-8593-5ce2b666182f",
+  "activeVersionId": "965c3f28-5c94-48bd-8593-5ce2b666182f",
+  "triggerCount": 1,
+  "createdAt": "2026-07-07T12:52:19.813Z",
+  "updatedAt": "2026-07-16T09:51:30.247Z",
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "connections": {
+    "Brief_Tetikleyici": {
+      "main": [
+        [
+          {
+            "node": "API_Guvenlik_Filtresi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API_Guvenlik_Filtresi": {
+      "main": [
+        [
+          {
+            "node": "Revizyon_Mu_Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revizyon_Mu_Router": {
+      "main": [
+        [
+          {
+            "node": "Claim_Attempt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Claim_Attempt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claim_Attempt": {
+      "main": [
+        [
+          {
+            "node": "LLM_Brief_Analiz_Ajani",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Revizyon_Limit_Kontrol_3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM_Brief_Analiz_Ajani": {
+      "main": [
+        [
+          {
+            "node": "Brief_Detaylarini_Normalize_Et",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI_Dil_Modeli": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "LLM_Brief_Analiz_Ajani",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JSON_Cikti_Formatlayici": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "LLM_Brief_Analiz_Ajani",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Brief_Detaylarini_Normalize_Et": {
+      "main": [
+        [
+          {
+            "node": "Gorsel_Formati_Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gorsel_Formati_Router": {
+      "main": [
+        [
+          {
+            "node": "Call_VitrinOS_META_POST",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call_VitrinOS_STORY",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call_VitrinOS_BANNER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call_VitrinOS_META_POST": {
+      "main": [
+        [
+          {
+            "node": "Get_Upload_Presigned_URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call_VitrinOS_STORY": {
+      "main": [
+        [
+          {
+            "node": "Get_Upload_Presigned_URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call_VitrinOS_BANNER": {
+      "main": [
+        [
+          {
+            "node": "Get_Upload_Presigned_URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get_Upload_Presigned_URL": {
+      "main": [
+        [
+          {
+            "node": "S3_Binary_PUT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S3_Binary_PUT": {
+      "main": [
+        [
+          {
+            "node": "Result_Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revizyon_Limit_Kontrol_3": {
+      "main": [
+        [
+          {
+            "node": "Fail_Attempt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download_Old_Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download_Old_Image": {
+      "main": [
+        [
+          {
+            "node": "Call_VitrinOS_REVIZE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call_VitrinOS_REVIZE": {
+      "main": [
+        [
+          {
+            "node": "Get_Upload_Presigned_URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "N8N_API_Execution_Detay_Al",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N8N_API_Execution_Detay_Al": {
+      "main": [
+        [
+          {
+            "node": "Hata_Bilgilerini_Hazirla",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hata_Bilgilerini_Hazirla": {
+      "main": [
+        [
+          {
+            "node": "Fail_Execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "n3BDaxJj7FnIMCIq",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/n3BDaxJj7FnIMCIq",
+          "cachedResultName": "VitrinOS_REVIZE"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "revision_count": "={{ Number($('Supabase_Is_Detaylarini_Getir').item.json.revision_count || 0) }}",
+            "intent": "={{ $('Supabase_Is_Detaylarini_Getir').item.json.format }}",
+            "prompts": "={{ $('Supabase_Prompt_Sablonlari_Getir_Rev').item.json }}",
+            "image_url": "={{ $('Supabase_Is_Detaylarini_Getir').item.json.image_url }}",
+            "revision_text": "={{ $('Supabase_Is_Detaylarini_Getir').item.json.revision_note }}",
+            "original_brief": "={{ $('Supabase_Is_Detaylarini_Getir').item.json.brief_text }}"
+          },
+          "matchingColumns": [
+            "a"
+          ],
+          "schema": [
+            {
+              "id": "revision_text",
+              "displayName": "revision_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "original_brief",
+              "displayName": "original_brief",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "intent",
+              "displayName": "intent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "revision_count",
+              "displayName": "revision_count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "prompts",
+              "displayName": "prompts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "object",
+              "removed": false
+            },
+            {
+              "id": "image_url",
+              "displayName": "image_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1840,
+        672
+      ],
+      "id": "0feeec40-c4d4-4678-bf53-2a69e9481b65",
+      "name": "Call_VitrinOS_REVIZE"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "TjIBuLmyigpNjBnV",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/TjIBuLmyigpNjBnV",
+          "cachedResultName": "VitrinOS_META_POST"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "product_name": "={{ $json.product_name }}",
+            "category": "={{ $json.category }}",
+            "slogan": "={{ $json.slogan }}",
+            "old_price": "={{ $json.old_price }}",
+            "new_price": "={{ $json.new_price }}",
+            "discount_rate": "={{ $json.discount_rate }}",
+            "campaign_name": "={{ $json.campaign_name }}",
+            "campaign_code": "={{ $json.campaign_code }}",
+            "width": "={{ $json.width }}",
+            "height": "={{ $json.height }}",
+            "prompts": "={{ $json.prompts }}",
+            "brand": "={{ $json.brand }}",
+            "briefText": "={{ $json.briefText }}",
+            "source_image_path": "={{ $json.source_image_path }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "product_name",
+              "displayName": "product_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "slogan",
+              "displayName": "slogan",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "source_image_path",
+              "displayName": "source_image_path",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "old_price",
+              "displayName": "old_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "new_price",
+              "displayName": "new_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "discount_rate",
+              "displayName": "discount_rate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "campaign_name",
+              "displayName": "campaign_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "campaign_code",
+              "displayName": "campaign_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "width",
+              "displayName": "width",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "height",
+              "displayName": "height",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "prompts",
+              "displayName": "prompts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "object",
+              "removed": false
+            },
+            {
+              "id": "brand",
+              "displayName": "brand",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "object",
+              "removed": false
+            },
+            {
+              "id": "briefText",
+              "displayName": "briefText",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1840,
+        864
+      ],
+      "id": "93042d03-ce9e-43cd-bd45-d4fae2635c6c",
+      "name": "Call_VitrinOS_META_POST"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vitrinos-brief",
+        "authentication": "headerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -3984,
+        768
+      ],
+      "id": "001b1e78-ff77-4249-969e-5ed878d48ad7",
+      "name": "Brief_Tetikleyici",
+      "webhookId": "2987eb30-2aef-4f49-ac9f-bed50953426d"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.isRevision }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true"
+                    },
+                    "id": "5c38bd6c-c4c6-4256-bdb1-6d31974f3e43"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Revizyon"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Yeni Brief"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -3536,
+        768
+      ],
+      "id": "98e8d130-892f-4df1-96cb-e49c052d85d5",
+      "name": "Revizyon_Mu_Router"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Brief_Tetikleyici').item.json.body.briefText }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Marka Kuralları:\n- Ses Tonu: {{ $node['Claim_Attempt'].json.data.brand.toneRules }}\n- Yasaklı Kelimeler: {{ $node['Claim_Attempt'].json.data.brand.bannedWords.join(', ') }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -2640,
+        1056
+      ],
+      "id": "31f420f5-db1b-4bb6-be54-fb9eff286408",
+      "name": "LLM_Brief_Analiz_Ajani"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.4-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5.4-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -2624,
+        1280
+      ],
+      "id": "3ca33200-277e-442d-9610-2caf677c59d3",
+      "name": "OpenAI_Dil_Modeli"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"intent\": {\n      \"type\": \"string\",\n      \"enum\": [\"Meta Post\", \"Story\", \"Banner\"]\n    },\n    \"visual_details\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"product_name\": { \"type\": \"string\" },\n        \"category\": { \"type\": \"string\" },\n        \"slogan\": { \"type\": \"string\" },\n        \"image_url\": { \"type\": \"string\" },\n        \"width\": { \"type\": \"integer\", \"description\": \"Genişlik\" },\n        \"height\": { \"type\": \"integer\", \"description\": \"Yükseklik\" },\n        \"prices\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"old_price\": { \"type\": \"string\" },\n            \"new_price\": { \"type\": \"string\" },\n            \"discount_rate\": { \"type\": \"string\" }\n          }\n        },\n        \"campaign\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"campaign_name\": { \"type\": \"string\" },\n            \"campaign_code\": { \"type\": \"string\" }\n          }\n        }\n      },\n      \"required\": [\"product_name\", \"category\", \"slogan\"]\n    }\n  },\n  \"required\": [\"intent\", \"visual_details\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -2496,
+        1280
+      ],
+      "id": "f8377650-f081-44e6-9ce4-ee44bbce46e6",
+      "name": "JSON_Cikti_Formatlayici"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nlet payload = input.output ?? input.text ?? input;\n\nif (typeof payload === 'string') {\n  try {\n    const match = payload.match(/```(?:json)?\\s*\\n?([\\s\\S]*?)\\n?\\s*```/);\n    let cleanJson = match ? match[1].trim() : payload.trim();\n    const jsonMatch = cleanJson.match(/\\{[\\s\\S]*\\}/);\n    if (jsonMatch) {\n      cleanJson = jsonMatch[0];\n    }\n    payload = JSON.parse(cleanJson);\n  } catch (error) {\n    payload = {};\n  }\n}\n\nfunction canonicalFormat(value) {\n  const normalized = String(value ?? '').trim().toLocaleLowerCase('tr-TR');\n\n  if (!normalized || normalized === 'auto' || normalized === 'otomatik seç') {\n    return undefined;\n  }\n\n  if (normalized === 'banner' || normalized === 'web banner') return 'Banner';\n  if (normalized === 'story' || normalized === 'hikaye') return 'Story';\n  if (normalized === 'meta post' || normalized === 'metapost' || normalized === 'post') {\n    return 'Meta Post';\n  }\n\n  return null;\n}\n\nconst requestedFormat = $('Claim_Attempt').first().json.data.format;\nconst explicitFormat = canonicalFormat(requestedFormat);\n\nconst llmIntent = ['Meta Post', 'Story', 'Banner'].includes(payload.intent)\n  ? payload.intent\n  : null;\n\n// Öncelik: kullanıcı formatı > LLM kararı > Meta Post varsayılanı\nconst intent = explicitFormat === null\n  ? 'Meta Post'\n  : explicitFormat || llmIntent || 'Meta Post';\n\nconst details = payload.visual_details ?? {};\nconst prices = details.prices ?? {};\nconst campaign = details.campaign ?? {};\n\nfunction defaultWidth(intentValue, value) {\n  const parsed = Number.parseInt(value, 10);\n  if (intentValue === 'Meta Post') return 1080;\n  if (intentValue === 'Story') return 1080;\n  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1600;\n}\n\nfunction defaultHeight(intentValue, value) {\n  const parsed = Number.parseInt(value, 10);\n  if (intentValue === 'Meta Post') return 1350;\n  if (intentValue === 'Story') return 1920;\n  return Number.isFinite(parsed) && parsed > 0 ? parsed : 600;\n}\n\n// Orijinal yapılandırılmış veri modeli (Database & Dashboard uyumluluğu için)\nconst structuredOutput = {\n  intent,\n  visual_details: {\n    product_name: String(details.product_name ?? '').trim(),\n    category: String(details.category ?? '').trim(),\n    slogan: String(details.slogan ?? '').trim(),\n    image_url: '',\n    width: defaultWidth(intent, details.width),\n    height: defaultHeight(intent, details.height),\n    prices: {\n      old_price: String(prices.old_price ?? '').trim(),\n      new_price: String(prices.new_price ?? '').trim(),\n      discount_rate: String(prices.discount_rate ?? '').trim(),\n    },\n    campaign: {\n      campaign_name: String(campaign.campaign_name ?? '').trim(),\n      campaign_code: String(campaign.campaign_code ?? '').trim(),\n    }\n  }\n};\n\n// Parent workflow bağlamındaki diğer düğümlerden verileri çekiyoruz\nconst prompts = $('Claim_Attempt').first().json.data.prompts;\nconst brand = $('Claim_Attempt').first().json.data.brand;\nconst briefText = $('Claim_Attempt').first().json.data.briefText;\n\nconst normalized = {\n  // Alt akışlar için doğrudan düzleştirilmiş alanlar\n  product_name: structuredOutput.visual_details.product_name,\n  category: structuredOutput.visual_details.category,\n  slogan: structuredOutput.visual_details.slogan,\n  source_image_path: String(\n  $('Claim_Attempt').first().json.data.imageId || ''\n).trim(),\n  width: structuredOutput.visual_details.width,\n  height: structuredOutput.visual_details.height,\n  old_price: structuredOutput.visual_details.prices.old_price,\n  new_price: structuredOutput.visual_details.prices.new_price,\n  discount_rate: structuredOutput.visual_details.prices.discount_rate,\n  campaign_name: structuredOutput.visual_details.campaign.campaign_name,\n  campaign_code: structuredOutput.visual_details.campaign.campaign_code,\n  prompts,\n  brand,\n  briefText,\n  raw_llm_output: input,\n  \n  // Veritabanına (brief_json) kaydedilecek yapılandırılmış çıktı\n  output: structuredOutput\n};\n\nreturn [\n  {\n    json: normalized\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2288,
+        1056
+      ],
+      "id": "0cd18a0c-f8b1-4b59-971e-4d74e24fb972",
+      "name": "Brief_Detaylarini_Normalize_Et"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.intent }}",
+                    "rightValue": "Meta Post",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "36c65411-d7a8-4b92-aee5-73d2f16d97bc"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Meta Post"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.intent }}",
+                    "rightValue": "Story",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3191c9a2-11cf-43d7-bd61-656d12dbd39e"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Story"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.intent }}",
+                    "rightValue": "Banner",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1fa1eb3b-97b2-42cd-9285-26aed2ca6ea1"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Banner"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -2064,
+        1040
+      ],
+      "id": "54366d8a-407e-4110-867e-c964e4bbfc91",
+      "name": "Gorsel_Formati_Router"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ Number($node['Supabase_Is_Detaylarini_Getir'].json.revision_count || 0) }}",
+              "rightValue": 3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              },
+              "id": "ddb73d03-5841-4d87-822f-42832d771525"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2288,
+        576
+      ],
+      "id": "6c7ab51e-4907-45bb-88c3-c6c5c9e9cccb",
+      "name": "Revizyon_Limit_Kontrol_3"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "36iRYjVaLyqIdo6z",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/36iRYjVaLyqIdo6z",
+          "cachedResultName": "VitrinOS_STORY"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "product_name": "={{ $json.product_name }}",
+            "category": "={{ $json.category }}",
+            "slogan": "={{ $json.slogan }}",
+            "old_price": "={{ $json.old_price }}",
+            "new_price": "={{ $json.new_price }}",
+            "discount_rate": "={{ $json.discount_rate }}",
+            "campaign_name": "={{ $json.campaign_name }}",
+            "campaign_code": "={{ $json.campaign_code }}",
+            "width": "={{ $json.width }}",
+            "height": "={{ $json.height }}",
+            "prompts": "={{ $json.prompts }}",
+            "brand": "={{ $json.brand }}",
+            "briefText": "={{ $json.briefText }}",
+            "source_image_path": "={{ $json.source_image_path }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "product_name",
+              "displayName": "product_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "slogan",
+              "displayName": "slogan",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "source_image_path",
+              "displayName": "source_image_path",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "old_price",
+              "displayName": "old_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "new_price",
+              "displayName": "new_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "discount_rate",
+              "displayName": "discount_rate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "campaign_name",
+              "displayName": "campaign_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "campaign_code",
+              "displayName": "campaign_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "width",
+              "displayName": "width",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "height",
+              "displayName": "height",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "prompts",
+              "displayName": "prompts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "object",
+              "removed": false
+            },
+            {
+              "id": "brand",
+              "displayName": "brand",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "object",
+              "removed": false
+            },
+            {
+              "id": "briefText",
+              "displayName": "briefText",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1840,
+        1056
+      ],
+      "id": "683bf163-49a4-4367-8f33-b13aee677a91",
+      "name": "Call_VitrinOS_STORY"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "gjzjuE91iiU2Ew0G",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/gjzjuE91iiU2Ew0G",
+          "cachedResultName": "VitrinOS_BANNER"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "product_name": "={{ $json.product_name }}",
+            "category": "={{ $json.category }}",
+            "slogan": "={{ $json.slogan }}",
+            "old_price": "={{ $json.old_price }}",
+            "new_price": "={{ $json.new_price }}",
+            "discount_rate": "={{ $json.discount_rate }}",
+            "campaign_name": "={{ $json.campaign_name }}",
+            "campaign_code": "={{ $json.campaign_code }}",
+            "width": "={{ $json.width }}",
+            "height": "={{ $json.height }}",
+            "prompts": "={{ $json.prompts }}",
+            "brand": "={{ $json.brand }}",
+            "briefText": "={{ $json.briefText }}",
+            "source_image_path": "={{ $json.source_image_path }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "product_name",
+              "displayName": "product_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "slogan",
+              "displayName": "slogan",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "source_image_path",
+              "displayName": "source_image_path",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "old_price",
+              "displayName": "old_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "new_price",
+              "displayName": "new_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "discount_rate",
+              "displayName": "discount_rate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "campaign_name",
+              "displayName": "campaign_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "campaign_code",
+              "displayName": "campaign_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "width",
+              "displayName": "width",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "height",
+              "displayName": "height",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "prompts",
+              "displayName": "prompts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "object",
+              "removed": false
+            },
+            {
+              "id": "brand",
+              "displayName": "brand",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "object",
+              "removed": false
+            },
+            {
+              "id": "briefText",
+              "displayName": "briefText",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1840,
+        1248
+      ],
+      "id": "90a44da8-3578-4197-a8d2-6f34b68de0b3",
+      "name": "Call_VitrinOS_BANNER"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3984,
+        1472
+      ],
+      "id": "fb9ac60f-a3fe-4bd0-a60e-5ba6e67309c0",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const executionData = $input.first().json;\nconst errorMsg = executionData.data?.resultData?.error?.message || executionData.data?.resultData?.error?.description || \"Bilinmeyen Hata\";\nlet jobId = \"\";\n\ntry {\n  // n8n API yanıtından Brief_Tetikleyici düğümünün body.jobId alanını çekeriz\n  const runData = executionData.data.resultData.runData;\n  const webhookData = runData.Brief_Tetikleyici[0].data.main[0][0].json;\n  jobId = webhookData.body.jobId;\n} catch (e) {\n  jobId = \"\";\n}\n\n// jobId'nin geçerli bir UUID olup olmadığını doğrula\nconst uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\nconst isValidUuid = jobId && uuidRegex.test(jobId);\n\n// Geçerli bir jobId yoksa, Supabase'e yazılacak bir iş kaydı olmadığından boş dizi dönerek akışı durdur\nif (!isValidUuid) {\n  return [];\n}\n\nreturn [{\n  json: {\n    jobId: jobId,\n    error: errorMsg\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3536,
+        1472
+      ],
+      "id": "a45d0952-062b-437a-818c-57233bd4e4ed",
+      "name": "Hata_Bilgilerini_Hazirla"
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\n\nconst items = $input.all();\nif (!items || items.length === 0) return [];\n\nconst headers = items[0].json.headers || {};\nconst body = items[0].json.body || {};\n\nconst signature = headers['x-vitrinos-signature'];\nconst timestamp = headers['x-vitrinos-timestamp'];\nconst secret = $env.N8N_API_SALT || $env.HMAC_SECRET; // n8n sunucusunda N8N_API_SALT veya HMAC_SECRET tanımlı olmalıdır\n\nif (!secret) {\n  throw new Error(\"Sunucu Yapılandırma Hatası: N8N_API_SALT veya HMAC_SECRET tanımlı değil.\");\n}\n\nif (!signature || !timestamp) {\n  throw new Error(\"Yetkilendirme Hatası: İmza veya zaman damgası eksik.\");\n}\n\n// Replay saldırısı koruması: 5 dakika (300.000 ms) zaman toleransı\nconst now = Date.now();\nconst requestTime = parseInt(timestamp, 10);\nif (isNaN(requestTime) || Math.abs(now - requestTime) > 300000) {\n  throw new Error(\"Yetkilendirme Hatası: İstek zaman aşımına uğradı (Replay Attack önlendi).\");\n}\n\n// Payload doğrulaması\nconst payloadString = JSON.stringify(body);\nconst dataToVerify = `${timestamp}.${payloadString}`;\n\nconst expectedSignature = crypto\n  .createHmac('sha256', secret)\n  .update(dataToVerify)\n  .digest('hex');\n\nif (signature !== expectedSignature) {\n  throw new Error(\"Yetkilendirme Hatası: Geçersiz imza. İstek manipüle edilmiş olabilir.\");\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3760,
+        768
+      ],
+      "id": "e52e3e52-8d79-4205-a9db-f591f53ef093",
+      "name": "API_Guvenlik_Filtresi"
+    },
+    {
+      "parameters": {
+        "url": "=https://server.n8n-mustafa.me/api/v1/executions/{{ $json.execution.id }}?includeData=true",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "n8nApi",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -3760,
+        1472
+      ],
+      "id": "c3fac69c-e1a2-46fa-86bf-74675d7a9b65",
+      "name": "N8N_API_Execution_Detay_Al"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.API_BASE_URL || 'http://api:3000' }}/api/v1/internal/v1/n8n/attempts/{{ $json.body.attemptId }}/claim",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "headerAuth",
+        "headerAuth": "VitrinOS Internal API",
+        "options": {}
+      },
+      "name": "Claim_Attempt",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -3088,
+        1056
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $env.API_BASE_URL || 'http://api:3000' }}/api/v1/internal/v1/n8n/attempts/{{ $('Claim_Attempt').json.data.attemptId }}/result",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "headerAuth",
+        "headerAuth": "VitrinOS Internal API",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"key\": \"{{ $json.key }}\",\n  \"mimeType\": \"{{ $json.mimeType }}\",\n  \"sizeBytes\": {{ $json.sizeBytes }},\n  \"checksum\": \"{{ $json.checksum }}\"\n}",
+        "options": {}
+      },
+      "name": "Result_Success",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1392,
+        1072
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.API_BASE_URL || 'http://api:3000' }}/api/v1/internal/v1/n8n/attempts/{{ $('Claim_Attempt').json.data.attemptId }}/fail",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "headerAuth",
+        "headerAuth": "VitrinOS Internal API",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"errorPayload\": {\n    \"message\": \"Maksimum revizyon limitine (3) ulaşıldı.\"\n  },\n  \"isRetryable\": false\n}",
+        "options": {}
+      },
+      "name": "Fail_Attempt",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -2064,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.API_BASE_URL || 'http://api:3000' }}/api/v1/internal/v1/n8n/executions/{{ $json.execution.id }}/fail",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "headerAuth",
+        "headerAuth": "VitrinOS Internal API",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"errorPayload\": {\n    \"message\": \"{{ $json.error.message }}\"\n  }\n}",
+        "options": {}
+      },
+      "name": "Fail_Execution",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -3312,
+        1472
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.API_BASE_URL || 'http://api:3000' }}/api/v1/assets/upload-url",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "headerAuth",
+        "headerAuth": "VitrinOS Internal API",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"mimeType\": \"image/png\",\n  \"sizeBytes\": {{ $json.binary.data.directory.length || 1048576 }},\n  \"purpose\": \"generated_asset\"\n}",
+        "options": {}
+      },
+      "name": "Get_Upload_Presigned_URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1800,
+        1072
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $('Get_Upload_Presigned_URL').json.data.uploadUrl }}",
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "name": "S3_Binary_PUT",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1600,
+        1072
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.API_BASE_URL || 'http://api:3000' }}/api/v1/internal/v1/n8n/assets/{{ $('Claim_Attempt').json.data.imageId }}/content",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "headerAuth",
+        "headerAuth": "VitrinOS Internal API",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "product_image"
+            }
+          }
+        }
+      },
+      "name": "Download_Old_Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -2064,
+        672
+      ]
+    }
+  ],
+  "nodeGroups": [],
+  "activeVersion": {
+    "nodes": [
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "n3BDaxJj7FnIMCIq",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/n3BDaxJj7FnIMCIq",
+            "cachedResultName": "VitrinOS_REVIZE"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "revision_count": "={{ Number($('Supabase_Is_Detaylarini_Getir').item.json.revision_count || 0) }}",
+              "intent": "={{ $('Supabase_Is_Detaylarini_Getir').item.json.format }}",
+              "prompts": "={{ $('Supabase_Prompt_Sablonlari_Getir_Rev').item.json }}",
+              "image_url": "={{ $('Supabase_Is_Detaylarini_Getir').item.json.image_url }}",
+              "revision_text": "={{ $('Supabase_Is_Detaylarini_Getir').item.json.revision_note }}",
+              "original_brief": "={{ $('Supabase_Is_Detaylarini_Getir').item.json.brief_text }}"
+            },
+            "matchingColumns": [
+              "a"
+            ],
+            "schema": [
+              {
+                "id": "revision_text",
+                "displayName": "revision_text",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "original_brief",
+                "displayName": "original_brief",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "intent",
+                "displayName": "intent",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "revision_count",
+                "displayName": "revision_count",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "number",
+                "removed": false
+              },
+              {
+                "id": "prompts",
+                "displayName": "prompts",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "object",
+                "removed": false
+              },
+              {
+                "id": "image_url",
+                "displayName": "image_url",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          -1840,
+          672
+        ],
+        "id": "0feeec40-c4d4-4678-bf53-2a69e9481b65",
+        "name": "Call_VitrinOS_REVIZE"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "TjIBuLmyigpNjBnV",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/TjIBuLmyigpNjBnV",
+            "cachedResultName": "VitrinOS_META_POST"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "product_name": "={{ $json.product_name }}",
+              "category": "={{ $json.category }}",
+              "slogan": "={{ $json.slogan }}",
+              "old_price": "={{ $json.old_price }}",
+              "new_price": "={{ $json.new_price }}",
+              "discount_rate": "={{ $json.discount_rate }}",
+              "campaign_name": "={{ $json.campaign_name }}",
+              "campaign_code": "={{ $json.campaign_code }}",
+              "width": "={{ $json.width }}",
+              "height": "={{ $json.height }}",
+              "prompts": "={{ $json.prompts }}",
+              "brand": "={{ $json.brand }}",
+              "briefText": "={{ $json.briefText }}",
+              "source_image_path": "={{ $json.source_image_path }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "product_name",
+                "displayName": "product_name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "category",
+                "displayName": "category",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "slogan",
+                "displayName": "slogan",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "source_image_path",
+                "displayName": "source_image_path",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "old_price",
+                "displayName": "old_price",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "new_price",
+                "displayName": "new_price",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "discount_rate",
+                "displayName": "discount_rate",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "campaign_name",
+                "displayName": "campaign_name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "campaign_code",
+                "displayName": "campaign_code",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "width",
+                "displayName": "width",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "number",
+                "removed": false
+              },
+              {
+                "id": "height",
+                "displayName": "height",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "number",
+                "removed": false
+              },
+              {
+                "id": "prompts",
+                "displayName": "prompts",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "object",
+                "removed": false
+              },
+              {
+                "id": "brand",
+                "displayName": "brand",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "object",
+                "removed": false
+              },
+              {
+                "id": "briefText",
+                "displayName": "briefText",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          -1840,
+          864
+        ],
+        "id": "93042d03-ce9e-43cd-bd45-d4fae2635c6c",
+        "name": "Call_VitrinOS_META_POST"
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "vitrinos-brief",
+          "authentication": "headerAuth",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -3984,
+          768
+        ],
+        "id": "001b1e78-ff77-4249-969e-5ed878d48ad7",
+        "name": "Brief_Tetikleyici",
+        "webhookId": "2987eb30-2aef-4f49-ac9f-bed50953426d"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.body.isRevision }}",
+                      "rightValue": true,
+                      "operator": {
+                        "type": "boolean",
+                        "operation": "true"
+                      },
+                      "id": "5c38bd6c-c4c6-4256-bdb1-6d31974f3e43"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "Revizyon"
+              }
+            ]
+          },
+          "options": {
+            "fallbackOutput": "extra",
+            "renameFallbackOutput": "Yeni Brief"
+          }
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          -3536,
+          768
+        ],
+        "id": "98e8d130-892f-4df1-96cb-e49c052d85d5",
+        "name": "Revizyon_Mu_Router"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "jobs",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "condition": "eq",
+                "keyValue": "={{ $('Brief_Tetikleyici').item.json.body.jobId }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "status",
+                "fieldValue": "processing"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -3312,
+          1056
+        ],
+        "id": "b237cdd8-1ceb-4d7c-a519-b409873f212b",
+        "name": "Supabase_Durum_Isleme_Guncelle"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "brands",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "keyValue": "={{ $('Brief_Tetikleyici').item.json.body.brandId }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -3088,
+          1056
+        ],
+        "id": "ab1643b8-7c82-40a0-b1d5-13a14749eebb",
+        "name": "Supabase_Marka_Bilgisi_Getir"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "brand_prompts",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "brand_id",
+                "keyValue": "={{ $('Brief_Tetikleyici').item.json.body.brandId }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -2864,
+          1056
+        ],
+        "id": "11dedfc9-e223-4a90-b373-632c3bd62d74",
+        "name": "Supabase_Prompt_Sablonlari_Getir"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $('Brief_Tetikleyici').item.json.body.briefText }}",
+          "hasOutputParser": true,
+          "options": {
+            "systemMessage": "=Marka Kuralları:\n- Ses Tonu: {{ $node['Supabase_Marka_Bilgisi_Getir'].json.tone_rules }}\n- Yasaklı Kelimeler: {{ $node['Supabase_Marka_Bilgisi_Getir'].json.banned_words.join(', ') }}"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          -2640,
+          1056
+        ],
+        "id": "31f420f5-db1b-4bb6-be54-fb9eff286408",
+        "name": "LLM_Brief_Analiz_Ajani"
+      },
+      {
+        "parameters": {
+          "model": {
+            "__rl": true,
+            "value": "gpt-5.4-mini",
+            "mode": "list",
+            "cachedResultName": "gpt-5.4-mini"
+          },
+          "builtInTools": {},
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.3,
+        "position": [
+          -2624,
+          1280
+        ],
+        "id": "3ca33200-277e-442d-9610-2caf677c59d3",
+        "name": "OpenAI_Dil_Modeli"
+      },
+      {
+        "parameters": {
+          "schemaType": "manual",
+          "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"intent\": {\n      \"type\": \"string\",\n      \"enum\": [\"Meta Post\", \"Story\", \"Banner\"]\n    },\n    \"visual_details\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"product_name\": { \"type\": \"string\" },\n        \"category\": { \"type\": \"string\" },\n        \"slogan\": { \"type\": \"string\" },\n        \"image_url\": { \"type\": \"string\" },\n        \"width\": { \"type\": \"integer\", \"description\": \"Genişlik\" },\n        \"height\": { \"type\": \"integer\", \"description\": \"Yükseklik\" },\n        \"prices\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"old_price\": { \"type\": \"string\" },\n            \"new_price\": { \"type\": \"string\" },\n            \"discount_rate\": { \"type\": \"string\" }\n          }\n        },\n        \"campaign\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"campaign_name\": { \"type\": \"string\" },\n            \"campaign_code\": { \"type\": \"string\" }\n          }\n        }\n      },\n      \"required\": [\"product_name\", \"category\", \"slogan\"]\n    }\n  },\n  \"required\": [\"intent\", \"visual_details\"]\n}"
+        },
+        "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+        "typeVersion": 1.3,
+        "position": [
+          -2496,
+          1280
+        ],
+        "id": "f8377650-f081-44e6-9ce4-ee44bbce46e6",
+        "name": "JSON_Cikti_Formatlayici"
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $input.first().json;\nlet payload = input.output ?? input.text ?? input;\n\nif (typeof payload === 'string') {\n  try {\n    const match = payload.match(/```(?:json)?\\s*\\n?([\\s\\S]*?)\\n?\\s*```/);\n    let cleanJson = match ? match[1].trim() : payload.trim();\n    const jsonMatch = cleanJson.match(/\\{[\\s\\S]*\\}/);\n    if (jsonMatch) {\n      cleanJson = jsonMatch[0];\n    }\n    payload = JSON.parse(cleanJson);\n  } catch (error) {\n    payload = {};\n  }\n}\n\nfunction canonicalFormat(value) {\n  const normalized = String(value ?? '').trim().toLocaleLowerCase('tr-TR');\n\n  if (!normalized || normalized === 'auto' || normalized === 'otomatik seç') {\n    return undefined;\n  }\n\n  if (normalized === 'banner' || normalized === 'web banner') return 'Banner';\n  if (normalized === 'story' || normalized === 'hikaye') return 'Story';\n  if (normalized === 'meta post' || normalized === 'metapost' || normalized === 'post') {\n    return 'Meta Post';\n  }\n\n  return null;\n}\n\nconst requestedFormat = $('Brief_Tetikleyici').first().json.body?.format;\nconst explicitFormat = canonicalFormat(requestedFormat);\n\nconst llmIntent = ['Meta Post', 'Story', 'Banner'].includes(payload.intent)\n  ? payload.intent\n  : null;\n\n// Öncelik: kullanıcı formatı > LLM kararı > Meta Post varsayılanı\nconst intent = explicitFormat === null\n  ? 'Meta Post'\n  : explicitFormat || llmIntent || 'Meta Post';\n\nconst details = payload.visual_details ?? {};\nconst prices = details.prices ?? {};\nconst campaign = details.campaign ?? {};\n\nfunction defaultWidth(intentValue, value) {\n  const parsed = Number.parseInt(value, 10);\n  if (intentValue === 'Meta Post') return 1080;\n  if (intentValue === 'Story') return 1080;\n  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1600;\n}\n\nfunction defaultHeight(intentValue, value) {\n  const parsed = Number.parseInt(value, 10);\n  if (intentValue === 'Meta Post') return 1350;\n  if (intentValue === 'Story') return 1920;\n  return Number.isFinite(parsed) && parsed > 0 ? parsed : 600;\n}\n\n// Orijinal yapılandırılmış veri modeli (Database & Dashboard uyumluluğu için)\nconst structuredOutput = {\n  intent,\n  visual_details: {\n    product_name: String(details.product_name ?? '').trim(),\n    category: String(details.category ?? '').trim(),\n    slogan: String(details.slogan ?? '').trim(),\n    image_url: '',\n    width: defaultWidth(intent, details.width),\n    height: defaultHeight(intent, details.height),\n    prices: {\n      old_price: String(prices.old_price ?? '').trim(),\n      new_price: String(prices.new_price ?? '').trim(),\n      discount_rate: String(prices.discount_rate ?? '').trim(),\n    },\n    campaign: {\n      campaign_name: String(campaign.campaign_name ?? '').trim(),\n      campaign_code: String(campaign.campaign_code ?? '').trim(),\n    }\n  }\n};\n\n// Parent workflow bağlamındaki diğer düğümlerden verileri çekiyoruz\nconst prompts = $('Supabase_Prompt_Sablonlari_Getir').first().json;\nconst brand = $('Supabase_Marka_Bilgisi_Getir').first().json;\nconst briefText = $('Brief_Tetikleyici').first().json.body.briefText;\n\nconst normalized = {\n  // Alt akışlar için doğrudan düzleştirilmiş alanlar\n  product_name: structuredOutput.visual_details.product_name,\n  category: structuredOutput.visual_details.category,\n  slogan: structuredOutput.visual_details.slogan,\n  source_image_path: String(\n  $('Brief_Tetikleyici').item.json.body.sourceImagePath || ''\n).trim(),\n  width: structuredOutput.visual_details.width,\n  height: structuredOutput.visual_details.height,\n  old_price: structuredOutput.visual_details.prices.old_price,\n  new_price: structuredOutput.visual_details.prices.new_price,\n  discount_rate: structuredOutput.visual_details.prices.discount_rate,\n  campaign_name: structuredOutput.visual_details.campaign.campaign_name,\n  campaign_code: structuredOutput.visual_details.campaign.campaign_code,\n  prompts,\n  brand,\n  briefText,\n  raw_llm_output: input,\n  \n  // Veritabanına (brief_json) kaydedilecek yapılandırılmış çıktı\n  output: structuredOutput\n};\n\nreturn [\n  {\n    json: normalized\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -2288,
+          1056
+        ],
+        "id": "0cd18a0c-f8b1-4b59-971e-4d74e24fb972",
+        "name": "Brief_Detaylarini_Normalize_Et"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.output.intent }}",
+                      "rightValue": "Meta Post",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "36c65411-d7a8-4b92-aee5-73d2f16d97bc"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "Meta Post"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.output.intent }}",
+                      "rightValue": "Story",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "3191c9a2-11cf-43d7-bd61-656d12dbd39e"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "Story"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.output.intent }}",
+                      "rightValue": "Banner",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "1fa1eb3b-97b2-42cd-9285-26aed2ca6ea1"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "Banner"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          -2064,
+          1040
+        ],
+        "id": "54366d8a-407e-4110-867e-c964e4bbfc91",
+        "name": "Gorsel_Formati_Router"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "=https://wrzalebhnlwppufdcmiz.supabase.co/storage/v1/object/generated-assets/{{ $('Brief_Tetikleyici').item.json.body.brandId }}/{{ $('Brief_Tetikleyici').item.json.body.jobId }}_rev0.png",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "supabaseApi",
+          "sendBody": true,
+          "contentType": "binaryData",
+          "inputDataFieldName": "data",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -1616,
+          1072
+        ],
+        "id": "a30ba87c-fcf4-4de2-b3af-fae3a3c98068",
+        "name": "Storage_Gorsel_Yukle"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "jobs",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "condition": "eq",
+                "keyValue": "={{ $('Brief_Tetikleyici').item.json.body.jobId }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "status",
+                "fieldValue": "completed"
+              },
+              {
+                "fieldId": "image_url",
+                "fieldValue": "={{ $('Brief_Tetikleyici').item.json.body.brandId }}/{{ $('Brief_Tetikleyici').item.json.body.jobId }}_rev0.png"
+              },
+              {
+                "fieldId": "brief_json",
+                "fieldValue": "={{ JSON.stringify($node['Brief_Detaylarini_Normalize_Et'].json.output) }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -1392,
+          1072
+        ],
+        "id": "be51c4cf-6e05-4b30-8f84-f4507d0406ea",
+        "name": "Supabase_Isi_Tamamlandi_Guncelle"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "jobs",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "condition": "eq",
+                "keyValue": "={{ $('Brief_Tetikleyici').item.json.body.jobId }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "status",
+                "fieldValue": "processing"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -3312,
+          576
+        ],
+        "id": "61167bf4-90e1-4975-9ac2-a6e91c3d2ad9",
+        "name": "Supabase_Revizyon_Isleme_Guncelle"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "jobs",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "keyValue": "={{ $('Brief_Tetikleyici').item.json.body.jobId }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -3088,
+          576
+        ],
+        "id": "2d67dad1-3fc8-4edf-801e-6d387c6b3a62",
+        "name": "Supabase_Is_Detaylarini_Getir"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "brands",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "keyValue": "={{ $('Brief_Tetikleyici').item.json.body.brandId }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -2864,
+          576
+        ],
+        "id": "0976f481-2a95-4b16-b20d-7f6eaadd7d33",
+        "name": "Supabase_Marka_Bilgisi_Getir_Rev"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "tableId": "brand_prompts",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "brand_id",
+                "keyValue": "={{ $('Brief_Tetikleyici').item.json.body.brandId }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -2576,
+          576
+        ],
+        "id": "acb5d587-d20c-4722-9199-c2c4bb6563a0",
+        "name": "Supabase_Prompt_Sablonlari_Getir_Rev"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "leftValue": "={{ Number($node['Supabase_Is_Detaylarini_Getir'].json.revision_count || 0) }}",
+                "rightValue": 3,
+                "operator": {
+                  "type": "number",
+                  "operation": "gte"
+                },
+                "id": "ddb73d03-5841-4d87-822f-42832d771525"
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -2288,
+          576
+        ],
+        "id": "6c7ab51e-4907-45bb-88c3-c6c5c9e9cccb",
+        "name": "Revizyon_Limit_Kontrol_3"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "jobs",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "condition": "eq",
+                "keyValue": "={{ $('Brief_Tetikleyici').item.json.body.jobId }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "status",
+                "fieldValue": "failed"
+              },
+              {
+                "fieldId": "revision_note",
+                "fieldValue": "Maksimum revizyon limitine (3) ulaşıldı."
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -2064,
+          480
+        ],
+        "id": "2de0538f-e618-440a-b36b-7fff6adaa8e3",
+        "name": "Supabase_Limit_Asimi_Hata_Guncelle"
+      },
+      {
+        "parameters": {
+          "url": "=https://wrzalebhnlwppufdcmiz.supabase.co/storage/v1/object/authenticated/generated-assets/{{ $node['Supabase_Is_Detaylarini_Getir'].json.image_url }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "supabaseApi",
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "file",
+                "outputPropertyName": "product_image"
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -2064,
+          672
+        ],
+        "id": "7da14544-1867-4258-8bfa-7451b08ae4ad",
+        "name": "Eski_Gorseli_Indir"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "=https://wrzalebhnlwppufdcmiz.supabase.co/storage/v1/object/generated-assets/{{ $('Brief_Tetikleyici').item.json.body.brandId }}/{{ $('Brief_Tetikleyici').item.json.body.jobId }}_rev{{ Number($node['Supabase_Is_Detaylarini_Getir'].json.revision_count || 0) }}.png",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "supabaseApi",
+          "sendBody": true,
+          "contentType": "binaryData",
+          "inputDataFieldName": "data",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -1616,
+          672
+        ],
+        "id": "6cad302d-ff66-4fc6-bb4e-dd05b7c2a935",
+        "name": "Storage_Revize_Gorsel_Yukle"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "jobs",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "condition": "eq",
+                "keyValue": "={{ $('Brief_Tetikleyici').item.json.body.jobId }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "status",
+                "fieldValue": "completed"
+              },
+              {
+                "fieldId": "image_url",
+                "fieldValue": "={{ $('Brief_Tetikleyici').item.json.body.brandId }}/{{ $('Brief_Tetikleyici').item.json.body.jobId }}_rev{{ Number($node['Supabase_Is_Detaylarini_Getir'].json.revision_count || 0) }}.png"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -1392,
+          672
+        ],
+        "id": "659238c9-c8e9-48fb-9f4a-a498ffe1f0df",
+        "name": "Supabase_Revizyon_Tamamlandi_Guncelle"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "36iRYjVaLyqIdo6z",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/36iRYjVaLyqIdo6z",
+            "cachedResultName": "VitrinOS_STORY"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "product_name": "={{ $json.product_name }}",
+              "category": "={{ $json.category }}",
+              "slogan": "={{ $json.slogan }}",
+              "old_price": "={{ $json.old_price }}",
+              "new_price": "={{ $json.new_price }}",
+              "discount_rate": "={{ $json.discount_rate }}",
+              "campaign_name": "={{ $json.campaign_name }}",
+              "campaign_code": "={{ $json.campaign_code }}",
+              "width": "={{ $json.width }}",
+              "height": "={{ $json.height }}",
+              "prompts": "={{ $json.prompts }}",
+              "brand": "={{ $json.brand }}",
+              "briefText": "={{ $json.briefText }}",
+              "source_image_path": "={{ $json.source_image_path }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "product_name",
+                "displayName": "product_name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "category",
+                "displayName": "category",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "slogan",
+                "displayName": "slogan",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "source_image_path",
+                "displayName": "source_image_path",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "old_price",
+                "displayName": "old_price",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "new_price",
+                "displayName": "new_price",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "discount_rate",
+                "displayName": "discount_rate",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "campaign_name",
+                "displayName": "campaign_name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "campaign_code",
+                "displayName": "campaign_code",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "width",
+                "displayName": "width",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "number",
+                "removed": false
+              },
+              {
+                "id": "height",
+                "displayName": "height",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "number",
+                "removed": false
+              },
+              {
+                "id": "prompts",
+                "displayName": "prompts",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "object",
+                "removed": false
+              },
+              {
+                "id": "brand",
+                "displayName": "brand",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "object",
+                "removed": false
+              },
+              {
+                "id": "briefText",
+                "displayName": "briefText",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          -1840,
+          1056
+        ],
+        "id": "683bf163-49a4-4367-8f33-b13aee677a91",
+        "name": "Call_VitrinOS_STORY"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "gjzjuE91iiU2Ew0G",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/gjzjuE91iiU2Ew0G",
+            "cachedResultName": "VitrinOS_BANNER"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "product_name": "={{ $json.product_name }}",
+              "category": "={{ $json.category }}",
+              "slogan": "={{ $json.slogan }}",
+              "old_price": "={{ $json.old_price }}",
+              "new_price": "={{ $json.new_price }}",
+              "discount_rate": "={{ $json.discount_rate }}",
+              "campaign_name": "={{ $json.campaign_name }}",
+              "campaign_code": "={{ $json.campaign_code }}",
+              "width": "={{ $json.width }}",
+              "height": "={{ $json.height }}",
+              "prompts": "={{ $json.prompts }}",
+              "brand": "={{ $json.brand }}",
+              "briefText": "={{ $json.briefText }}",
+              "source_image_path": "={{ $json.source_image_path }}"
+            },
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "product_name",
+                "displayName": "product_name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "category",
+                "displayName": "category",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "slogan",
+                "displayName": "slogan",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "source_image_path",
+                "displayName": "source_image_path",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "old_price",
+                "displayName": "old_price",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "new_price",
+                "displayName": "new_price",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "discount_rate",
+                "displayName": "discount_rate",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "campaign_name",
+                "displayName": "campaign_name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "campaign_code",
+                "displayName": "campaign_code",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "width",
+                "displayName": "width",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "number",
+                "removed": false
+              },
+              {
+                "id": "height",
+                "displayName": "height",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "number",
+                "removed": false
+              },
+              {
+                "id": "prompts",
+                "displayName": "prompts",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "object",
+                "removed": false
+              },
+              {
+                "id": "brand",
+                "displayName": "brand",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "object",
+                "removed": false
+              },
+              {
+                "id": "briefText",
+                "displayName": "briefText",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          -1840,
+          1248
+        ],
+        "id": "90a44da8-3578-4197-a8d2-6f34b68de0b3",
+        "name": "Call_VitrinOS_BANNER"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          -3984,
+          1472
+        ],
+        "id": "fb9ac60f-a3fe-4bd0-a60e-5ba6e67309c0",
+        "name": "Error Trigger"
+      },
+      {
+        "parameters": {
+          "jsCode": "const executionData = $input.first().json;\nconst errorMsg = executionData.data?.resultData?.error?.message || executionData.data?.resultData?.error?.description || \"Bilinmeyen Hata\";\nlet jobId = \"\";\n\ntry {\n  // n8n API yanıtından Brief_Tetikleyici düğümünün body.jobId alanını çekeriz\n  const runData = executionData.data.resultData.runData;\n  const webhookData = runData.Brief_Tetikleyici[0].data.main[0][0].json;\n  jobId = webhookData.body.jobId;\n} catch (e) {\n  jobId = \"\";\n}\n\n// jobId'nin geçerli bir UUID olup olmadığını doğrula\nconst uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\nconst isValidUuid = jobId && uuidRegex.test(jobId);\n\n// Geçerli bir jobId yoksa, Supabase'e yazılacak bir iş kaydı olmadığından boş dizi dönerek akışı durdur\nif (!isValidUuid) {\n  return [];\n}\n\nreturn [{\n  json: {\n    jobId: jobId,\n    error: errorMsg\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -3536,
+          1472
+        ],
+        "id": "a45d0952-062b-437a-818c-57233bd4e4ed",
+        "name": "Hata_Bilgilerini_Hazirla"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "tableId": "jobs",
+          "filters": {
+            "conditions": [
+              {
+                "keyName": "id",
+                "condition": "eq",
+                "keyValue": "={{ $json.jobId }}"
+              }
+            ]
+          },
+          "fieldsUi": {
+            "fieldValues": [
+              {
+                "fieldId": "status",
+                "fieldValue": "failed"
+              },
+              {
+                "fieldId": "revision_note",
+                "fieldValue": "={{ $json.error }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.supabase",
+        "typeVersion": 1,
+        "position": [
+          -3312,
+          1472
+        ],
+        "id": "3b8d69a9-cf50-420e-b03e-60215231df50",
+        "name": "Supabase_Hata_Yaz"
+      },
+      {
+        "parameters": {
+          "jsCode": "const crypto = require('crypto');\n\nconst items = $input.all();\nif (!items || items.length === 0) return [];\n\nconst headers = items[0].json.headers || {};\nconst body = items[0].json.body || {};\n\nconst signature = headers['x-vitrinos-signature'];\nconst timestamp = headers['x-vitrinos-timestamp'];\nconst secret = $env.N8N_API_SALT || $env.HMAC_SECRET; // n8n sunucusunda N8N_API_SALT veya HMAC_SECRET tanımlı olmalıdır\n\nif (!secret) {\n  throw new Error(\"Sunucu Yapılandırma Hatası: N8N_API_SALT veya HMAC_SECRET tanımlı değil.\");\n}\n\nif (!signature || !timestamp) {\n  throw new Error(\"Yetkilendirme Hatası: İmza veya zaman damgası eksik.\");\n}\n\n// Replay saldırısı koruması: 5 dakika (300.000 ms) zaman toleransı\nconst now = Date.now();\nconst requestTime = parseInt(timestamp, 10);\nif (isNaN(requestTime) || Math.abs(now - requestTime) > 300000) {\n  throw new Error(\"Yetkilendirme Hatası: İstek zaman aşımına uğradı (Replay Attack önlendi).\");\n}\n\n// Payload doğrulaması\nconst payloadString = JSON.stringify(body);\nconst dataToVerify = `${timestamp}.${payloadString}`;\n\nconst expectedSignature = crypto\n  .createHmac('sha256', secret)\n  .update(dataToVerify)\n  .digest('hex');\n\nif (signature !== expectedSignature) {\n  throw new Error(\"Yetkilendirme Hatası: Geçersiz imza. İstek manipüle edilmiş olabilir.\");\n}\n\nreturn items;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -3760,
+          768
+        ],
+        "id": "e52e3e52-8d79-4205-a9db-f591f53ef093",
+        "name": "API_Guvenlik_Filtresi"
+      },
+      {
+        "parameters": {
+          "url": "=https://server.n8n-mustafa.me/api/v1/executions/{{ $json.execution.id }}?includeData=true",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "n8nApi",
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "json"
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -3760,
+          1472
+        ],
+        "id": "c3fac69c-e1a2-46fa-86bf-74675d7a9b65",
+        "name": "N8N_API_Execution_Detay_Al"
+      }
+    ],
+    "connections": {
+      "Call_VitrinOS_REVIZE": {
+        "main": [
+          [
+            {
+              "node": "Storage_Revize_Gorsel_Yukle",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call_VitrinOS_META_POST": {
+        "main": [
+          [
+            {
+              "node": "Storage_Gorsel_Yukle",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Brief_Tetikleyici": {
+        "main": [
+          [
+            {
+              "node": "API_Guvenlik_Filtresi",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Revizyon_Mu_Router": {
+        "main": [
+          [
+            {
+              "node": "Supabase_Revizyon_Isleme_Guncelle",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Supabase_Durum_Isleme_Guncelle",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Supabase_Durum_Isleme_Guncelle": {
+        "main": [
+          [
+            {
+              "node": "Supabase_Marka_Bilgisi_Getir",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Supabase_Marka_Bilgisi_Getir": {
+        "main": [
+          [
+            {
+              "node": "Supabase_Prompt_Sablonlari_Getir",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Supabase_Prompt_Sablonlari_Getir": {
+        "main": [
+          [
+            {
+              "node": "LLM_Brief_Analiz_Ajani",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "LLM_Brief_Analiz_Ajani": {
+        "main": [
+          [
+            {
+              "node": "Brief_Detaylarini_Normalize_Et",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI_Dil_Modeli": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "LLM_Brief_Analiz_Ajani",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "JSON_Cikti_Formatlayici": {
+        "ai_outputParser": [
+          [
+            {
+              "node": "LLM_Brief_Analiz_Ajani",
+              "type": "ai_outputParser",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Brief_Detaylarini_Normalize_Et": {
+        "main": [
+          [
+            {
+              "node": "Gorsel_Formati_Router",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gorsel_Formati_Router": {
+        "main": [
+          [
+            {
+              "node": "Call_VitrinOS_META_POST",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Call_VitrinOS_STORY",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Call_VitrinOS_BANNER",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Storage_Gorsel_Yukle": {
+        "main": [
+          [
+            {
+              "node": "Supabase_Isi_Tamamlandi_Guncelle",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Supabase_Revizyon_Isleme_Guncelle": {
+        "main": [
+          [
+            {
+              "node": "Supabase_Is_Detaylarini_Getir",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Supabase_Is_Detaylarini_Getir": {
+        "main": [
+          [
+            {
+              "node": "Supabase_Marka_Bilgisi_Getir_Rev",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Supabase_Marka_Bilgisi_Getir_Rev": {
+        "main": [
+          [
+            {
+              "node": "Supabase_Prompt_Sablonlari_Getir_Rev",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Supabase_Prompt_Sablonlari_Getir_Rev": {
+        "main": [
+          [
+            {
+              "node": "Revizyon_Limit_Kontrol_3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Revizyon_Limit_Kontrol_3": {
+        "main": [
+          [
+            {
+              "node": "Supabase_Limit_Asimi_Hata_Guncelle",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Eski_Gorseli_Indir",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Eski_Gorseli_Indir": {
+        "main": [
+          [
+            {
+              "node": "Call_VitrinOS_REVIZE",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Storage_Revize_Gorsel_Yukle": {
+        "main": [
+          [
+            {
+              "node": "Supabase_Revizyon_Tamamlandi_Guncelle",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call_VitrinOS_STORY": {
+        "main": [
+          [
+            {
+              "node": "Storage_Gorsel_Yukle",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call_VitrinOS_BANNER": {
+        "main": [
+          [
+            {
+              "node": "Storage_Gorsel_Yukle",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Error Trigger": {
+        "main": [
+          [
+            {
+              "node": "N8N_API_Execution_Detay_Al",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Hata_Bilgilerini_Hazirla": {
+        "main": [
+          [
+            {
+              "node": "Supabase_Hata_Yaz",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "API_Guvenlik_Filtresi": {
+        "main": [
+          [
+            {
+              "node": "Revizyon_Mu_Router",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "N8N_API_Execution_Detay_Al": {
+        "main": [
+          [
+            {
+              "node": "Hata_Bilgilerini_Hazirla",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": []
+  },
+  "tags": [],
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "parentFolderId": null,
+  "scopes": [
+    "execution:reveal",
+    "workflow:create",
+    "workflow:delete",
+    "workflow:disableRedaction",
+    "workflow:enableRedaction",
+    "workflow:execute",
+    "workflow:execute-chat",
+    "workflow:export",
+    "workflow:import",
+    "workflow:list",
+    "workflow:move",
+    "workflow:publish",
+    "workflow:read",
+    "workflow:share",
+    "workflow:unpublish",
+    "workflow:unshare",
+    "workflow:update"
+  ],
+  "canExecute": true
+}

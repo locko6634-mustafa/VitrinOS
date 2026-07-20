@@ -78,6 +78,7 @@ export const internalRoutes = async (fastify) => {
                 briefText: job.briefText,
                 format: job.format,
                 imageId: job.imageId,
+                revisionCount: job.revisionCount,
                 brand: brandInfo ? {
                     name: brandInfo.name,
                     colorPalette: brandInfo.colorPalette,
