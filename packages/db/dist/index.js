@@ -39,7 +39,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sql = exports.createDb = void 0;
+exports.isNull = exports.gte = exports.lte = exports.lt = exports.gt = exports.or = exports.and = exports.eq = exports.sql = exports.createDb = void 0;
 const node_postgres_1 = require("drizzle-orm/node-postgres");
 const pg_1 = __importDefault(require("pg"));
 const schema = __importStar(require("./schema.js"));
@@ -52,6 +52,14 @@ const createDb = (connectionString) => {
 exports.createDb = createDb;
 var drizzle_orm_1 = require("drizzle-orm");
 Object.defineProperty(exports, "sql", { enumerable: true, get: function () { return drizzle_orm_1.sql; } });
+Object.defineProperty(exports, "eq", { enumerable: true, get: function () { return drizzle_orm_1.eq; } });
+Object.defineProperty(exports, "and", { enumerable: true, get: function () { return drizzle_orm_1.and; } });
+Object.defineProperty(exports, "or", { enumerable: true, get: function () { return drizzle_orm_1.or; } });
+Object.defineProperty(exports, "gt", { enumerable: true, get: function () { return drizzle_orm_1.gt; } });
+Object.defineProperty(exports, "lt", { enumerable: true, get: function () { return drizzle_orm_1.lt; } });
+Object.defineProperty(exports, "lte", { enumerable: true, get: function () { return drizzle_orm_1.lte; } });
+Object.defineProperty(exports, "gte", { enumerable: true, get: function () { return drizzle_orm_1.gte; } });
+Object.defineProperty(exports, "isNull", { enumerable: true, get: function () { return drizzle_orm_1.isNull; } });
 __exportStar(require("./schema.js"), exports);
 __exportStar(require("./repository.js"), exports);
 //# sourceMappingURL=index.js.map

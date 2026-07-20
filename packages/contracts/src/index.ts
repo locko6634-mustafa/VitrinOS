@@ -1,3 +1,5 @@
+export * from './auth.js';
+
 import { z } from 'zod';
 
 export const HealthStatusResponseSchema = z.object({
