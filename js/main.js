@@ -116,7 +116,7 @@
     const navMenu = document.getElementById("navMenu");
     const menuLinks = Array.from(navMenu?.querySelectorAll("a") || []);
     const brand = navShell?.querySelector(".brand");
-    const mobileQuery = window.matchMedia("(max-width: 960px)");
+    const mobileQuery = window.matchMedia("(max-width: " + (window.VitrinOS?.config?.defaults?.marketingBreakpoint || 960) + "px)");
 
     if (!navToggle || !navShell || !navMenu) return;
 

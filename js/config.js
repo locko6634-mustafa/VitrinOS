@@ -58,9 +58,11 @@
         revisionMinLength: 6,
         revisionLimit: 3,
         requestTimeoutMs: 15000,
-        mobileBreakpoint: 640
+        mobileBreakpoint: 640,
+        drawerBreakpoint: 1120
       },
       admin: { pageSize: 25, mobileBreakpoint: 1120 },
+      marketingBreakpoint: 960,
       lead: { minSubmitSeconds: 3 }
     }
   };

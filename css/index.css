@@ -2824,4 +2824,13 @@ body[data-surface="marketing"] .enterprise-features li::before {
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-height: 600px) {
+  body[data-surface="marketing"] .ambient-orbit,
+  body[data-surface="marketing"] .ambient-prism,
+  body[data-surface="marketing"] .orbit-one,
+  body[data-surface="marketing"] .orbit-two {
+    display: none !important;
+  }
+}
 }

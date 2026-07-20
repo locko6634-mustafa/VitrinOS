@@ -20,6 +20,8 @@ body[data-surface="workspace"] {
   --workspace-shadow-1: var(--vo-shadow-1, 0 1px 2px hsla(220 20% 16% / 0.06));
   --workspace-shadow-2: var(--vo-shadow-2, 0 16px 42px hsla(220 22% 18% / 0.09));
   --workspace-shadow-3: var(--vo-shadow-3, 0 30px 80px hsla(220 28% 18% / 0.13));
+  --vo-success: hsl(142 55% 40%);
+  --vo-danger: hsl(2 68% 48%);
   min-height: 100dvh;
   color: var(--ink);
   background:
@@ -174,7 +176,7 @@ body[data-surface="workspace"] .button.secondary {
 
 body[data-surface="workspace"] .button.secondary:hover {
   border-color: var(--line-strong);
-  background: hsl(37 38% 97%);
+  background: var(--bg-soft);
 }
 
 .compact-button {
@@ -360,8 +362,8 @@ body[data-surface="workspace"] .button.secondary:hover {
   height: 8px;
   margin-top: 3px;
   border-radius: 50%;
-  background: hsl(142 55% 40%);
-  box-shadow: 0 0 0 5px hsla(142 55% 40% / 0.11);
+  background: var(--vo-success);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--vo-success) 11%, transparent);
   animation: statusPulse 2.4s ease-in-out infinite;
 }
 
@@ -488,9 +490,9 @@ body[data-surface="workspace"] .button.secondary:hover {
   justify-content: space-between;
   gap: 20px;
   margin-top: 18px;
-  border: 1px solid hsla(2 72% 45% / 0.25);
-  border-left: 3px solid hsl(2 68% 48%);
-  background: hsl(5 66% 98%);
+  border: 1px solid color-mix(in srgb, var(--vo-danger) 25%, transparent);
+  border-left: 3px solid var(--vo-danger);
+  background: color-mix(in srgb, var(--vo-danger) 4%, var(--surface));
   padding: 14px 16px;
   box-shadow: var(--workspace-shadow-1);
 }
@@ -511,9 +513,9 @@ body[data-surface="workspace"] .button.secondary:hover {
 }
 
 .dashboard-feedback[data-kind="warning"] {
-  border-color: hsla(25 92% 53% / 0.28);
+  border-color: color-mix(in srgb, var(--accent) 28%, transparent);
   border-left-color: var(--accent);
-  background: hsl(35 100% 97%);
+  background: color-mix(in srgb, var(--accent) 5%, var(--surface));
 }
 
 .tab-panel {

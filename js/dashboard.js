@@ -76,7 +76,7 @@
   const barMetaPost = document.querySelector("#barMetaPost");
   const barStory = document.querySelector("#barStory");
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const appDrawerQuery = window.matchMedia("(max-width: 1120px)");
+  const appDrawerQuery = window.matchMedia("(max-width: " + (dashboardConfig.drawerBreakpoint || 1120) + "px)");
 
   if (authContext.role === "admin") {
     [adminPanelLink, mobileAdminPanelLink].filter(Boolean).forEach((link) => {

@@ -138,7 +138,7 @@
 
   .admin-body .button.secondary:hover {
     border-color: var(--vo-line-strong);
-    background: hsl(37 38% 97%);
+    background: var(--admin-bg);
   }
 
   .admin-body .compact-button {
@@ -272,7 +272,7 @@
 
   .admin-nav-button:hover {
     color: var(--vo-graphite);
-    background: hsl(220 15% 13% / 0.035);
+    background: color-mix(in srgb, var(--admin-ink) 3.5%, transparent);
     transform: translateX(2px);
   }
 
@@ -294,7 +294,7 @@
     margin-top: auto;
     padding: 16px;
     border-top: 1px solid var(--vo-line-strong);
-    background: linear-gradient(145deg, hsl(25 92% 53% / 0.08), transparent 68%);
+    background: linear-gradient(145deg, color-mix(in srgb, var(--admin-accent) 8%, transparent), transparent 68%);
   }
 
   .admin-sidebar-note p {
@@ -311,7 +311,7 @@
     margin-right: 8px;
     border-radius: 50%;
     background: var(--vo-success);
-    box-shadow: 0 0 0 5px hsl(154 67% 32% / 0.12);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--vo-success) 12%, transparent);
   }
 
   .admin-main {

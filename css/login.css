@@ -1521,4 +1521,15 @@ body[data-surface="auth"] .mfa-code-input {
     transition-duration: 0.01ms !important;
   }
 }
+
+@media (max-height: 650px) {
+  .optic-orbit-one,
+  .optic-orbit-two,
+  .security-ring-one,
+  .security-ring-two,
+  .optic-aperture,
+  .security-core {
+    display: none !important;
+  }
+}
 }
