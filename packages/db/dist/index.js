@@ -53,4 +53,5 @@ exports.createDb = createDb;
 var drizzle_orm_1 = require("drizzle-orm");
 Object.defineProperty(exports, "sql", { enumerable: true, get: function () { return drizzle_orm_1.sql; } });
 __exportStar(require("./schema.js"), exports);
+__exportStar(require("./repository.js"), exports);
 //# sourceMappingURL=index.js.map

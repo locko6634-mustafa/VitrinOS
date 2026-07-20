@@ -12,4 +12,5 @@ export const createDb = (connectionString: string) => {
 
 export { sql } from 'drizzle-orm';
 export * from './schema.js';
+export * from './repository.js';
 
