@@ -6,14 +6,20 @@ import dbPlugin from './db.js';
 import { healthRoutes } from './routes/health.js';
 import { authRoutes } from './routes/auth.js';
 import { adminRoutes } from './routes/admin.js';
+import { brandsRoutes } from './routes/brands.js';
+import { promptsRoutes } from './routes/prompts.js';
+import { assetsRoutes } from './routes/assets.js';
+import { jobsRoutes } from './routes/jobs.js';
+import { leadsRoutes } from './routes/leads.js';
+import { internalRoutes } from './routes/internal.js';
 
 const fastify = Fastify({
   logger: true
 });
 
-// Global Rate Limit
+// Global Rate Limit (Public ve app uçları için geçerli, internal token'lılar veya sse için rate limit by-pass veya yüksek limitler ayarlanabilir, şimdilik varsayılan bırakıyoruz)
 fastify.register(rateLimit, {
-  max: 100,
+  max: 200,
   timeWindow: '1 minute'
 });
 
@@ -30,6 +36,12 @@ fastify.register(dbPlugin);
 fastify.register(healthRoutes);
 fastify.register(authRoutes);
 fastify.register(adminRoutes);
+fastify.register(brandsRoutes);
+fastify.register(promptsRoutes);
+fastify.register(assetsRoutes);
+fastify.register(jobsRoutes);
+fastify.register(leadsRoutes);
+fastify.register(internalRoutes);
 
 const start = async () => {
   try {
