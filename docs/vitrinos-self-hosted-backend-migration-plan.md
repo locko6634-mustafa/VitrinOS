@@ -292,11 +292,11 @@ Ana durumlar: `queued -> dispatching -> processing -> succeeded | failed_retryab
 - [x] Parola, session, CSRF, rate limit, parola aktivasyonu/yenileme ve MFA akışlarını uygula.
 - [x] Rol matrisi ile kullanıcı ve audit yönetim uçlarını tamamla.
 
-### Faz 4 — Uygulama API'leri ve Storage
+### Faz 4 — Uygulama API'leri ve Storage [TAMAMLANDI]
 
-- Marka, prompt, job, asset ve lead uçlarını Edge Function davranışlarıyla eşdeğer hale getir.
-- S3/R2 presigned upload/download, checksum ve cleanup kuyruğunu uygula.
-- SSE job event yayını ve yeniden bağlanma semantiğini tamamla.
+- [x] Marka, prompt, job, asset ve lead uçlarını Edge Function davranışlarıyla eşdeğer hale getir.
+- [x] S3/R2 presigned upload/download, checksum ve cleanup kuyruğunu uygula.
+- [x] SSE job event yayını ve yeniden bağlanma semantiğini tamamla.
 
 ### Faz 5 — n8n V2
 
@@ -391,11 +391,11 @@ Ana durumlar: `queued -> dispatching -> processing -> succeeded | failed_retryab
 
 ## 19. Diğer agent için ilk çalışma paketi
 
-Uygulamaya başlayacak agent Faz 0, Faz 1, Faz 2 ve Faz 3'ü tamamlanmış olarak devralacaktır. Sıradaki çalışma paketi Faz 4 (Uygulama API'leri ve Storage) aşamasıdır:
+Uygulamaya başlayacak agent Faz 0, Faz 1, Faz 2, Faz 3 ve Faz 4'ü tamamlanmış olarak devralacaktır. Sıradaki çalışma paketi Faz 5 (n8n V2) aşamasıdır:
 
-1. Marka, prompt, job, asset ve lead uçlarını Edge Function davranışlarıyla eşdeğer hale getirecek şekilde Fastify API'ye geçir.
-2. S3/R2 presigned upload/download URL üretimi, dosya checksum doğrulaması ve cleanup kuyruğunu entegre et.
-3. SSE (Server-Sent Events) tabanlı job durum ve olay yayını ile yeniden bağlanma semantiğini tamamla.
+1. Dahili API credential'larını oluştur; V2 workflow'ları n8n arayüzünde klonla.
+2. Supabase node'larını HTTP internal API ile değiştir; ortak hata workflow'unu bağla.
+3. Her içerik türü, revizyon, timeout, duplicate callback ve sağlayıcı hata senaryosunu test et.
 
-Bu sıra değiştirilmemelidir: API katmanının temel veri/dosya akışları tamamlandıktan sonra n8n entegrasyonu (Faz 5) yapılmalıdır.
+Bu sıra değiştirilmemelidir: n8n entegrasyonu tamamlandıktan sonra frontend dönüşümüne (Faz 6) geçilmelidir.
 
