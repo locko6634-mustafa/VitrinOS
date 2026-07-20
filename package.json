@@ -2,13 +2,14 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "test": "node --test quality/tests/config.test.mjs quality/tests/frontend-contract.test.mjs",
+    "test": "node --test quality/tests/config.test.mjs quality/tests/frontend-contract.test.mjs quality/tests/responsive-overflow.test.mjs",
     "release-gate": "node quality/scripts/release-gate.mjs",
     "release-manifest": "node quality/scripts/generate-release-manifest.mjs",
     "ops-check": "node quality/scripts/ops-contract.mjs",
     "check": "npm test && npm run ops-check && npm run release-gate"
   },
   "devDependencies": {
+    "playwright": "^1.45.0",
     "supabase": "^2.109.1"
   }
 }
