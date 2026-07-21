@@ -39,7 +39,8 @@ export const internalRoutes = async (fastify) => {
             return reply.code(404).send({ code: 'NOT_FOUND', message: 'İlgili iş bulunamadı' });
         if (job.status === 'cancelled')
             return reply.code(409).send({ code: 'JOB_CANCELLED', message: 'İş iptal edilmiş' });
-        if (attempt.status !== 'processing') {
+        let replayedClaim = attempt.status === 'processing';
+        if (!replayedClaim) {
             const transitioned = await fastify.db.transaction(async (tx) => {
                 const updated = await tx.update(jobAttempts)
                     .set({ status: 'processing', updatedAt: new Date() })
@@ -53,11 +54,13 @@ export const internalRoutes = async (fastify) => {
             });
             if (transitioned)
                 await notify(job.id, 'processing', job.ownerId);
+            else
+                replayedClaim = true;
         }
         const brand = await fastify.db.query.brands.findFirst({ where: eq(brands.id, job.brandId) });
         const prompts = await fastify.db.query.brandPrompts.findFirst({ where: eq(brandPrompts.brandId, job.brandId) });
         return reply.send({ data: {
-                jobId: job.id, attemptId, briefText: job.briefText, format: job.format, imageId: job.imageId,
+                jobId: job.id, attemptId, claimState: replayedClaim ? 'replayed' : 'claimed', briefText: job.briefText, format: job.format, imageId: job.imageId,
                 brand: brand && { name: brand.name, colorPalette: brand.colorPalette, toneRules: brand.toneRules, bannedWords: brand.bannedWords },
                 prompts: prompts && { basePrompt: prompts.basePrompt, bannerPrompt: prompts.bannerPrompt, metaPostPrompt: prompts.metaPostPrompt, storyPrompt: prompts.storyPrompt, revizePrompt: prompts.revizePrompt },
             } });
