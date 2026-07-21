@@ -1,0 +1,145 @@
+name: vitrinos
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB zorunludur}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER zorunludur}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD zorunludur}
+    volumes:
+      - vitrinos_postgres_data:/var/lib/postgresql/data
+    networks:
+      - vitrinos_internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    mem_limit: 1536m
+    cpus: "1.00"
+    pids_limit: 200
+
+  migrate:
+    build:
+      context: ../..
+      target: migrate
+    profiles: ["tools"]
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:?POSTGRES_USER zorunludur}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD zorunludur}@postgres:5432/${POSTGRES_DB:?POSTGRES_DB zorunludur}
+    networks:
+      - vitrinos_internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?MINIO_ROOT_USER zorunludur}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD zorunludur}
+    volumes:
+      - vitrinos_minio_data:/data
+    networks:
+      - vitrinos_internal
+      - vitrinos_automation
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:9000/minio/health/live || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    mem_limit: 512m
+    cpus: "0.35"
+    pids_limit: 100
+
+  minio-init:
+    image: minio/mc:latest
+    restart: "no"
+    entrypoint: >-
+      /bin/sh -c "mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD
+      && mc mb --ignore-existing local/$$MINIO_BUCKET_NAME
+      && mc anonymous set none local/$$MINIO_BUCKET_NAME"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?MINIO_ROOT_USER zorunludur}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD zorunludur}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME:?MINIO_BUCKET_NAME zorunludur}
+    networks:
+      - vitrinos_internal
+    depends_on:
+      minio:
+        condition: service_healthy
+
+  api:
+    build:
+      context: ../..
+      target: api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOST: 0.0.0.0
+      DATABASE_URL: postgresql://${POSTGRES_USER:?POSTGRES_USER zorunludur}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD zorunludur}@postgres:5432/${POSTGRES_DB:?POSTGRES_DB zorunludur}
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET zorunludur}
+      MFA_ENCRYPTION_KEY: ${MFA_ENCRYPTION_KEY:?MFA_ENCRYPTION_KEY zorunludur}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:?INTERNAL_API_TOKEN zorunludur}
+      N8N_WEBHOOK_SECRET: ${N8N_WEBHOOK_SECRET:?N8N_WEBHOOK_SECRET zorunludur}
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY_ID: ${MINIO_ROOT_USER:?MINIO_ROOT_USER zorunludur}
+      S3_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD zorunludur}
+      S3_BUCKET_NAME: ${MINIO_BUCKET_NAME:?MINIO_BUCKET_NAME zorunludur}
+      S3_FORCE_PATH_STYLE: true
+    networks:
+      - vitrinos_internal
+      - vitrinos_automation
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:3000/health/ready').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    mem_limit: 768m
+    cpus: "0.75"
+    pids_limit: 150
+
+  worker:
+    build:
+      context: ../..
+      target: worker
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:?POSTGRES_USER zorunludur}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD zorunludur}@postgres:5432/${POSTGRES_DB:?POSTGRES_DB zorunludur}
+      N8N_WEBHOOK_URL: http://n8n:5678/webhook/vitrinos-brief-v2
+      N8N_WEBHOOK_SECRET: ${N8N_WEBHOOK_SECRET:?N8N_WEBHOOK_SECRET zorunludur}
+      WORKER_POLL_INTERVAL_MS: 5000
+    networks:
+      - vitrinos_internal
+      - vitrinos_automation
+    depends_on:
+      postgres:
+        condition: service_healthy
+    mem_limit: 512m
+    cpus: "0.50"
+    pids_limit: 100
+
+networks:
+  vitrinos_internal:
+    name: vitrinos_internal
+    internal: true
+  vitrinos_automation:
+    name: vitrinos_automation
+    external: true
+
+volumes:
+  vitrinos_postgres_data:
+  vitrinos_minio_data:
