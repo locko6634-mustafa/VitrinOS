@@ -1,20 +1,20 @@
-import { z } from 'zod';
 import dotenv from 'dotenv';
+import { z } from 'zod';
 
 dotenv.config();
 
-const envSchema = z.object({
+const environment = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   DATABASE_URL: z.string().url().default('postgresql://postgres:postgres@localhost:5432/vitrinos'),
-  N8N_WEBHOOK_URL: z.string().url().default('https://server.n8n-mustafa.me/webhook/vitrinos-brief'),
-  N8N_WEBHOOK_SECRET: z.string().min(8).default('temporary_webhook_secret_for_local_dev'),
-  INTERNAL_API_TOKEN: z.string().min(16).default('super_secret_internal_api_token_for_n8n_and_worker'),
+  N8N_WEBHOOK_URL: z.string().url(),
+  N8N_WEBHOOK_SECRET: z.string().min(32),
+  WORKER_POLL_INTERVAL_MS: z.coerce.number().int().min(250).default(5000),
 });
 
-const parsed = envSchema.safeParse(process.env);
+const parsed = environment.safeParse(process.env);
 
 if (!parsed.success) {
-  console.error('Worker environment variables are invalid:', parsed.error.format());
+  console.error('Worker ortam değişkenleri geçersiz:', parsed.error.format());
   process.exit(1);
 }
 
