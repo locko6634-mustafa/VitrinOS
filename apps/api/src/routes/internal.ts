@@ -60,8 +60,9 @@ export const internalRoutes: FastifyPluginAsync = async (fastify) => {
     const brand = await fastify.db.query.brands.findFirst({ where: eq(brands.id, job.brandId) });
     const prompts = await fastify.db.query.brandPrompts.findFirst({ where: eq(brandPrompts.brandId, job.brandId) });
     return reply.send({ data: {
-      jobId: job.id, attemptId, claimState: replayedClaim ? 'replayed' : 'claimed', briefText: job.briefText, format: job.format, imageId: job.imageId,
-      brand: brand && { name: brand.name, colorPalette: brand.colorPalette, toneRules: brand.toneRules, bannedWords: brand.bannedWords },
+      jobId: job.id, attemptId, claimState: replayedClaim ? 'replayed' : 'claimed', briefText: job.briefText, format: job.format,
+      imageId: job.imageId, revisionCount: job.revisionCount, revisionNote: job.revisionNote,
+      brand: brand && { name: brand.name, logoUrl: brand.logoUrl, colorPalette: brand.colorPalette, toneRules: brand.toneRules, bannedWords: brand.bannedWords },
       prompts: prompts && { basePrompt: prompts.basePrompt, bannerPrompt: prompts.bannerPrompt, metaPostPrompt: prompts.metaPostPrompt, storyPrompt: prompts.storyPrompt, revizePrompt: prompts.revizePrompt },
     } });
   });
