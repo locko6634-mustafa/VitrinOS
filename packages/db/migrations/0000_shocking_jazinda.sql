@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS "app"."brands" (
 	"website_url" text,
 	"color_palette" jsonb DEFAULT '{"primary":"#d9962a","secondary":"#7a4f12","theme":"koyu"}'::jsonb NOT NULL,
 	"tone_rules" text,
-	"banned_words" text[] DEFAULT  NOT NULL,
+	"banned_words" text[] DEFAULT ARRAY[]::text[] NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );

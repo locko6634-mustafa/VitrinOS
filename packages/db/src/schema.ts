@@ -1,4 +1,5 @@
 import { pgSchema, uuid, text, timestamp, integer, jsonb, boolean } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 
 export const appSchema = pgSchema('app');
 
@@ -76,7 +77,7 @@ export const brands = appSchema.table('brands', {
     theme: 'koyu',
   }),
   toneRules: text('tone_rules'),
-  bannedWords: text('banned_words').array().notNull().default([]),
+  bannedWords: text('banned_words').array().notNull().default(sql`ARRAY[]::text[]`),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

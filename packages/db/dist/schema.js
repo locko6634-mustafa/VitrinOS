@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.outboxJobs = exports.storageCleanupQueue = exports.securityAuditLog = exports.leadAttempts = exports.leads = exports.jobEvents = exports.jobAttempts = exports.jobs = exports.assets = exports.brandPrompts = exports.brands = exports.oneTimeTokens = exports.mfaRecoveryCodes = exports.mfaFactors = exports.authSessions = exports.passwordCredentials = exports.users = exports.appSchema = void 0;
 const pg_core_1 = require("drizzle-orm/pg-core");
+const drizzle_orm_1 = require("drizzle-orm");
 exports.appSchema = (0, pg_core_1.pgSchema)('app');
 exports.users = exports.appSchema.table('users', {
     id: (0, pg_core_1.uuid)('id').primaryKey().defaultRandom(),
@@ -71,7 +72,7 @@ exports.brands = exports.appSchema.table('brands', {
         theme: 'koyu',
     }),
     toneRules: (0, pg_core_1.text)('tone_rules'),
-    bannedWords: (0, pg_core_1.text)('banned_words').array().notNull().default([]),
+    bannedWords: (0, pg_core_1.text)('banned_words').array().notNull().default((0, drizzle_orm_1.sql) `ARRAY[]::text[]`),
     createdAt: (0, pg_core_1.timestamp)('created_at').defaultNow().notNull(),
     updatedAt: (0, pg_core_1.timestamp)('updated_at').defaultNow().notNull(),
 });
