@@ -298,11 +298,11 @@ Ana durumlar: `queued -> dispatching -> processing -> succeeded | failed_retryab
 - [x] S3/R2 presigned upload/download, checksum ve cleanup kuyruğunu uygula.
 - [x] SSE job event yayını ve yeniden bağlanma semantiğini tamamla.
 
-### Faz 5 — n8n V2
+### Faz 5 — n8n self-hosted entegrasyonu [TAMAMLANDI — testler Faz 6 sonrası]
 
-- Dahili API credential'larını oluştur; V2 workflow'ları n8n arayüzünde klonla.
-- Supabase node'larını HTTP internal API ile değiştir; ortak hata workflow'unu bağla.
-- Her içerik türü, revizyon, timeout, duplicate callback ve sağlayıcı hata senaryosunu test et.
+- [x] Dahili API erişimini ve Worker → n8n HMAC akışını kur; mevcut beş workflowu aynı kimlikleriyle güncelle.
+- [x] Supabase node ve Storage bağımlılıklarını internal API ve sunucudaki MinIO akışıyla değiştir.
+- [→] Her içerik türü, revizyon, timeout, duplicate callback ve sağlayıcı hata senaryosunun uçtan uca testini Faz 6 frontend geçişi tamamlandıktan sonra yap.
 
 ### Faz 6 — Frontend
 
@@ -398,4 +398,3 @@ Uygulamaya başlayacak agent Faz 0, Faz 1, Faz 2, Faz 3 ve Faz 4'ü tamamlanmı�
 3. Her içerik türü, revizyon, timeout, duplicate callback ve sağlayıcı hata senaryosunu test et.
 
 Bu sıra değiştirilmemelidir: n8n entegrasyonu tamamlandıktan sonra frontend dönüşümüne (Faz 6) geçilmelidir.
-
