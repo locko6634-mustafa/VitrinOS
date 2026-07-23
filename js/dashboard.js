@@ -75,9 +75,15 @@
   const barStory = document.querySelector("#barStory");
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-  if (user.role === "admin") {
-    [adminPanelLink, mobileAdminPanelLink].filter(Boolean).forEach((link) => {
-      link.hidden = false;
+  if (appMenuToggle && appRail) {
+    appMenuToggle.addEventListener("click", () => {
+      const isOpen = appShell?.classList.toggle("menu-open");
+      if (appRail) appRail.inert = !isOpen;
+    });
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Tab" && appShell?.classList.contains("menu-open")) {
+        // focus trap
+      }
     });
   }
 

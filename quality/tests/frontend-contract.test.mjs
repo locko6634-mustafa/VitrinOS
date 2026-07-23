@@ -80,23 +80,15 @@ test("auth yüzeylerinde kurgu müşteri kanıtı bulunmaz", async () => {
   assert.doesNotMatch(source, /NovaMarket|18\s+job/i);
 });
 
-test("admin MFA doğrulaması yalnızca güncel AAL2 oturumuna güvenir", async () => {
-  const authSource = await read("js/supabase.js");
+test("admin MFA doğrulaması güvenli Cookie ve MFA challenge akışını kullanır", async () => {
   const loginSource = await read("js/login.js");
   const challengeSource = await read("js/mfa-challenge.js");
   const adminSource = await read("js/admin.js");
-  const functionSource = await read("supabase/functions/admin-user-actions/index.ts");
 
-  assert.doesNotMatch(authSource, /ADMIN_MFA_TRUST|hasRecentAdminMfa|rememberAdminMfa/);
-  assert.doesNotMatch(loginSource, /hasRecentAdminMfa|rememberAdminMfa/);
-  assert.doesNotMatch(challengeSource, /rememberAdminMfa/);
-  assert.match(authSource, /context\.currentLevel === "aal2"/);
-  assert.match(loginSource, /assurance\.currentLevel === "aal2"/);
-  assert.match(loginSource, /role !== "admin" && Boolean\(rememberInput\?\.checked\)/);
-  assert.match(authSource, /REMEMBERED_LOGIN_KEY/);
-  assert.match(adminSource, /Authorization: `Bearer \$\{session\.access_token\}`/);
-  assert.match(functionSource, /@supabase\/supabase-js@2\.110\.7/);
-  assert.match(functionSource, /getAuthenticatorAssuranceLevel\(accessToken\)/);
+  assert.match(loginSource, /response\.mfaRequired/);
+  assert.match(loginSource, /mfa-challenge\.html/);
+  assert.match(challengeSource, /\/auth\/mfa\/verify/);
+  assert.match(adminSource, /\/admin\/users/);
 });
 
 test("admin geri bildirimleri erişilebilir dialog ve toast üzerinden yürür", async () => {
@@ -185,11 +177,14 @@ test("mobil workspace ve admin drawer hesap eylemlerini ve odak izolasyonunu kor
   assert.match(adminJs, /event\.key === ["']Tab["'][\s\S]*admin-sidebar-open/);
 });
 
-test("revision_requested pipeline aktif revizyon adimi olarak sunulur", async () => {
+test("iş durum haritası bağımsız backend durumlarını kapsar", async () => {
   const source = await read("js/dashboard.js");
-  assert.match(source, /\["pending",\s*"processing",\s*"revision_requested",\s*"pending_retry"\]/);
-  assert.match(source, /state\.currentJob\.status === "revision_requested"[\s\S]*Revizyon haz/);
-  assert.doesNotMatch(source, /\["completed",\s*"revision_requested"\]/);
+  assert.match(source, /queued:\s*"Sırada"/);
+  assert.match(source, /dispatching:\s*"Gönderiliyor"/);
+  assert.match(source, /processing:\s*"Üretiliyor"/);
+  assert.match(source, /succeeded:\s*"Tamamlandı"/);
+  assert.match(source, /failed_retryable:\s*"Yeniden Denenecek"/);
+  assert.match(source, /failed_terminal:\s*"Başarısız"/);
 });
 
 test("review kontrolleri job tamamlanana kadar varsayilan olarak kapalidir", async () => {

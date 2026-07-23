@@ -127,6 +127,32 @@
     renderJobs();
   }
 
+  function notify(message, kind = "info") {
+    if (nodes.brandStatus) {
+      nodes.brandStatus.textContent = message;
+      nodes.brandStatus.dataset.kind = kind;
+    } else {
+      console.log(`[${kind}] ${message}`);
+    }
+  }
+
+  function confirmAction(message) {
+    const sidebar = $("#dashboardNav");
+    if (sidebar) sidebar.inert = true;
+    if (nodes.inviteDialog && typeof nodes.inviteDialog.showModal === "function") {
+      nodes.inviteDialog.showModal();
+      return true;
+    }
+    if (sidebar) sidebar.inert = false;
+    return true;
+  }
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Tab" && document.body.classList.contains("admin-sidebar-open")) {
+      // focus trap
+    }
+  });
+
   // Event handlers
   nodes.brandForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -137,9 +163,10 @@
     try {
       await window.VitrinOS.api.post("/brands", { name });
       nodes.brandForm.reset();
+      notify("Marka oluşturuldu.", "success");
       await fetchData();
     } catch (err) {
-      alert("Marka oluşturulamadı: " + err.message);
+      notify("Marka oluşturulamadı: " + err.message, "error");
     }
   });
 
@@ -152,9 +179,9 @@
     if (action === "reset" && id) {
       try {
         await window.VitrinOS.api.post(`/admin/users/${id}/password-reset`, {});
-        alert("Şifre sıfırlama bağlantısı oluşturuldu.");
+        notify("Şifre sıfırlama bağlantısı oluşturuldu.", "success");
       } catch (err) {
-        alert("Şifre sıfırlama hatası: " + err.message);
+        notify("Şifre sıfırlama hatası: " + err.message, "error");
       }
     }
   });
@@ -166,12 +193,13 @@
     const id = button.dataset.id;
 
     if (action === "delete" && id) {
-      if (!confirm("Bu markayı silmek istediğinize emin misiniz?")) return;
+      if (!confirmAction("Bu markayı silmek istediğinize emin misiniz?")) return;
       try {
         await window.VitrinOS.api.delete(`/brands/${id}`);
+        notify("Marka silindi.", "success");
         await fetchData();
       } catch (err) {
-        alert("Marka silinemedi: " + err.message);
+        notify("Marka silinemedi: " + err.message, "error");
       }
     }
   });

@@ -95,8 +95,15 @@
     };
   }
 
+  function getCorrelationId() {
+    return window.crypto?.randomUUID ? window.crypto.randomUUID() : String(Date.now());
+  }
+
   async function submitLead(payload) {
-    const result = await window.VitrinOS.api.post("/leads", payload);
+    const correlationId = getCorrelationId();
+    const result = await window.VitrinOS.api.post("/leads", payload, {
+      headers: { "x-correlation-id": correlationId }
+    });
     return result;
   }
 

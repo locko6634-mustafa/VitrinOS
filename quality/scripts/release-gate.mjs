@@ -6,6 +6,10 @@ const required = [
   ".github/workflows/ci.yml",
   "js/observability.js",
   "quality/tests/config.test.mjs",
+  "quality/tests/staging-e2e-gate.test.mjs",
+  "infra/scripts/dry-run-migration.ts",
+  "infra/scripts/reconciliation-check.ts",
+  "infra/scripts/backup-restore-test.ts",
   "quality/scripts/ops-contract.mjs",
   "quality/docs/ops-resilience-runbook.md",
   "quality/docs/restore-drill.md"
