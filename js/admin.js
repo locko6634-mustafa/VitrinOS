@@ -26,6 +26,7 @@
   const text = (value) => value == null || value === "" ? "—" : String(value);
   const date = (value) => value ? new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value)) : "—";
   const jobStatusLabel = (status) => ({ queued: "Sırada", dispatching: "Gönderiliyor", processing: "Üretiliyor", succeeded: "Tamamlandı", approved: "Onaylandı", failed_retryable: "Yeniden denenecek", failed_terminal: "Başarısız", cancelled: "İptal edildi" }[status] || text(status));
+  const leadStatusLabel = (status) => ({ new: "Yeni", reviewed: "İncelendi", approved: "Onaylandı", rejected: "Reddedildi" }[status] || text(status));
   const palette = (brand) => brand.colorPalette || {};
   const packPrompt = (text, background, image) => JSON.stringify({ text, background, image });
   const unpackPrompt = (value) => {
@@ -130,8 +131,11 @@
       const row = document.createElement("tr");
       appendCell(row, item.name); appendCell(row, item.company); appendCell(row, item.email); appendCell(row, item.need);
       const stateCell = document.createElement("td"); const select = document.createElement("select");
-      ["new", "reviewed", "approved", "rejected"].forEach((value) => select.add(new Option(value, value, false, item.status === value)));
-      select.addEventListener("change", () => updateLead(item.id, select.value)); stateCell.append(select); row.append(stateCell); nodes.leadRows?.append(row);
+      ["new", "reviewed", "approved", "rejected"].forEach((value) => select.add(new Option(leadStatusLabel(value), value, false, item.status === value)));
+      select.addEventListener("change", () => updateLead(item.id, select.value)); stateCell.append(select); row.append(stateCell);
+      const actions = document.createElement("td");
+      actions.append(actionButton("Davet gönder", "invite", item.id));
+      row.append(actions); nodes.leadRows?.append(row);
     });
   }
 
@@ -236,6 +240,14 @@
       if (button.dataset.action === "reset") await window.VitrinOS.api.post(`/admin/users/${button.dataset.id}/password-reset`, {});
       await fetchData(); notify("Kullanıcı işlemi tamamlandı.", "success");
     } catch (error) { notify(error.message || "Kullanıcı işlemi tamamlanamadı.", "error"); }
+  });
+
+  nodes.leadRows?.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-action=\"invite\"]"); if (!button) return;
+    const lead = state.leads.find((item) => item.id === button.dataset.id); if (!lead) return;
+    nodes.inviteEmail.value = lead.email || "";
+    nodes.inviteName.value = lead.name || "";
+    nodes.inviteDialog?.showModal();
   });
 
   $("#inviteUserButton")?.addEventListener("click", () => nodes.inviteDialog?.showModal());
