@@ -26,5 +26,5 @@ jobs:
             echo "==> Updating VitrinOS production deployment..."
             cd /opt/vitrinos/app
             git pull origin main
-            sudo docker compose -f infra/compose/docker-compose.production.yml --env-file infra/compose/production.env up -d --build
+            docker compose -f infra/compose/docker-compose.production.yml --env-file infra/compose/production.env up -d --build
             echo "==> Deployment completed successfully!"
