@@ -7,4 +7,4 @@ Disallow: /mfa-challenge.html
 Disallow: /mfa-setup.html
 Disallow: /set-password.html
 
-Sitemap: https://vitrin-os.vercel.app/sitemap.xml
+Sitemap: /sitemap.xml

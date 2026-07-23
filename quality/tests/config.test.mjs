@@ -30,7 +30,7 @@ test("frontend runtime config ortam değişkenlerini başarıyla alır", async (
 test("runtime endpoint secret değerleri dışarı aktarmıyor", async () => {
   const source = await readFile("api/runtime-config.js", "utf8");
   assert.match(source, /PUBLIC_APP_URL/);
-  assert.match(source, /VERCEL_ENV/);
+  assert.match(source, /APP_ENV/);
   assert.doesNotMatch(source, /SERVICE_ROLE|N8N_WEBHOOK_SECRET|LEAD_HASH_SECRET/);
 });
 

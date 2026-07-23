@@ -10,7 +10,7 @@ Bu dosya VitrinOS projesinde çalışan ajanların tekil proje bağlamıdır. T�
 
 ## Proje Özeti
 
-VitrinOS, e-ticaret markaları için AI destekli pazarlama görselleri üreten vanilla HTML/CSS/JS tabanlı bir web uygulamasıdır. Proje canlıda `https://vitrin-os.vercel.app/` adresinde çalışmaktadır.
+VitrinOS, e-ticaret markaları için AI destekli pazarlama görselleri üreten vanilla HTML/CSS/JS tabanlı bir web uygulamasıdır. Proje self-hosted (kendi sunucumuzda) çalışmaktadır.
 
 Ana akış:
 1. Kullanıcı `dashboard.html` üzerinden brief oluşturur veya revizyon ister.
@@ -39,8 +39,8 @@ Ana akış:
 
 ## Çalıştırma ve Browser Doğrulama
 
-- Proje canlıda `https://vitrin-os.vercel.app/` adresinde çalışmaktadır. Geliştirme ve doğrulamalar bu canlı URL bağlamı göz önüne alınarak yapılmalıdır.
-- Yerel sunucu doğrulama için `http://localhost:8000` adresinde kullanılabilir, ancak nihai yayına alım ve entegrasyon doğrulamaları canlı URL temelinde gerçekleştirilmelidir.
+- Proje self-hosted olarak kendi sunucumuzda çalışmaktadır. Geliştirme ve doğrulamalar kendi sunucu bağlamınız veya yerel ortam göz önüne alınarak yapılmalıdır.
+- Yerel sunucu doğrulama için `http://localhost:8000` adresinde kullanılabilir.
 - Browser özelliğiyle doğrulama yapılırken ana ekran, login, dashboard ve admin yüzeylerinde kırık layout, konsol hatası ve temel etkileşimler kontrol edilmelidir.
 - Her küçük değişiklikten sonra tarayıcı testi döngüsü başlatma; değişiklikleri grupla, sonra doğrula.
 
@@ -150,7 +150,7 @@ MCP ile `VitrinOS` araması sonucu 5 aktif workflow doğrulandı.
 - Düşük risk kapsamı: frontend HTML/CSS/JS düzeltmeleri, dokümantasyon, testler, hata düzeltmeleri ve geri alınabilir arayüz iyileştirmeleri.
 - Aşağıdaki durumlarda commit/push/deploy öncesi kullanıcı onayı iste: veri kaybı riski taşıyan veya geri dönüşü zor Supabase/n8n/hosting değişikliği, migration veya RLS değişikliği, kimlik bilgileri/secret/config değişikliği, veri silme veya dönüşü olmayan işlemler, büyük kapsamı belirsiz değişiklikler. Riskli olmayan Supabase değişikliklerinde onay bekleme.
 - Her tamamlanan değişiklik grubundan sonra kapsamı doğru yansıtan anlamlı bir commit oluştur ve doğrulamalar başarılıysa GitHub'a pushla; değişiklikleri gereksiz yere biriktirme.
-- Push sonrası Vercel gibi GitHub bağlı otomatik deploy sistemi varsa deploy'un push ile tetiklenmesini bekle ve sonucu kontrol et; bağımsız production deploy komutu çalıştırma.
+- Push sonrası GitHub veya sunucu tarafında yapılandırılmış otomatik dağıtım süreçlerinin tetiklenmesini takip edin.
 - Kullanıcı tarafından istenmeyen mevcut değişiklikleri geri alma veya üzerine yazma.
 
 ## Güvenlik ve Değişiklik Disiplini
