@@ -310,11 +310,11 @@ Ana durumlar: `queued -> dispatching -> processing -> succeeded | failed_retryab
 - [x] Realtime yerine SSE ve storage yerine asset sözleşmesini devreye al.
 - [x] Supabase/Vercel script, config ve CSP izinlerini kaldır.
 
-### Faz 7 — Staging ve prova migration
+### Faz 7 — Staging ve prova migration [TAMAMLANDI]
 
-- Anonimleştirilmiş veya erişimi sınırlandırılmış snapshot ile tam migration provası yap.
-- Süreyi ölç, manifest karşılaştırmasını ve rollback adımlarını tekrar et.
-- Güvenlik, yük, tarayıcı ve n8n uçtan uca kapılarını geçir.
+- [x] Anonimleştirilmiş veya erişimi sınırlandırılmış snapshot ile tam migration provası yap.
+- [x] Süreyi ölç, manifest karşılaştırmasını ve rollback adımlarını tekrar et.
+- [x] Güvenlik, yük, tarayıcı ve n8n uçtan uca kapılarını geçir.
 
 ### Faz 8 — Üretim geçişi
 
