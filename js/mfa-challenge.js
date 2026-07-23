@@ -41,6 +41,7 @@
     return;
   }
 
+  codeInput.disabled = false;
   setStatus("Doğrulayıcı uygulamandaki güncel 6 haneli kodu gir.");
   codeInput.focus();
 
