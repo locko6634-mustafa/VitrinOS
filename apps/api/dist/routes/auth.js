@@ -32,7 +32,7 @@ export const authRoutes = async (fastify) => {
         request.session = dbSession;
     });
     // Giriş Rotaları
-    fastify.post('/auth/login', async (request, reply) => {
+    fastify.post('/api/v1/auth/login', async (request, reply) => {
         const { email, password } = LoginRequestSchema.parse(request.body);
         const normalizedEmail = email.toLowerCase().trim();
         const userRecord = await fastify.db.query.users.findFirst({
@@ -112,7 +112,7 @@ export const authRoutes = async (fastify) => {
         return reply.send({ data: { user: { id: userRecord.id, email: userRecord.email, role: userRecord.role } } });
     });
     // MFA Doğrulama Rotaları
-    fastify.post('/auth/mfa/verify', async (request, reply) => {
+    fastify.post('/api/v1/auth/mfa/verify', async (request, reply) => {
         const { challengeToken, code } = MfaVerifyRequestSchema.parse(request.body);
         const hashedChallenge = hashSessionToken(challengeToken);
         const challengeSession = await fastify.db.query.authSessions.findFirst({
@@ -172,7 +172,7 @@ export const authRoutes = async (fastify) => {
         return reply.send({ data: { user: { id: userRecord.id, email: userRecord.email, role: userRecord.role } } });
     });
     // Çıkış
-    fastify.post('/auth/logout', async (request, reply) => {
+    fastify.post('/api/v1/auth/logout', async (request, reply) => {
         if (request.session) {
             await fastify.db.update(authSessions).set({ isRevoked: true }).where(eq(authSessions.id, request.session.id));
             await fastify.db.insert(securityAuditLog).values({
@@ -185,7 +185,7 @@ export const authRoutes = async (fastify) => {
         return reply.send({ data: { success: true } });
     });
     // Aktif Oturum
-    fastify.get('/auth/session', async (request, reply) => {
+    fastify.get('/api/v1/auth/session', async (request, reply) => {
         if (!request.user) {
             return reply.code(401).send({ code: 'UNAUTHORIZED', message: 'Yetkisiz erişim' });
         }
@@ -200,7 +200,7 @@ export const authRoutes = async (fastify) => {
         });
     });
     // Şifremi Unuttum
-    fastify.post('/auth/password/forgot', async (request, reply) => {
+    fastify.post('/api/v1/auth/password/forgot', async (request, reply) => {
         const { email } = request.body;
         const normalizedEmail = email.toLowerCase().trim();
         const userRecord = await fastify.db.query.users.findFirst({
@@ -237,7 +237,7 @@ export const authRoutes = async (fastify) => {
         return reply.send({ data: { success: true, message: 'Eğer e-posta adresi kayıtlı ise sıfırlama bağlantısı gönderilmiştir.' } });
     });
     // Şifre Sıfırlama
-    fastify.post('/auth/password/reset', async (request, reply) => {
+    fastify.post('/api/v1/auth/password/reset', async (request, reply) => {
         const { token, password } = ResetPasswordRequestSchema.parse(request.body);
         const hashedToken = hashSessionToken(token);
         const tokenRecord = await fastify.db.query.oneTimeTokens.findFirst({
@@ -266,7 +266,7 @@ export const authRoutes = async (fastify) => {
         return reply.send({ data: { success: true, message: 'Şifreniz başarıyla güncellendi' } });
     });
     // İlk Şifre Aktivasyonu (Taşınmış kullanıcılar için)
-    fastify.post('/auth/password/activate', async (request, reply) => {
+    fastify.post('/api/v1/auth/password/activate', async (request, reply) => {
         const { token, password } = ActivateAccountRequestSchema.parse(request.body);
         const hashedToken = hashSessionToken(token);
         const tokenRecord = await fastify.db.query.oneTimeTokens.findFirst({
@@ -299,7 +299,7 @@ export const authRoutes = async (fastify) => {
         return reply.send({ data: { success: true, message: 'Hesabınız başarıyla aktive edildi. Giriş yapabilirsiniz.' } });
     });
     // MFA Kurulum / Kaydetme (Giriş Yapmış Kullanıcılar İçin)
-    fastify.post('/auth/mfa/enroll', async (request, reply) => {
+    fastify.post('/api/v1/auth/mfa/enroll', async (request, reply) => {
         if (!request.user) {
             return reply.code(401).send({ code: 'UNAUTHORIZED', message: 'Yetkisiz erişim' });
         }
@@ -317,7 +317,7 @@ export const authRoutes = async (fastify) => {
         return reply.send({ data: { secret: rawSecret, qrCodeUri } });
     });
     // MFA Onaylama
-    fastify.post('/auth/mfa/confirm', async (request, reply) => {
+    fastify.post('/api/v1/auth/mfa/confirm', async (request, reply) => {
         if (!request.user) {
             return reply.code(401).send({ code: 'UNAUTHORIZED', message: 'Yetkisiz erişim' });
         }
@@ -348,7 +348,7 @@ export const authRoutes = async (fastify) => {
         return reply.send({ data: { success: true, message: 'MFA başarıyla etkinleştirildi' } });
     });
     // MFA Kapatma / Kaldırma
-    fastify.delete('/auth/mfa', async (request, reply) => {
+    fastify.delete('/api/v1/auth/mfa', async (request, reply) => {
         if (!request.user) {
             return reply.code(401).send({ code: 'UNAUTHORIZED', message: 'Yetkisiz erişim' });
         }

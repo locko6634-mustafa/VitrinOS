@@ -17,7 +17,7 @@ export const adminRoutes = async (fastify) => {
         }
     });
     // Kullanıcıları Listeleme
-    fastify.get('/admin/users', async (request, reply) => {
+    fastify.get('/api/v1/admin/users', async (request, reply) => {
         const allUsers = await fastify.db.query.users.findMany({
             columns: {
                 id: true,
@@ -32,7 +32,7 @@ export const adminRoutes = async (fastify) => {
         return reply.send({ data: allUsers });
     });
     // Kullanıcı Durumunu Değiştirme (active/suspended)
-    fastify.patch('/admin/users/:id/status', async (request, reply) => {
+    fastify.patch('/api/v1/admin/users/:id/status', async (request, reply) => {
         const { id } = request.params;
         const { status } = request.body;
         if (!['active', 'suspended'].includes(status)) {
@@ -72,7 +72,7 @@ export const adminRoutes = async (fastify) => {
         return reply.send({ data: { success: true, message: `Kullanıcı durumu '${status}' olarak güncellendi` } });
     });
     // Kullanıcı Rolünü Değiştirme (admin/user)
-    fastify.patch('/admin/users/:id/role', async (request, reply) => {
+    fastify.patch('/api/v1/admin/users/:id/role', async (request, reply) => {
         const { id } = request.params;
         const { role } = request.body;
         if (!['admin', 'user'].includes(role)) {
@@ -103,7 +103,7 @@ export const adminRoutes = async (fastify) => {
         return reply.send({ data: { success: true, message: `Kullanıcı rolü '${role}' olarak güncellendi` } });
     });
     // Kullanıcı Oturumlarını Geçersiz Kılma
-    fastify.post('/admin/users/:id/sessions/revoke', async (request, reply) => {
+    fastify.post('/api/v1/admin/users/:id/sessions/revoke', async (request, reply) => {
         const { id } = request.params;
         const targetUser = await fastify.db.query.users.findFirst({
             where: eq(users.id, id)
@@ -125,7 +125,7 @@ export const adminRoutes = async (fastify) => {
         return reply.send({ data: { success: true, message: 'Kullanıcının tüm aktif oturumları sonlandırıldı' } });
     });
     // Kullanıcıya Şifre Sıfırlama Bağlantısı Gönderme (Yönetici tetiklemeli)
-    fastify.post('/admin/users/:id/password-reset', async (request, reply) => {
+    fastify.post('/api/v1/admin/users/:id/password-reset', async (request, reply) => {
         const { id } = request.params;
         const targetUser = await fastify.db.query.users.findFirst({
             where: eq(users.id, id)

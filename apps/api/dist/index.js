@@ -12,6 +12,7 @@ import { assetsRoutes } from './routes/assets.js';
 import { jobsRoutes } from './routes/jobs.js';
 import { leadsRoutes } from './routes/leads.js';
 import { internalRoutes } from './routes/internal.js';
+import { configRoutes } from './routes/config.js';
 const fastify = Fastify({
     logger: true
 });
@@ -28,6 +29,7 @@ fastify.register(cookie, {
 // DB Plugin
 fastify.register(dbPlugin);
 // Rotaları kaydet
+fastify.register(configRoutes);
 fastify.register(healthRoutes);
 fastify.register(authRoutes);
 fastify.register(adminRoutes);

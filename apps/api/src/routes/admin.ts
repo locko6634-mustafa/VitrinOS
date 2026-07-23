@@ -33,7 +33,7 @@ export const adminRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   // Kullanıcıları Listeleme
-  fastify.get('/admin/users', async (request, reply) => {
+  fastify.get('/api/v1/admin/users', async (request, reply) => {
     const allUsers = await fastify.db.query.users.findMany({
       columns: {
         id: true,
@@ -50,7 +50,7 @@ export const adminRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   // Kullanıcı Durumunu Değiştirme (active/suspended)
-  fastify.patch('/admin/users/:id/status', async (request, reply) => {
+  fastify.patch('/api/v1/admin/users/:id/status', async (request, reply) => {
     const { id } = request.params as { id: string };
     const { status } = request.body as { status: 'active' | 'suspended' };
 
@@ -99,7 +99,7 @@ export const adminRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   // Kullanıcı Rolünü Değiştirme (admin/user)
-  fastify.patch('/admin/users/:id/role', async (request, reply) => {
+  fastify.patch('/api/v1/admin/users/:id/role', async (request, reply) => {
     const { id } = request.params as { id: string };
     const { role } = request.body as { role: 'admin' | 'user' };
 
@@ -138,7 +138,7 @@ export const adminRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   // Kullanıcı Oturumlarını Geçersiz Kılma
-  fastify.post('/admin/users/:id/sessions/revoke', async (request, reply) => {
+  fastify.post('/api/v1/admin/users/:id/sessions/revoke', async (request, reply) => {
     const { id } = request.params as { id: string };
 
     const targetUser = await fastify.db.query.users.findFirst({
@@ -166,7 +166,7 @@ export const adminRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   // Kullanıcıya Şifre Sıfırlama Bağlantısı Gönderme (Yönetici tetiklemeli)
-  fastify.post('/admin/users/:id/password-reset', async (request, reply) => {
+  fastify.post('/api/v1/admin/users/:id/password-reset', async (request, reply) => {
     const { id } = request.params as { id: string };
 
     const targetUser = await fastify.db.query.users.findFirst({
