@@ -12,6 +12,8 @@ import { assetsRoutes } from './routes/assets.js';
 import { jobsRoutes } from './routes/jobs.js';
 import { leadsRoutes } from './routes/leads.js';
 import { internalRoutes } from './routes/internal.js';
+import { users, authSessions, eq, and, gt } from '@vitrinos/db';
+import { hashSessionToken } from '@vitrinos/security';
 
 import { configRoutes } from './routes/config.js';
 
@@ -33,6 +35,39 @@ fastify.register(cookie, {
 
 // DB Plugin
 fastify.register(dbPlugin);
+
+// Oturum bağlamı tüm API rotalarında gerekli. Bu hook auth eklentisinin
+// içine konulduğunda Fastify kapsülleme nedeniyle yalnızca /auth/*
+// isteklerinde çalışıyordu.
+fastify.addHook('preHandler', async (request) => {
+  const sessionToken = request.cookies.session;
+  if (!sessionToken) {
+    request.user = null;
+    request.session = null;
+    return;
+  }
+
+  const session = await fastify.db.query.authSessions.findFirst({
+    where: and(
+      eq(authSessions.hashedSessionId, hashSessionToken(sessionToken)),
+      eq(authSessions.isRevoked, false),
+      gt(authSessions.expiresAt, new Date())
+    )
+  });
+
+  if (!session) {
+    request.user = null;
+    request.session = null;
+    return;
+  }
+
+  const user = await fastify.db.query.users.findFirst({
+    where: eq(users.id, session.userId)
+  });
+
+  request.user = user?.status === 'active' ? user : null;
+  request.session = request.user ? session : null;
+});
 
 // Rotaları kaydet
 fastify.register(configRoutes);

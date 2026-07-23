@@ -41,44 +41,6 @@ declare module 'fastify' {
 }
 
 export const authRoutes: FastifyPluginAsync = async (fastify) => {
-  // Session doğrulama hook'u (Tüm isteklerde çalışabilir, isteğe bağlı olarak rotalarda kontrol edilir)
-  fastify.addHook('preHandler', async (request) => {
-    const sessionToken = request.cookies.session;
-    if (!sessionToken) {
-      request.user = null;
-      request.session = null;
-      return;
-    }
-
-    const hashedToken = hashSessionToken(sessionToken);
-    const dbSession = await fastify.db.query.authSessions.findFirst({
-      where: and(
-        eq(authSessions.hashedSessionId, hashedToken),
-        eq(authSessions.isRevoked, false),
-        gt(authSessions.expiresAt, new Date())
-      )
-    });
-
-    if (!dbSession) {
-      request.user = null;
-      request.session = null;
-      return;
-    }
-
-    const dbUser = await fastify.db.query.users.findFirst({
-      where: eq(users.id, dbSession.userId)
-    });
-
-    if (!dbUser || dbUser.status !== 'active') {
-      request.user = null;
-      request.session = null;
-      return;
-    }
-
-    request.user = dbUser;
-    request.session = dbSession;
-  });
-
   // Giriş Rotaları
   fastify.post('/api/v1/auth/login', async (request, reply) => {
     const { email, password } = LoginRequestSchema.parse(request.body);
