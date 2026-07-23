@@ -85,7 +85,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=edge_proxy"
-      - "traefik.http.routers.vitrinos-frontend.rule=Host(`${DOMAIN_NAME:-vitrinos.n8n-mustafa.me}`)"
+      - "traefik.http.routers.vitrinos-frontend.rule=Host(`${DOMAIN_NAME:-vitrinos.n8n-mustafa.me}`) && !PathPrefix(`/api`)"
       - "traefik.http.routers.vitrinos-frontend.entrypoints=websecure"
       - "traefik.http.routers.vitrinos-frontend.priority=100"
       - "traefik.http.routers.vitrinos-frontend.tls=true"
