@@ -85,12 +85,11 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=edge_proxy"
-      - "traefik.http.routers.vitrinos-app-frontend.rule=Host(`${DOMAIN_NAME:-vitrinos.n8n-mustafa.me}`)"
-      - "traefik.http.routers.vitrinos-app-frontend.entrypoints=websecure"
-      - "traefik.http.routers.vitrinos-app-frontend.service=vitrinos-app-frontend-svc"
-      - "traefik.http.routers.vitrinos-app-frontend.tls=true"
-      - "traefik.http.routers.vitrinos-app-frontend.tls.certresolver=mytlschallenge"
-      - "traefik.http.services.vitrinos-app-frontend-svc.loadbalancer.server.port=80"
+      - "traefik.http.routers.vitrinos.rule=Host(`${DOMAIN_NAME:-vitrinos.n8n-mustafa.me}`)"
+      - "traefik.http.routers.vitrinos.entrypoints=websecure"
+      - "traefik.http.routers.vitrinos.tls=true"
+      - "traefik.http.routers.vitrinos.tls.certresolver=mytlschallenge"
+      - "traefik.http.services.vitrinos.loadbalancer.server.port=80"
     healthcheck:
       test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://127.0.0.1:80/ || exit 1"]
       interval: 30s
@@ -126,12 +125,11 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=edge_proxy"
-      - "traefik.http.routers.vitrinos-app-api.rule=Host(`${DOMAIN_NAME:-vitrinos.n8n-mustafa.me}`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.vitrinos-app-api.entrypoints=websecure"
-      - "traefik.http.routers.vitrinos-app-api.service=vitrinos-app-api-svc"
-      - "traefik.http.routers.vitrinos-app-api.tls=true"
-      - "traefik.http.routers.vitrinos-app-api.tls.certresolver=mytlschallenge"
-      - "traefik.http.services.vitrinos-app-api-svc.loadbalancer.server.port=3000"
+      - "traefik.http.routers.vitrinos-api.rule=Host(`${DOMAIN_NAME:-vitrinos.n8n-mustafa.me}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.vitrinos-api.entrypoints=websecure"
+      - "traefik.http.routers.vitrinos-api.tls=true"
+      - "traefik.http.routers.vitrinos-api.tls.certresolver=mytlschallenge"
+      - "traefik.http.services.vitrinos-api.loadbalancer.server.port=3000"
     depends_on:
       postgres:
         condition: service_healthy
