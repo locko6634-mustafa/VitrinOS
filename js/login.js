@@ -51,7 +51,7 @@
     try {
       const user = await window.VitrinOS.authStore.fetchSession();
       if (user) {
-        window.location.replace(user.role === "admin" ? "admin.html" : "dashboard.html");
+        window.location.replace(user.role === "admin" ? (user.mfaEnabled ? "admin.html" : "mfa-setup.html") : "dashboard.html");
       }
     } catch (error) {
       // Oturum yoksa devam et
@@ -98,7 +98,7 @@
       const user = response.user;
       setStatus("Kimlik doğrulandı. Yönlendiriliyorsunuz…", "success");
       redirecting = true;
-      window.location.href = user?.role === "admin" ? "admin.html" : "dashboard.html";
+      window.location.href = user?.role === "admin" ? (user.mfaEnabled ? "admin.html" : "mfa-setup.html") : "dashboard.html";
     } catch (error) {
       setInvalid(identifierInput, true);
       setInvalid(passwordInput, true);

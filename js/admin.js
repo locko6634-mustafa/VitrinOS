@@ -4,205 +4,228 @@
     window.location.replace("login.html");
     return;
   }
-
-  const adminConfig = window.VitrinOS.config.defaults.admin;
-  const colors = window.VitrinOS.config.defaults.colors;
-  const PAGE_SIZE = adminConfig.pageSize;
-
-  const state = {
-    selectedBrandId: "",
-    selectedJobId: "",
-    brands: [],
-    users: [],
-    leads: [],
-    jobs: [],
-    jobPage: 0,
-    leadPage: 0,
-    hasMoreJobs: false,
-    hasMoreLeads: false
-  };
-
-  const $ = (selector) => document.querySelector(selector);
-
-  const nodes = {
-    brandRows: $("#brandRows"),
-    brandCount: $("#brandCount"),
-    brandForm: $("#brandForm"),
-    brandStatus: $("#brandStatus"),
-    brandOwner: $("#brandOwner"),
-    userRows: $("#userRows"),
-    userCount: $("#userCount"),
-    leadRows: $("#leadRows"),
-    leadCount: $("#leadCount"),
-    jobRows: $("#jobRows"),
-    jobCount: $("#jobCount"),
-    jobDetail: $("#jobDetail"),
-    inviteDialog: $("#adminInviteDialog"),
-    inviteForm: $("#adminInviteForm"),
-    inviteEmail: $("#adminInviteEmail"),
-    inviteName: $("#adminInviteName")
-  };
-
-  async function fetchData() {
-    try {
-      const [brandsList, usersList, jobsList] = await Promise.all([
-        window.VitrinOS.api.get("/brands"),
-        window.VitrinOS.api.get("/admin/users"),
-        window.VitrinOS.api.get("/jobs")
-      ]);
-
-      state.brands = brandsList || [];
-      state.users = usersList || [];
-      state.jobs = jobsList || [];
-
-      renderAll();
-    } catch (err) {
-      console.error("Admin fetchData hatası:", err);
-    }
+  if (!user.mfaEnabled) {
+    window.location.replace("mfa-setup.html");
+    return;
   }
 
-  function renderBrands() {
-    if (!nodes.brandRows) return;
-    nodes.brandRows.replaceChildren();
+  const $ = (selector) => document.querySelector(selector);
+  const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+  const state = { brands: [], users: [], leads: [], jobs: [], selectedBrand: null, prompts: null };
+  const nodes = {
+    shell: $("#appShell"), rail: $("#dashboardNav"), menu: $("#appMenuToggle"),
+    tabs: $$("[data-admin-tab]"), panels: $$("[data-admin-panel]"),
+    brandRows: $("#brandRows"), brandCount: $("#brandCount"), brandForm: $("#brandForm"), brandStatus: $("#brandStatus"),
+    brandId: $("#brandId"), brandName: $("#brandName"), brandLogo: $("#brandLogo"), brandWebsite: $("#brandWebsite"), brandOwner: $("#brandOwner"), brandTheme: $("#brandTheme"), brandPrimary: $("#brandPrimary"), brandSecondary: $("#brandSecondary"), brandTone: $("#brandTone"), brandBanned: $("#brandBanned"), brandTitle: $("#brandFormTitle"),
+    userRows: $("#userRows"), userCount: $("#userCount"), leadRows: $("#leadRows"), leadCount: $("#leadCount"),
+    jobRows: $("#jobRows"), jobCount: $("#jobCount"), jobDetail: $("#jobDetail"),
+    inviteDialog: $("#adminInviteDialog"), inviteForm: $("#adminInviteForm"), inviteEmail: $("#adminInviteEmail"), inviteName: $("#adminInviteName"), toastRegion: $("#adminToastRegion")
+  };
 
-    if (nodes.brandCount) nodes.brandCount.textContent = String(state.brands.length);
+  const text = (value) => value == null || value === "" ? "—" : String(value);
+  const date = (value) => value ? new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value)) : "—";
+  const palette = (brand) => brand.colorPalette || {};
+  const packPrompt = (text, background, image) => JSON.stringify({ text, background, image });
+  const unpackPrompt = (value) => {
+    try { const parsed = JSON.parse(value || ""); return parsed && typeof parsed === "object" ? parsed : { text: value || "", background: "", image: "" }; }
+    catch { return { text: value || "", background: "", image: "" }; }
+  };
 
-    state.brands.forEach((brand) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><strong>${brand.name}</strong></td>
-        <td>${brand.websiteUrl || "-"}</td>
-        <td>${new Date(brand.createdAt || Date.now()).toLocaleDateString("tr-TR")}</td>
-        <td>
-          <button class="button-secondary button-small" data-action="edit" data-id="${brand.id}">Düzenle</button>
-          <button class="button-danger button-small" data-action="delete" data-id="${brand.id}">Sil</button>
-        </td>
-      `;
-      nodes.brandRows.appendChild(tr);
+  function notify(message, kind = "") {
+    if (nodes.brandStatus) {
+      nodes.brandStatus.textContent = message;
+      nodes.brandStatus.dataset.kind = kind;
+    }
+    if (!nodes.toastRegion) return;
+    const toast = document.createElement("p");
+    toast.className = `admin-toast ${kind}`.trim();
+    toast.textContent = message;
+    nodes.toastRegion.replaceChildren(toast);
+  }
+
+  function switchTab(name) {
+    nodes.tabs.forEach((tab) => {
+      const active = tab.dataset.adminTab === name;
+      tab.classList.toggle("is-active", active);
+      tab.setAttribute("aria-selected", String(active));
+    });
+    nodes.panels.forEach((panel) => {
+      const active = panel.dataset.adminPanel === name;
+      panel.hidden = !active;
+      panel.classList.toggle("is-active", active);
+    });
+    nodes.rail?.classList.remove("is-open");
+    document.body.classList.remove("admin-sidebar-open");
+    nodes.menu?.setAttribute("aria-expanded", "false");
+  }
+
+  function clearRows(element) { if (element) element.replaceChildren(); }
+  function appendCell(row, value) { const cell = document.createElement("td"); cell.textContent = text(value); row.append(cell); return cell; }
+  function actionButton(label, action, id, className = "admin-row-button") {
+    const button = document.createElement("button");
+    button.type = "button"; button.className = className; button.dataset.action = action; button.dataset.id = id; button.textContent = label;
+    return button;
+  }
+
+  function renderOwners() {
+    if (!nodes.brandOwner) return;
+    const selected = nodes.brandOwner.value;
+    nodes.brandOwner.replaceChildren(new Option("Atanmamış", ""));
+    state.users.forEach((item) => nodes.brandOwner.add(new Option(item.email, item.id)));
+    nodes.brandOwner.value = selected;
+  }
+
+  function filteredBrands() {
+    const query = $("#brandSearch")?.value.trim().toLocaleLowerCase("tr-TR") || "";
+    const theme = $("#brandThemeFilter")?.value || "all";
+    return state.brands.filter((brand) => {
+      const owner = state.users.find((item) => item.id === brand.userId)?.email || "";
+      return (!query || `${brand.name} ${owner}`.toLocaleLowerCase("tr-TR").includes(query)) && (theme === "all" || palette(brand).theme === theme);
     });
   }
 
+  function renderBrands() {
+    clearRows(nodes.brandRows);
+    const brands = filteredBrands();
+    if (nodes.brandCount) nodes.brandCount.textContent = `${brands.length} marka`;
+    brands.forEach((brand) => {
+      const row = document.createElement("tr"); row.dataset.id = brand.id;
+      const owner = state.users.find((item) => item.id === brand.userId)?.email;
+      appendCell(row, brand.name); appendCell(row, owner); appendCell(row, palette(brand).theme); appendCell(row, "Promptlar"); appendCell(row, date(brand.updatedAt));
+      row.addEventListener("click", () => selectBrand(brand.id));
+      nodes.brandRows?.append(row);
+    });
+  }
+
+  function filteredUsers() {
+    const query = $("#userSearch")?.value.trim().toLowerCase() || "";
+    const selectedStatus = $("#userStatusFilter")?.value || "all";
+    return state.users.filter((item) => (!query || item.email.toLowerCase().includes(query)) && (selectedStatus === "all" || item.status === selectedStatus));
+  }
+
   function renderUsers() {
-    if (!nodes.userRows) return;
-    nodes.userRows.replaceChildren();
+    clearRows(nodes.userRows); const users = filteredUsers();
+    if (nodes.userCount) nodes.userCount.textContent = `${users.length} kullanıcı`;
+    users.forEach((item) => {
+      const row = document.createElement("tr");
+      appendCell(row, item.email);
+      appendCell(row, state.brands.filter((brand) => brand.userId === item.id).map((brand) => brand.name).join(", "));
+      appendCell(row, state.jobs.filter((job) => job.ownerId === item.id).length);
+      appendCell(row, date(item.lastSignInAt)); appendCell(row, item.status);
+      const actions = document.createElement("td");
+      actions.append(actionButton(item.status === "active" ? "Askıya al" : "Etkinleştir", "status", item.id), actionButton("Oturumları kapat", "revoke", item.id), actionButton("Şifre sıfırla", "reset", item.id));
+      row.append(actions); nodes.userRows?.append(row);
+    });
+  }
 
-    if (nodes.userCount) nodes.userCount.textContent = String(state.users.length);
-
-    state.users.forEach((u) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><strong>${u.email}</strong></td>
-        <td>${u.role}</td>
-        <td><span class="badge badge-${u.status === "active" ? "success" : "warning"}">${u.status}</span></td>
-        <td>${new Date(u.createdAt || Date.now()).toLocaleDateString("tr-TR")}</td>
-        <td>
-          <button class="button-secondary button-small" data-action="reset" data-id="${u.id}">Şifre Sıfırla</button>
-        </td>
-      `;
-      nodes.userRows.appendChild(tr);
+  function renderLeads() {
+    clearRows(nodes.leadRows);
+    const query = $("#leadSearch")?.value.trim().toLocaleLowerCase("tr-TR") || "";
+    const selectedStatus = $("#leadStatusFilter")?.value || "all";
+    const leads = state.leads.filter((item) => (!query || `${item.name} ${item.company} ${item.email}`.toLocaleLowerCase("tr-TR").includes(query)) && (selectedStatus === "all" || item.status === selectedStatus));
+    if (nodes.leadCount) nodes.leadCount.textContent = `${leads.length} başvuru`;
+    leads.forEach((item) => {
+      const row = document.createElement("tr");
+      appendCell(row, item.name); appendCell(row, item.company); appendCell(row, item.email); appendCell(row, item.need);
+      const stateCell = document.createElement("td"); const select = document.createElement("select");
+      ["new", "reviewed", "approved", "rejected"].forEach((value) => select.add(new Option(value, value, false, item.status === value)));
+      select.addEventListener("change", () => updateLead(item.id, select.value)); stateCell.append(select); row.append(stateCell); nodes.leadRows?.append(row);
     });
   }
 
   function renderJobs() {
-    if (!nodes.jobRows) return;
-    nodes.jobRows.replaceChildren();
-
-    if (nodes.jobCount) nodes.jobCount.textContent = String(state.jobs.length);
-
-    state.jobs.forEach((j) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><strong>${j.briefText}</strong></td>
-        <td>${j.format}</td>
-        <td><em>${j.status}</em></td>
-        <td>${new Date(j.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</td>
-      `;
-      nodes.jobRows.appendChild(tr);
+    clearRows(nodes.jobRows);
+    const brandId = $("#jobBrandFilter")?.value || "all"; const format = $("#jobFormatFilter")?.value || "all"; const jobStatus = $("#jobStatusFilter")?.value || "all";
+    const jobs = state.jobs.filter((item) => (brandId === "all" || item.brandId === brandId) && (format === "all" || item.format === format) && (jobStatus === "all" || item.status === jobStatus));
+    if (nodes.jobCount) nodes.jobCount.textContent = `${jobs.length} job`;
+    jobs.forEach((item) => {
+      const row = document.createElement("tr"); const brand = state.brands.find((entry) => entry.id === item.brandId);
+      appendCell(row, item.id.slice(0, 8)); appendCell(row, brand?.name); appendCell(row, item.format); appendCell(row, item.status); appendCell(row, item.revisionCount); appendCell(row, date(item.createdAt));
+      row.addEventListener("click", () => {
+        if (!nodes.jobDetail) return;
+        nodes.jobDetail.replaceChildren(); const title = document.createElement("strong"); title.textContent = `${brand?.name || "Marka"} · ${item.format}`;
+        const description = document.createElement("p"); description.textContent = item.briefText; nodes.jobDetail.append(title, description);
+      });
+      nodes.jobRows?.append(row);
     });
   }
 
-  function renderAll() {
-    renderBrands();
-    renderUsers();
-    renderJobs();
+  function renderJobBrandOptions() {
+    const select = $("#jobBrandFilter"); if (!select) return;
+    const selected = select.value; select.replaceChildren(new Option("Tümü", "all"));
+    state.brands.forEach((brand) => select.add(new Option(brand.name, brand.id)));
+    select.value = Array.from(select.options).some((option) => option.value === selected) ? selected : "all";
   }
 
-  function notify(message, kind = "info") {
-    if (nodes.brandStatus) {
-      nodes.brandStatus.textContent = message;
-      nodes.brandStatus.dataset.kind = kind;
-    } else {
-      console.log(`[${kind}] ${message}`);
-    }
-  }
+  function renderAll() { renderOwners(); renderJobBrandOptions(); renderBrands(); renderUsers(); renderLeads(); renderJobs(); }
 
-  function confirmAction(message) {
-    const sidebar = $("#dashboardNav");
-    if (sidebar) sidebar.inert = true;
-    if (nodes.inviteDialog && typeof nodes.inviteDialog.showModal === "function") {
-      nodes.inviteDialog.showModal();
-      return true;
-    }
-    if (sidebar) sidebar.inert = false;
-    return true;
-  }
-
-  window.addEventListener("keydown", (event) => {
-    if (event.key === "Tab" && document.body.classList.contains("admin-sidebar-open")) {
-      // focus trap
-    }
-  });
-
-  // Event handlers
-  nodes.brandForm?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData(nodes.brandForm);
-    const name = String(formData.get("name") || "").trim();
-    if (!name) return;
-
+  async function selectBrand(id) {
+    const brand = state.brands.find((item) => item.id === id); if (!brand) return;
+    state.selectedBrand = brand; nodes.brandId.value = brand.id; nodes.brandTitle.textContent = brand.name;
+    const colors = palette(brand); nodes.brandName.value = brand.name || ""; nodes.brandLogo.value = brand.logoUrl || ""; nodes.brandWebsite.value = brand.websiteUrl || ""; nodes.brandOwner.value = brand.userId || "";
+    nodes.brandTheme.value = colors.theme || "koyu"; nodes.brandPrimary.value = colors.primary || "#d9962a"; nodes.brandSecondary.value = colors.secondary || "#7a4f12"; nodes.brandTone.value = brand.toneRules || ""; nodes.brandBanned.value = (brand.bannedWords || []).join(", ");
+    notify("Promptlar yükleniyor…");
     try {
-      await window.VitrinOS.api.post("/brands", { name });
-      nodes.brandForm.reset();
-      notify("Marka oluşturuldu.", "success");
-      await fetchData();
-    } catch (err) {
-      notify("Marka oluşturulamadı: " + err.message, "error");
-    }
+      state.prompts = await window.VitrinOS.api.get(`/brands/${brand.id}/prompt`);
+      const story = unpackPrompt(state.prompts.storyPrompt); const banner = unpackPrompt(state.prompts.bannerPrompt); const meta = unpackPrompt(state.prompts.metaPostPrompt);
+      $("#basePrompt").value = state.prompts.basePrompt || ""; $("#storyTextPrompt").value = story.text; $("#storyBgPrompt").value = story.background; $("#storyImgPrompt").value = story.image; $("#bannerTextPrompt").value = banner.text; $("#bannerBgPrompt").value = banner.background; $("#bannerImgPrompt").value = banner.image; $("#metaPostTextPrompt").value = meta.text; $("#metaPostBgPrompt").value = meta.background; $("#metaPostImgPrompt").value = meta.image; $("#revizePrompt").value = state.prompts.revizePrompt || "";
+      notify("Marka ayarları yüklendi.", "success");
+    } catch (error) { notify(error.message || "Promptlar yüklenemedi.", "error"); }
+  }
+
+  function resetBrandForm() {
+    state.selectedBrand = null; state.prompts = null; nodes.brandForm.reset(); nodes.brandId.value = ""; nodes.brandTitle.textContent = "Yeni marka";
+    nodes.brandPrimary.value = "#d9962a"; nodes.brandSecondary.value = "#7a4f12"; nodes.brandTheme.value = "koyu"; notify("Yeni marka bilgilerini girin.");
+  }
+
+  async function fetchData() {
+    try {
+      const [brands, users, leads, jobs] = await Promise.all([window.VitrinOS.api.get("/brands"), window.VitrinOS.api.get("/admin/users"), window.VitrinOS.api.get("/admin/leads"), window.VitrinOS.api.get("/jobs")]);
+      state.brands = brands || []; state.users = users || []; state.leads = leads || []; state.jobs = jobs || [];
+      renderAll();
+    } catch (error) { notify(error.message || "Yönetim verileri yüklenemedi.", "error"); }
+  }
+
+  async function updateLead(id, value) {
+    try { await window.VitrinOS.api.patch(`/admin/leads/${id}/status`, { status: value }); await fetchData(); } catch (error) { notify(error.message || "Başvuru güncellenemedi.", "error"); }
+  }
+
+  nodes.tabs.forEach((tab) => tab.addEventListener("click", () => switchTab(tab.dataset.adminTab)));
+  nodes.menu?.addEventListener("click", () => { const open = nodes.rail?.classList.toggle("is-open"); const sidebar = nodes.rail; if (sidebar) sidebar.inert = !open; document.body.classList.toggle("admin-sidebar-open", open); nodes.menu.setAttribute("aria-expanded", String(open)); });
+  window.addEventListener("keydown", (event) => { if (event.key === "Tab" && document.body.classList.contains("admin-sidebar-open")) nodes.rail?.focus(); });
+  $$('[data-admin-logout]').forEach((button) => button.addEventListener("click", () => window.VitrinOS.authStore.logout()));
+  ["#brandSearch", "#brandThemeFilter"].forEach((selector) => $(selector)?.addEventListener("input", renderBrands));
+  ["#userSearch", "#userStatusFilter"].forEach((selector) => $(selector)?.addEventListener("input", renderUsers));
+  ["#leadSearch", "#leadStatusFilter"].forEach((selector) => $(selector)?.addEventListener("input", renderLeads));
+  ["#jobBrandFilter", "#jobFormatFilter", "#jobStatusFilter"].forEach((selector) => $(selector)?.addEventListener("input", renderJobs));
+  $("#newBrandButton")?.addEventListener("click", resetBrandForm);
+
+  nodes.brandForm?.addEventListener("submit", async (event) => {
+    event.preventDefault(); const name = nodes.brandName.value.trim(); if (name.length < 2) return notify("Marka adı en az 2 karakter olmalıdır.", "error");
+    const payload = { name, userId: nodes.brandOwner.value || null, logoUrl: nodes.brandLogo.value.trim(), websiteUrl: nodes.brandWebsite.value.trim(), colorPalette: { theme: nodes.brandTheme.value, primary: nodes.brandPrimary.value, secondary: nodes.brandSecondary.value }, toneRules: nodes.brandTone.value.trim(), bannedWords: nodes.brandBanned.value.split(",").map((item) => item.trim()).filter(Boolean) };
+    try {
+      const saved = nodes.brandId.value ? await window.VitrinOS.api.patch(`/brands/${nodes.brandId.value}`, payload) : await window.VitrinOS.api.post("/brands", payload);
+      const prompts = { basePrompt: $("#basePrompt").value, storyPrompt: packPrompt($("#storyTextPrompt").value, $("#storyBgPrompt").value, $("#storyImgPrompt").value), bannerPrompt: packPrompt($("#bannerTextPrompt").value, $("#bannerBgPrompt").value, $("#bannerImgPrompt").value), metaPostPrompt: packPrompt($("#metaPostTextPrompt").value, $("#metaPostBgPrompt").value, $("#metaPostImgPrompt").value), revizePrompt: $("#revizePrompt").value };
+      await window.VitrinOS.api.put(`/brands/${saved.id}/prompt`, prompts); notify("Marka ve prompt ayarları kaydedildi.", "success"); await fetchData(); await selectBrand(saved.id);
+    } catch (error) { notify(error.message || "Marka kaydedilemedi.", "error"); }
   });
 
-  nodes.userRows?.addEventListener("click", async (e) => {
-    const button = e.target.closest("button");
-    if (!button) return;
-    const action = button.dataset.action;
-    const id = button.dataset.id;
-
-    if (action === "reset" && id) {
-      try {
-        await window.VitrinOS.api.post(`/admin/users/${id}/password-reset`, {});
-        notify("Şifre sıfırlama bağlantısı oluşturuldu.", "success");
-      } catch (err) {
-        notify("Şifre sıfırlama hatası: " + err.message, "error");
-      }
-    }
+  nodes.userRows?.addEventListener("click", async (event) => {
+    const button = event.target.closest("button[data-action]"); if (!button) return;
+    try {
+      if (button.dataset.action === "status") { const target = state.users.find((item) => item.id === button.dataset.id); await window.VitrinOS.api.patch(`/admin/users/${button.dataset.id}/status`, { status: target?.status === "active" ? "suspended" : "active" }); }
+      if (button.dataset.action === "revoke") await window.VitrinOS.api.post(`/admin/users/${button.dataset.id}/sessions/revoke`, {});
+      if (button.dataset.action === "reset") await window.VitrinOS.api.post(`/admin/users/${button.dataset.id}/password-reset`, {});
+      await fetchData(); notify("Kullanıcı işlemi tamamlandı.", "success");
+    } catch (error) { notify(error.message || "Kullanıcı işlemi tamamlanamadı.", "error"); }
   });
 
-  nodes.brandRows?.addEventListener("click", async (e) => {
-    const button = e.target.closest("button");
-    if (!button) return;
-    const action = button.dataset.action;
-    const id = button.dataset.id;
-
-    if (action === "delete" && id) {
-      if (!confirmAction("Bu markayı silmek istediğinize emin misiniz?")) return;
-      try {
-        await window.VitrinOS.api.delete(`/brands/${id}`);
-        notify("Marka silindi.", "success");
-        await fetchData();
-      } catch (err) {
-        notify("Marka silinemedi: " + err.message, "error");
-      }
-    }
+  $("#inviteUserButton")?.addEventListener("click", () => nodes.inviteDialog?.showModal());
+  nodes.inviteForm?.addEventListener("submit", async (event) => {
+    event.preventDefault(); if (event.submitter?.value === "cancel") return nodes.inviteDialog.close();
+    try { await window.VitrinOS.api.post("/admin/users", { email: nodes.inviteEmail.value, name: nodes.inviteName.value }); nodes.inviteDialog.close(); nodes.inviteForm.reset(); await fetchData(); notify("Davet e-postası kuyruğa alındı.", "success"); } catch (error) { notify(error.message || "Davet gönderilemedi.", "error"); }
   });
 
   await fetchData();
+  resetBrandForm();
 })();

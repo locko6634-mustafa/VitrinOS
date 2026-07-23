@@ -14,12 +14,12 @@
   <body class="app-body admin-body" data-surface="admin">
     <a class="skip-link" href="#admin-main">İçeriğe geç</a>
 
-    <div class="app-shell" id="appShell">
-      <header class="app-topbar">
-        <button class="app-menu-toggle" id="appMenuToggle" type="button" aria-expanded="false" aria-controls="dashboardNav" aria-label="Menüyü aç">
-          <span class="menu-toggle-box" aria-hidden="true">
-            <span class="menu-toggle-inner"></span>
-          </span>
+    <div class="admin-shell" id="appShell">
+      <header class="admin-topbar">
+        <button class="admin-nav-toggle" id="appMenuToggle" type="button" aria-expanded="false" aria-controls="dashboardNav" aria-label="Menüyü aç">
+          <span class="bar" aria-hidden="true"></span>
+          <span class="bar" aria-hidden="true"></span>
+          <span class="bar" aria-hidden="true"></span>
         </button>
 
         <a class="brand app-brand" href="index.html" aria-label="VitrinOS ana sayfa">
@@ -32,31 +32,28 @@
         </div>
       </header>
 
-      <div class="app-menu-scrim" id="appMenuScrim" tabindex="-1" aria-hidden="true"></div>
-
-      <div class="app-layout">
-        <nav class="app-rail" id="dashboardNav" aria-label="Yönetim menüsü">
-          <ul class="nav-list" role="tablist" aria-label="Yönetim sekmeleri">
+        <nav class="admin-sidebar" id="dashboardNav" aria-label="Yönetim menüsü">
+          <ul class="admin-nav" role="tablist" aria-label="Yönetim sekmeleri">
             <li role="presentation">
-              <button class="nav-button is-active" id="admin-tab-brands" role="tab" aria-selected="true" aria-controls="admin-panel-brands" data-admin-tab="brands">
+              <button class="admin-nav-button is-active" id="admin-tab-brands" role="tab" aria-selected="true" aria-controls="admin-panel-brands" data-admin-tab="brands">
                 <span class="nav-icon" aria-hidden="true">🏢</span>
                 <span class="nav-text">Markalar & Promptlar</span>
               </button>
             </li>
             <li role="presentation">
-              <button class="nav-button" id="admin-tab-users" role="tab" aria-selected="false" aria-controls="admin-panel-users" data-admin-tab="users">
+              <button class="admin-nav-button" id="admin-tab-users" role="tab" aria-selected="false" aria-controls="admin-panel-users" data-admin-tab="users">
                 <span class="nav-icon" aria-hidden="true">👥</span>
                 <span class="nav-text">Kullanıcılar</span>
               </button>
             </li>
             <li role="presentation">
-              <button class="nav-button" id="admin-tab-leads" role="tab" aria-selected="false" aria-controls="admin-panel-leads" data-admin-tab="leads">
+              <button class="admin-nav-button" id="admin-tab-leads" role="tab" aria-selected="false" aria-controls="admin-panel-leads" data-admin-tab="leads">
                 <span class="nav-icon" aria-hidden="true">📋</span>
                 <span class="nav-text">Başvurular</span>
               </button>
             </li>
             <li role="presentation">
-              <button class="nav-button" id="admin-tab-jobs" role="tab" aria-selected="false" aria-controls="admin-panel-jobs" data-admin-tab="jobs">
+              <button class="admin-nav-button" id="admin-tab-jobs" role="tab" aria-selected="false" aria-controls="admin-panel-jobs" data-admin-tab="jobs">
                 <span class="nav-icon" aria-hidden="true">⚡</span>
                 <span class="nav-text">İş Takibi</span>
               </button>
@@ -64,18 +61,18 @@
           </ul>
 
           <div class="app-rail-footer admin-sidebar-actions">
-            <a class="nav-button-link" href="dashboard.html">
+            <a class="admin-nav-button" href="dashboard.html">
               <span class="nav-icon" aria-hidden="true">←</span>
               <span class="nav-text">Çalışma alanına dön</span>
             </a>
-            <button class="nav-button-link logout-link" type="button" data-admin-logout>
+            <button class="admin-nav-button" type="button" data-admin-logout>
               <span class="nav-icon" aria-hidden="true">🚪</span>
               <span class="nav-text">Çıkış yap</span>
             </button>
           </div>
         </nav>
 
-        <main class="app-main" id="admin-main">
+        <main class="admin-main" id="admin-main">
           <section class="admin-panel is-active" id="admin-panel-brands" role="tabpanel" aria-labelledby="admin-tab-brands" data-admin-panel="brands">
             <div class="admin-toolbar">
               <label class="admin-search">
@@ -248,7 +245,6 @@
             </div>
           </section>
         </main>
-      </div>
     </div>
 
     <dialog class="admin-dialog" id="adminConfirmDialog" aria-labelledby="adminConfirmTitle" aria-describedby="adminConfirmMessage">

@@ -81,7 +81,7 @@ export const authRoutes = async (fastify) => {
             sameSite: 'lax',
             maxAge: 30 * 24 * 60 * 60 // 30 gün
         });
-        return reply.send({ data: { user: { id: userRecord.id, email: userRecord.email, role: userRecord.role } } });
+        return reply.send({ data: { user: { id: userRecord.id, email: userRecord.email, role: userRecord.role, mfaEnabled: false } } });
     });
     // MFA Doğrulama Rotaları
     fastify.post('/api/v1/auth/mfa/verify', async (request, reply) => {
@@ -161,12 +161,16 @@ export const authRoutes = async (fastify) => {
         if (!request.user) {
             return reply.code(401).send({ code: 'UNAUTHORIZED', message: 'Yetkisiz erişim' });
         }
+        const verifiedMfa = await fastify.db.query.mfaFactors.findFirst({
+            where: and(eq(mfaFactors.userId, request.user.id), eq(mfaFactors.status, 'verified'))
+        });
         return reply.send({
             data: {
                 user: {
                     id: request.user.id,
                     email: request.user.email,
-                    role: request.user.role
+                    role: request.user.role,
+                    mfaEnabled: Boolean(verifiedMfa)
                 }
             }
         });

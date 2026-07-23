@@ -1,16 +1,19 @@
 import { FastifyPluginAsync } from 'fastify';
 import { 
   users, 
+  passwordCredentials,
   authSessions, 
   oneTimeTokens, 
   outboxJobs,
   securityAuditLog,
+  leads,
   eq,
   and
 } from '@vitrinos/db';
 import { 
   generateSessionToken, 
-  hashSessionToken 
+  hashSessionToken,
+  hashPassword
 } from '@vitrinos/security';
 
 export const adminRoutes: FastifyPluginAsync = async (fastify) => {
@@ -47,6 +50,95 @@ export const adminRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     return reply.send({ data: allUsers });
+  });
+
+  fastify.post('/api/v1/admin/users', async (request, reply) => {
+    const { email } = request.body as { email?: string; name?: string };
+    const normalizedEmail = email?.trim().toLowerCase();
+
+    if (!normalizedEmail || !/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
+      return reply.code(400).send({ code: 'INVALID_EMAIL', message: 'Geçerli bir e-posta adresi girin' });
+    }
+
+    const existingUser = await fastify.db.query.users.findFirst({ where: eq(users.email, normalizedEmail) });
+    if (existingUser) {
+      return reply.code(409).send({ code: 'EMAIL_IN_USE', message: 'Bu e-posta adresi zaten kayıtlı' });
+    }
+
+    const activationToken = generateSessionToken();
+    const temporaryPassword = await hashPassword(generateSessionToken());
+    const [newUser] = await fastify.db.transaction(async (tx) => {
+      const [createdUser] = await tx.insert(users).values({ email: normalizedEmail, role: 'user', status: 'active' }).returning();
+      await tx.insert(passwordCredentials).values({ userId: createdUser.id, passwordHash: temporaryPassword });
+      await tx.insert(oneTimeTokens).values({
+        userId: createdUser.id,
+        tokenHash: hashSessionToken(activationToken),
+        purpose: 'activate_account',
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+      });
+      await tx.insert(outboxJobs).values({
+        type: 'email',
+        payload: { to: normalizedEmail, template: 'activate_account', data: { token: activationToken, email: normalizedEmail } }
+      });
+      return [createdUser];
+    });
+
+    await fastify.db.insert(securityAuditLog).values({
+      actorId: request.user!.id,
+      action: 'user_invited',
+      targetType: 'user',
+      targetId: newUser.id,
+      result: 'success'
+    });
+
+    return reply.code(201).send({ data: { id: newUser.id, email: newUser.email } });
+  });
+
+  // Başvurular yalnızca yönetici yüzeyinden okunur ve güncellenir.
+  fastify.get('/api/v1/admin/leads', async (request, reply) => {
+    const allLeads = await fastify.db.query.leads.findMany({
+      columns: {
+        id: true,
+        name: true,
+        company: true,
+        email: true,
+        need: true,
+        status: true,
+        createdAt: true,
+      },
+      orderBy: (leads, { desc }) => [desc(leads.createdAt)]
+    });
+
+    return reply.send({ data: allLeads });
+  });
+
+  fastify.patch('/api/v1/admin/leads/:id/status', async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const { status } = request.body as { status?: string };
+
+    if (!status || !['new', 'reviewed', 'approved', 'rejected'].includes(status)) {
+      return reply.code(400).send({ code: 'INVALID_LEAD_STATUS', message: 'Geçersiz başvuru durumu' });
+    }
+
+    const [updatedLead] = await fastify.db.update(leads)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(leads.id, id))
+      .returning({ id: leads.id, status: leads.status });
+
+    if (!updatedLead) {
+      return reply.code(404).send({ code: 'LEAD_NOT_FOUND', message: 'Başvuru bulunamadı' });
+    }
+
+    await fastify.db.insert(securityAuditLog).values({
+      actorId: request.user!.id,
+      action: 'lead_status_changed',
+      targetType: 'lead',
+      targetId: id,
+      result: 'success',
+      metadata: { status }
+    });
+
+    return reply.send({ data: updatedLead });
   });
 
   // Kullanıcı Durumunu Değiştirme (active/suspended)

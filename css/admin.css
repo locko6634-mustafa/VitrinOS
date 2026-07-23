@@ -207,6 +207,9 @@
   .admin-nav {
     display: grid;
     gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
   .admin-rail-intro {
@@ -257,6 +260,17 @@
     color: var(--vo-ink-muted);
     font: 600 0.64rem / 1 var(--vo-font-mono);
     letter-spacing: 0.08em;
+  }
+
+  .admin-nav-button .nav-icon {
+    flex: 0 0 28px;
+  }
+
+  .admin-nav-button .nav-text {
+    width: auto;
+    color: inherit;
+    font: inherit;
+    letter-spacing: normal;
   }
 
   .admin-nav-button::after {

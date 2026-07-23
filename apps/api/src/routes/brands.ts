@@ -4,6 +4,7 @@ import { brands, eq, and } from '@vitrinos/db';
 
 const BrandSchema = z.object({
   name: z.string().min(2, 'Marka adı en az 2 karakter olmalıdır'),
+  userId: z.string().uuid().nullable().optional(),
   logoUrl: z.string().url('Geçersiz logo URL').optional().or(z.literal('')),
   websiteUrl: z.string().url('Geçersiz web sitesi URL').optional().or(z.literal('')),
   colorPalette: z.object({
@@ -42,7 +43,7 @@ export const brandsRoutes: FastifyPluginAsync = async (fastify) => {
     const body = BrandSchema.parse(request.body);
 
     const [newBrand] = await fastify.db.insert(brands).values({
-      userId: request.user!.id,
+      userId: request.user!.role === 'admin' ? body.userId ?? request.user!.id : request.user!.id,
       name: body.name,
       logoUrl: body.logoUrl || null,
       websiteUrl: body.websiteUrl || null,
@@ -72,6 +73,7 @@ export const brandsRoutes: FastifyPluginAsync = async (fastify) => {
     const [updatedBrand] = await fastify.db.update(brands)
       .set({
         ...body,
+        userId: request.user!.role === 'admin' && body.userId !== undefined ? body.userId : existingBrand.userId,
         updatedAt: new Date(),
       })
       .where(eq(brands.id, brandId))
