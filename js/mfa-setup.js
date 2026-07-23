@@ -45,6 +45,28 @@
     updateVerifyState();
   }
 
+  async function initializeSetup() {
+    try {
+      const user = await window.VitrinOS.authStore.fetchSession();
+      if (!user || user.role !== "admin") {
+        window.location.replace("login.html");
+        return;
+      }
+
+      if (user.mfaEnabled) {
+        window.location.replace("admin.html");
+        return;
+      }
+
+      if (startButton) startButton.hidden = false;
+      setStatus("Kuruluma hazırsınız. Doğrulayıcı uygulamanızı bağlayın.", "mfa");
+    } catch (error) {
+      setStatus("Oturum doğrulanamadı. Lütfen yeniden giriş yapın.", "error");
+    } finally {
+      screen?.setAttribute("aria-busy", "false");
+    }
+  }
+
   async function beginEnrollment() {
     setStartBusy(true);
     screen?.setAttribute("aria-busy", "true");
@@ -135,4 +157,6 @@
     codeInput.setAttribute("aria-invalid", "false");
     updateVerifyState();
   });
+
+  await initializeSetup();
 })();
