@@ -12,7 +12,9 @@
     "release-manifest": "node quality/scripts/generate-release-manifest.mjs",
     "ops-check": "node quality/scripts/ops-contract.mjs",
     "check": "npm test && npm run ops-check && npm run release-gate",
-    "build": "npm run build --workspaces --if-present"
+    "build:packages": "npm run build --workspace @vitrinos/contracts && npm run build --workspace @vitrinos/db && npm run build --workspace @vitrinos/security",
+    "build:apps": "npm run build --workspace @vitrinos/api && npm run build --workspace @vitrinos/worker",
+    "build": "npm run build:packages && npm run build:apps"
   },
   "devDependencies": {
     "playwright": "^1.45.0",
