@@ -43,7 +43,7 @@ declare module 'fastify' {
 export const authRoutes: FastifyPluginAsync = async (fastify) => {
   // Giriş Rotaları
   fastify.post('/api/v1/auth/login', async (request, reply) => {
-    const { email, password } = LoginRequestSchema.parse(request.body);
+    const { email, password, rememberMe } = LoginRequestSchema.parse(request.body);
     const normalizedEmail = email.toLowerCase().trim();
 
     const userRecord = await fastify.db.query.users.findFirst({
@@ -110,10 +110,17 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
     const sessionToken = generateSessionToken();
     const hashedToken = hashSessionToken(sessionToken);
 
+    // Admin her zaman oturum cookie'si alır; normal kullanıcılar rememberMe'ye bağlı
+    const isAdminUser = userRecord.role === 'admin';
+    const sessionMaxAge = (!isAdminUser && rememberMe) ? 30 * 24 * 60 * 60 : undefined;
+    const sessionExpiresAt = sessionMaxAge
+      ? new Date(Date.now() + sessionMaxAge * 1000)
+      : new Date(Date.now() + 24 * 60 * 60 * 1000); // DB kaydı için fallback: 24 saat
+
     await fastify.db.insert(authSessions).values({
       hashedSessionId: hashedToken,
       userId: userRecord.id,
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 Gün
+      expiresAt: sessionExpiresAt,
       isRevoked: false,
       ipDigest: request.ip,
       userAgentDigest: request.headers['user-agent'] || null
@@ -129,13 +136,14 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
       metadata: { email: normalizedEmail }
     });
 
-    reply.setCookie('session', sessionToken, {
+    const cookieOptions: Record<string, unknown> = {
       path: '/',
       secure: config.NODE_ENV === 'production',
       httpOnly: true,
-      sameSite: 'lax',
-      maxAge: 30 * 24 * 60 * 60 // 30 gün
-    });
+      sameSite: 'lax'
+    };
+    if (sessionMaxAge) cookieOptions.maxAge = sessionMaxAge;
+    reply.setCookie('session', sessionToken, cookieOptions as any);
 
     return reply.send({ data: { user: { id: userRecord.id, email: userRecord.email, role: userRecord.role, mfaEnabled: false } } });
   });
@@ -188,10 +196,22 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
     const sessionToken = generateSessionToken();
     const hashedToken = hashSessionToken(sessionToken);
 
+    // MFA doğrulamasından geçen kullanıcı bilgisini al (admin kontrolü için)
+    const mfaUserRecord = await fastify.db.query.users.findFirst({
+      where: eq(users.id, challengeSession.userId),
+      columns: { id: true, role: true }
+    });
+    const isMfaAdmin = mfaUserRecord?.role === 'admin';
+    // Admin: oturum cookie (tarayıcı kapanınca sona erer), normal: 30 gün
+    const mfaSessionMaxAge = isMfaAdmin ? undefined : 30 * 24 * 60 * 60;
+    const mfaSessionExpiresAt = mfaSessionMaxAge
+      ? new Date(Date.now() + mfaSessionMaxAge * 1000)
+      : new Date(Date.now() + 24 * 60 * 60 * 1000);
+
     await fastify.db.insert(authSessions).values({
       hashedSessionId: hashedToken,
       userId: challengeSession.userId,
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 Gün
+      expiresAt: mfaSessionExpiresAt,
       isRevoked: false,
       ipDigest: request.ip,
       userAgentDigest: request.headers['user-agent'] || null
@@ -206,13 +226,14 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
       result: 'success'
     });
 
-    reply.setCookie('session', sessionToken, {
+    const mfaCookieOptions: Record<string, unknown> = {
       path: '/',
       secure: config.NODE_ENV === 'production',
       httpOnly: true,
-      sameSite: 'lax',
-      maxAge: 30 * 24 * 60 * 60
-    });
+      sameSite: 'lax'
+    };
+    if (mfaSessionMaxAge) mfaCookieOptions.maxAge = mfaSessionMaxAge;
+    reply.setCookie('session', sessionToken, mfaCookieOptions as any);
 
     const userRecord = await fastify.db.query.users.findFirst({
       where: eq(users.id, challengeSession.userId)
