@@ -2,14 +2,14 @@ import { createDb, sql } from '@vitrinos/db';
 import { config } from '../config.js';
 export async function healthRoutes(fastify) {
     const db = createDb(config.DATABASE_URL);
-    fastify.get('/health/live', async () => {
+    const handleLive = async () => {
         return {
             status: 'ok',
             uptime: process.uptime(),
             timestamp: new Date().toISOString()
         };
-    });
-    fastify.get('/health/ready', async (request, reply) => {
+    };
+    const handleReady = async (request, reply) => {
         try {
             // Veritabanı canlılık testi
             await db.execute(sql `SELECT 1`);
@@ -33,6 +33,12 @@ export async function healthRoutes(fastify) {
                 }
             });
         }
-    });
+    };
+    fastify.get('/health/live', handleLive);
+    fastify.get('/api/health/live', handleLive);
+    fastify.get('/api/v1/health/live', handleLive);
+    fastify.get('/health/ready', handleReady);
+    fastify.get('/api/health/ready', handleReady);
+    fastify.get('/api/v1/health/ready', handleReady);
 }
 //# sourceMappingURL=health.js.map

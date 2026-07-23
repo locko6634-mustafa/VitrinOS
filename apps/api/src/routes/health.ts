@@ -6,15 +6,15 @@ import { config } from '../config.js';
 export async function healthRoutes(fastify: FastifyInstance) {
   const db = createDb(config.DATABASE_URL);
 
-  fastify.get('/health/live', async () => {
+  const handleLive = async () => {
     return {
       status: 'ok',
       uptime: process.uptime(),
       timestamp: new Date().toISOString()
     };
-  });
+  };
 
-  fastify.get('/health/ready', async (request, reply) => {
+  const handleReady = async (request: any, reply: any) => {
     try {
       // Veritabanı canlılık testi
       await db.execute(sql`SELECT 1`);
@@ -37,5 +37,13 @@ export async function healthRoutes(fastify: FastifyInstance) {
         }
       });
     }
-  });
+  };
+
+  fastify.get('/health/live', handleLive);
+  fastify.get('/api/health/live', handleLive);
+  fastify.get('/api/v1/health/live', handleLive);
+
+  fastify.get('/health/ready', handleReady);
+  fastify.get('/api/health/ready', handleReady);
+  fastify.get('/api/v1/health/ready', handleReady);
 }
