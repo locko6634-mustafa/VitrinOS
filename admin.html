@@ -9,7 +9,7 @@
     <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" fill="%23f8f4ec"/%3E%3Cpath d="M11 15h11l10 30 10-30h11L38 53H26L11 15Z" fill="%231d1e22"/%3E%3Cpath d="M46 42h9v9h-9z" fill="%23f46b22"/%3E%3C/svg%3E'>
     <link rel="stylesheet" href="css/style.css?v=2.1">
     <link rel="stylesheet" href="css/dashboard.css?v=2.1">
-    <link rel="stylesheet" href="css/admin.css?v=2.4">
+    <link rel="stylesheet" href="css/admin.css?v=2.5">
   </head>
   <body class="app-body admin-body" data-surface="admin">
     <a class="skip-link" href="#admin-main">İçeriğe geç</a>
@@ -51,27 +51,27 @@
               </button>
             </li>
             <li role="presentation">
-              <button class="admin-nav-button is-active" id="admin-tab-brands" role="tab" aria-selected="true" aria-controls="admin-panel-brands" data-admin-tab="brands">
-                <span class="nav-icon" aria-hidden="true">🏢</span>
-                <span class="nav-text">Markalar & Promptlar</span>
+              <button class="admin-nav-button" id="admin-tab-brands" role="tab" aria-selected="false" aria-controls="admin-panel-brands" data-admin-tab="brands">
+                <span class="nav-icon" aria-hidden="true">02</span>
+                <span class="nav-text">Markalar</span>
               </button>
             </li>
             <li role="presentation">
               <button class="admin-nav-button" id="admin-tab-users" role="tab" aria-selected="false" aria-controls="admin-panel-users" data-admin-tab="users">
-                <span class="nav-icon" aria-hidden="true">👥</span>
+                <span class="nav-icon" aria-hidden="true">03</span>
                 <span class="nav-text">Kullanıcılar</span>
               </button>
             </li>
             <li role="presentation">
               <button class="admin-nav-button" id="admin-tab-leads" role="tab" aria-selected="false" aria-controls="admin-panel-leads" data-admin-tab="leads">
-                <span class="nav-icon" aria-hidden="true">📋</span>
+                <span class="nav-icon" aria-hidden="true">04</span>
                 <span class="nav-text">Başvurular</span>
               </button>
             </li>
             <li role="presentation">
               <button class="admin-nav-button" id="admin-tab-jobs" role="tab" aria-selected="false" aria-controls="admin-panel-jobs" data-admin-tab="jobs">
-                <span class="nav-icon" aria-hidden="true">⚡</span>
-                <span class="nav-text">İş Takibi</span>
+                <span class="nav-icon" aria-hidden="true">05</span>
+                <span class="nav-text">Job izleme</span>
               </button>
             </li>
           </ul>
@@ -86,20 +86,24 @@
               <span class="nav-text">Çıkış yap</span>
             </button>
           </div>
+          <div class="admin-sidebar-note">
+            <span>Canlı sistem</span>
+            <p>VitrinOS Canlı Otomasyon Sistemi için marka, kullanıcı, başvuru ve üretim operasyonlarını yönetin.</p>
+          </div>
         </nav>
 
         <main class="admin-main" id="admin-main">
+          <header class="admin-page-head">
+            <div>
+              <p class="kicker">Canlı operasyon paneli</p>
+              <h1>Marka, kullanıcı, başvuru<br>ve job akışı tek masada.</h1>
+            </div>
+            <p class="admin-note">Marka ayarları, kullanıcı yönetimi, başvurular ve job akışı tek merkezden izlenir.</p>
+          </header>
           <section class="admin-panel is-active" id="admin-panel-overview" role="tabpanel" aria-labelledby="admin-tab-overview" data-admin-panel="overview">
-            <header class="admin-page-head">
-              <div>
-                <p class="kicker">Canlı operasyon paneli</p>
-                <h1>Marka, kullanıcı, başvuru<br>ve job akışı tek masada.</h1>
-              </div>
-              <p class="admin-note">Marka ayarları, kullanıcı yönetimi, başvurular ve job akışı tek merkezden izlenir.</p>
-            </header>
-            <div class="admin-metric-grid admin-metric-grid--overview" aria-label="Operasyon özeti">
-              <article class="admin-metric"><span>Son joblar</span><strong id="overviewJobCount">0</strong><em id="overviewJobNote">Üretim kuyruğu bekleniyor</em></article>
-              <article class="admin-metric"><span>Son başvurular</span><strong id="overviewLeadCount">0</strong><em id="overviewLeadNote">Lead akışı bekleniyor</em></article>
+            <div class="admin-split-grid">
+              <article class="admin-card"><div class="admin-card-head"><span>Son joblar</span><strong>Üretim kuyruğu</strong></div><div class="admin-list" id="recentJobs"></div></article>
+              <article class="admin-card"><div class="admin-card-head"><span>Son başvurular</span><strong>Lead akışı</strong></div><div class="admin-list" id="recentLeads"></div></article>
             </div>
           </section>
           <section class="admin-panel" id="admin-panel-brands" role="tabpanel" aria-labelledby="admin-tab-brands" data-admin-panel="brands" hidden>
@@ -307,6 +311,6 @@
     <script src="js/observability.js?v=1.1"></script>
     <script src="js/api-client.js"></script>
     <script src="js/auth-store.js"></script>
-    <script src="js/admin.js?v=2.4"></script>
+    <script src="js/admin.js?v=2.5"></script>
   </body>
 </html>

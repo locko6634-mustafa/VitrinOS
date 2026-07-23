@@ -19,7 +19,7 @@
     brandId: $("#brandId"), brandName: $("#brandName"), brandLogo: $("#brandLogo"), brandWebsite: $("#brandWebsite"), brandOwner: $("#brandOwner"), brandTheme: $("#brandTheme"), brandPrimary: $("#brandPrimary"), brandSecondary: $("#brandSecondary"), brandTone: $("#brandTone"), brandBanned: $("#brandBanned"), brandTitle: $("#brandFormTitle"),
     userRows: $("#userRows"), userCount: $("#userCount"), leadRows: $("#leadRows"), leadCount: $("#leadCount"),
     jobRows: $("#jobRows"), jobCount: $("#jobCount"), jobDetail: $("#jobDetail"),
-    overviewJobCount: $("#overviewJobCount"), overviewJobNote: $("#overviewJobNote"), overviewLeadCount: $("#overviewLeadCount"), overviewLeadNote: $("#overviewLeadNote"),
+    recentJobs: $("#recentJobs"), recentLeads: $("#recentLeads"),
     inviteDialog: $("#adminInviteDialog"), inviteForm: $("#adminInviteForm"), inviteEmail: $("#adminInviteEmail"), inviteName: $("#adminInviteName"), toastRegion: $("#adminToastRegion")
   };
 
@@ -159,12 +159,19 @@
   }
 
   function renderOverview() {
-    const activeJobs = state.jobs.filter((item) => ["pending", "processing"].includes(item.status)).length;
-    const newLeads = state.leads.filter((item) => item.status === "new").length;
-    if (nodes.overviewJobCount) nodes.overviewJobCount.textContent = state.jobs.length;
-    if (nodes.overviewLeadCount) nodes.overviewLeadCount.textContent = state.leads.length;
-    if (nodes.overviewJobNote) nodes.overviewJobNote.textContent = activeJobs ? `${activeJobs} iş üretim kuyruğunda` : "Üretim kuyruğu sakin";
-    if (nodes.overviewLeadNote) nodes.overviewLeadNote.textContent = newLeads ? `${newLeads} yeni lead bekliyor` : "Lead akışı güncel";
+    const renderList = (target, items, title, subtitle) => {
+      if (!target) return;
+      target.replaceChildren();
+      items.slice(0, 5).forEach((item) => {
+        const row = document.createElement("article"); row.className = "admin-list-item";
+        const content = document.createElement("div");
+        const heading = document.createElement("strong"); heading.textContent = title(item);
+        const detail = document.createElement("span"); detail.textContent = subtitle(item);
+        content.append(heading, detail); row.append(content); target.append(row);
+      });
+    };
+    renderList(nodes.recentJobs, state.jobs, (job) => `${job.id.slice(0, 8)} · ${state.brands.find((brand) => brand.id === job.brandId)?.name || "Marka"}`, (job) => `${job.format || "Format"} · ${date(job.createdAt)}`);
+    renderList(nodes.recentLeads, state.leads, (lead) => `${lead.name || "Başvuru"} · ${lead.company || ""}`, (lead) => `${lead.need || "İhtiyaç belirtilmedi"} · ${date(lead.createdAt)}`);
   }
 
   function renderAll() { renderOwners(); renderJobBrandOptions(); renderBrands(); renderUsers(); renderLeads(); renderJobs(); renderOverview(); }
@@ -185,7 +192,7 @@
 
   function resetBrandForm() {
     state.selectedBrand = null; state.prompts = null; nodes.brandForm.reset(); nodes.brandId.value = ""; nodes.brandTitle.textContent = "Yeni marka";
-    nodes.brandPrimary.value = "#d9962a"; nodes.brandSecondary.value = "#7a4f12"; nodes.brandTheme.value = "koyu"; notify("Yeni marka bilgilerini girin.");
+    nodes.brandPrimary.value = "#d9962a"; nodes.brandSecondary.value = "#7a4f12"; nodes.brandTheme.value = "koyu";
   }
 
   async function fetchData() {

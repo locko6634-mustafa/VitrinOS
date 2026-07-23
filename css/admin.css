@@ -379,10 +379,6 @@
     box-shadow: var(--vo-shadow-1);
   }
 
-  .admin-metric-grid--overview {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .admin-metric {
     position: relative;
     min-height: 154px;
