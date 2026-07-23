@@ -9,7 +9,7 @@
     <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" fill="%23f8f4ec"/%3E%3Cpath d="M11 15h11l10 30 10-30h11L38 53H26L11 15Z" fill="%231d1e22"/%3E%3Cpath d="M46 42h9v9h-9z" fill="%23f46b22"/%3E%3C/svg%3E'>
     <link rel="stylesheet" href="css/style.css?v=2.1">
     <link rel="stylesheet" href="css/dashboard.css?v=2.1">
-    <link rel="stylesheet" href="css/admin.css?v=2.3">
+    <link rel="stylesheet" href="css/admin.css?v=2.4">
   </head>
   <body class="app-body admin-body" data-surface="admin">
     <a class="skip-link" href="#admin-main">İçeriğe geç</a>
@@ -26,14 +26,30 @@
           <span class="brand-word">Vitrin</span><span class="brand-os">OS</span><sup class="brand-reg" aria-hidden="true">®</sup>
         </a>
 
+        <div class="admin-context" aria-label="Yönetim alanı">
+          <span>Admin</span>
+          <strong>Operasyon kontrol merkezi</strong>
+        </div>
         <div class="app-topbar-actions">
           <span class="badge badge-admin">Sistem Yöneticisi</span>
+          <a class="admin-link-button" href="mfa-setup.html">MFA güvenliği</a>
+          <a class="admin-link-button" href="dashboard.html">Kullanıcı paneli</a>
           <button class="button secondary compact-button" type="button" data-admin-logout>Çıkış yap</button>
         </div>
       </header>
 
         <nav class="admin-sidebar" id="dashboardNav" aria-label="Yönetim menüsü">
+          <div class="admin-rail-intro">
+            <span>Creative command desk</span>
+            <strong>Operasyon merkezi</strong>
+          </div>
           <ul class="admin-nav" role="tablist" aria-label="Yönetim sekmeleri">
+            <li role="presentation">
+              <button class="admin-nav-button is-active" id="admin-tab-overview" role="tab" aria-selected="true" aria-controls="admin-panel-overview" data-admin-tab="overview">
+                <span class="nav-icon" aria-hidden="true">01</span>
+                <span class="nav-text">Kontrol merkezi</span>
+              </button>
+            </li>
             <li role="presentation">
               <button class="admin-nav-button is-active" id="admin-tab-brands" role="tab" aria-selected="true" aria-controls="admin-panel-brands" data-admin-tab="brands">
                 <span class="nav-icon" aria-hidden="true">🏢</span>
@@ -73,7 +89,20 @@
         </nav>
 
         <main class="admin-main" id="admin-main">
-          <section class="admin-panel is-active" id="admin-panel-brands" role="tabpanel" aria-labelledby="admin-tab-brands" data-admin-panel="brands">
+          <section class="admin-panel is-active" id="admin-panel-overview" role="tabpanel" aria-labelledby="admin-tab-overview" data-admin-panel="overview">
+            <header class="admin-page-head">
+              <div>
+                <p class="kicker">Canlı operasyon paneli</p>
+                <h1>Marka, kullanıcı, başvuru<br>ve job akışı tek masada.</h1>
+              </div>
+              <p class="admin-note">Marka ayarları, kullanıcı yönetimi, başvurular ve job akışı tek merkezden izlenir.</p>
+            </header>
+            <div class="admin-metric-grid admin-metric-grid--overview" aria-label="Operasyon özeti">
+              <article class="admin-metric"><span>Son joblar</span><strong id="overviewJobCount">0</strong><em id="overviewJobNote">Üretim kuyruğu bekleniyor</em></article>
+              <article class="admin-metric"><span>Son başvurular</span><strong id="overviewLeadCount">0</strong><em id="overviewLeadNote">Lead akışı bekleniyor</em></article>
+            </div>
+          </section>
+          <section class="admin-panel" id="admin-panel-brands" role="tabpanel" aria-labelledby="admin-tab-brands" data-admin-panel="brands" hidden>
             <div class="admin-toolbar">
               <label class="admin-search">
                 <span>Marka ara</span>
@@ -278,6 +307,6 @@
     <script src="js/observability.js?v=1.1"></script>
     <script src="js/api-client.js"></script>
     <script src="js/auth-store.js"></script>
-    <script src="js/admin.js?v=2.3"></script>
+    <script src="js/admin.js?v=2.4"></script>
   </body>
 </html>

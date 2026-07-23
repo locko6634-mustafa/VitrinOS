@@ -19,6 +19,7 @@
     brandId: $("#brandId"), brandName: $("#brandName"), brandLogo: $("#brandLogo"), brandWebsite: $("#brandWebsite"), brandOwner: $("#brandOwner"), brandTheme: $("#brandTheme"), brandPrimary: $("#brandPrimary"), brandSecondary: $("#brandSecondary"), brandTone: $("#brandTone"), brandBanned: $("#brandBanned"), brandTitle: $("#brandFormTitle"),
     userRows: $("#userRows"), userCount: $("#userCount"), leadRows: $("#leadRows"), leadCount: $("#leadCount"),
     jobRows: $("#jobRows"), jobCount: $("#jobCount"), jobDetail: $("#jobDetail"),
+    overviewJobCount: $("#overviewJobCount"), overviewJobNote: $("#overviewJobNote"), overviewLeadCount: $("#overviewLeadCount"), overviewLeadNote: $("#overviewLeadNote"),
     inviteDialog: $("#adminInviteDialog"), inviteForm: $("#adminInviteForm"), inviteEmail: $("#adminInviteEmail"), inviteName: $("#adminInviteName"), toastRegion: $("#adminToastRegion")
   };
 
@@ -157,7 +158,16 @@
     select.value = Array.from(select.options).some((option) => option.value === selected) ? selected : "all";
   }
 
-  function renderAll() { renderOwners(); renderJobBrandOptions(); renderBrands(); renderUsers(); renderLeads(); renderJobs(); }
+  function renderOverview() {
+    const activeJobs = state.jobs.filter((item) => ["pending", "processing"].includes(item.status)).length;
+    const newLeads = state.leads.filter((item) => item.status === "new").length;
+    if (nodes.overviewJobCount) nodes.overviewJobCount.textContent = state.jobs.length;
+    if (nodes.overviewLeadCount) nodes.overviewLeadCount.textContent = state.leads.length;
+    if (nodes.overviewJobNote) nodes.overviewJobNote.textContent = activeJobs ? `${activeJobs} iş üretim kuyruğunda` : "Üretim kuyruğu sakin";
+    if (nodes.overviewLeadNote) nodes.overviewLeadNote.textContent = newLeads ? `${newLeads} yeni lead bekliyor` : "Lead akışı güncel";
+  }
+
+  function renderAll() { renderOwners(); renderJobBrandOptions(); renderBrands(); renderUsers(); renderLeads(); renderJobs(); renderOverview(); }
 
   async function selectBrand(id) {
     const brand = state.brands.find((item) => item.id === id); if (!brand) return;
