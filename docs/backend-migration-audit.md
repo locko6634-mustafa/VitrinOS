@@ -32,22 +32,23 @@ Tüm HTML ve CSS dosyaları dosya karması ve satır farkı ile karşılaştır�
 | `dashboard.html` + `css/dashboard.css` | CSS aynı. Hazırlık kartı metinleri yeni altyapıyı yansıtıyor. Fazladan kapanış etiketi bulundu. | Etiket düzeltildi; altyapı metinleri korunuyor. |
 | `admin.html` + `css/admin.css` | Geçiş sırasında admin kabuk/menü hiyerarşisi referans tasarımdan ayrılmıştı. | Referans görünüm geri kuruldu; self-hosted REST bağları korundu. |
 
-## Sonraki backend aşaması için raporlanan maddeler
+## Backend aşaması sonuçları
 
-Bu maddeler tespit edildi ancak bu turda değiştirilmedi.
+Raporlanan backend maddeleri ikinci turda kaynak, migration ve frontend sözleşmesi düzeyinde kapatıldı. Canlı staging çağrısı için de kimlik bilgisi gerektirmeyen bir smoke komutu eklendi.
 
 | Öncelik | Kaynak | Bulgu | Önerilen sonraki adım |
 | --- | --- | --- | --- |
-| P0 | `apps/api/src/config.ts` | `SESSION_SECRET`, `MFA_ENCRYPTION_KEY`, `INTERNAL_API_TOKEN`, S3 anahtarları ve webhook sırrı için üretimde kullanılabilecek sabit varsayılanlar var. Ortam değişkeni eksikse tahmin edilebilir anahtarlarla servis başlar. | `production` ortamında bu değerleri zorunlu yapın; varsayılanları yalnızca test ortamına taşıyın ve dağıtım doğrulamasına ekleyin. |
-| P1 | `apps/api/src/routes/jobs.ts`, `apps/api/src/routes/internal.ts` | Job yaşam döngüsü `queued → dispatching → processing → succeeded/failed_* /cancelled` iken bazı eski frontend kavramları `approved` ve `revision_requested` etrafında kalmış. | Job onay/revizyon ürün kararını netleştirin; gerekiyorsa API endpointlerini ve durum geçişlerini tek sözleşmede birleştirin. |
-| P1 | `js/dashboard.js` ve `apps/api/src/routes/jobs.ts` | Dashboarddaki onay düğmesi şu an API isteği yapmadan yalnızca veriyi yeniden çekiyor. Job route'larında eşleşen bir onay endpointi yok. | Onay akışı gerekiyorsa yetkili `approve` endpointi, durum geçişi, audit kaydı ve UI hata durumu birlikte eklenmeli. |
-| P1 | `apps/api/src/routes/admin.ts` | Kullanıcı davet isteğindeki `name` frontendden geliyor ancak route yalnızca e-postayı kullanıyor. | Kullanıcı adı ürün gereksinimiyse şemaya ve kullanıcı kaydına ekleyin; değilse frontend davet formundan alanı kaldırın. |
-| P2 | `apps/api/src/routes/config.ts` | Runtime config, frontendin `apiBaseUrl` veya `appBasePath` değerlerini yayınlamıyor. Şu an varsayılan `/api/v1` ve URL çıkarımıyla çalışıyor. | Ters proxy veya alt dizin dağıtımı planlanıyorsa bu iki değeri runtime config sözleşmesine ekleyin. |
-| P2 | Canlı entegrasyon | Eski sürüm Supabase Auth/Storage'a, güncel sürüm Fastify/PostgreSQL/MinIO'ya bağlı. Kaynak kod endpointleri eşleşiyor ancak gerçek prod istekleri bu denetimde çalıştırılmadı. | Login, MFA, lead, asset upload, job oluşturma, revizyon ve admin işlemleri için yetkili staging smoke testi yürütün. |
+| Durum | Kaynak | Uygulanan çözüm |
+| --- | --- | --- |
+| Kapandı | `apps/api/src/config.ts` | Production modunda veritabanı, oturum, MFA, n8n, S3 ve internal token değerleri ortam değişkeni olarak zorunlu. Eksik değerle API başlamaz. |
+| Kapandı | `apps/api/src/routes/jobs.ts` | Tek durum sözleşmesi tanımlandı: `succeeded → approved` ve `succeeded/approved → queued` revizyon geçişleri. Onay/revizyon event, outbox ve audit kaydı üretir. |
+| Kapandı | `js/dashboard.js` | Onay ve revizyon düğmeleri artık sırasıyla `/approve` ve `/revision` endpointlerini çağırır. |
+| Kapandı | `packages/db` ve `apps/api/src/routes/admin.ts` | Davet kullanıcı adı `display_name` alanına kaydedilir; migration `0001_complex_charles_xavier.sql` oluşturuldu. |
+| Kapandı | `apps/api/src/routes/config.ts` | `apiBaseUrl` ve `appBasePath`, runtime config ile frontend'e yayınlanır. |
+| Hazır | `quality/scripts/staging-smoke.mjs` | `npm run staging:smoke` canlılık, hazır olma, runtime config ve sayfa erişimini denetler. `STAGING_SESSION_COOKIE` verilirse oturum endpointini de kontrol eder. |
 
 ## Sonraki doğrulama sırası
 
-1. Production ortam değişkenleri ve sır yönetimi için P0 maddesini kapatın.
-2. Job onay/revizyon durum makinesini API, worker ve n8n boyunca tekleştirin.
-3. Yetkili staging hesabıyla uçtan uca smoke testi çalıştırın.
-4. Bu rapordaki P1/P2 maddelerini kapattıkça ilgili satırı güncelleyin.
+1. Production ortam değişkenlerini dağıtım gizli değer deposuna ekleyin.
+2. Migration `0001_complex_charles_xavier.sql` dosyasını staging, sonra production ortamında uygulayın.
+3. `STAGING_BASE_URL` ile smoke komutunu çalıştırın; oturum denetimi için geçici test oturumu sağlayın.

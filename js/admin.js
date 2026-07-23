@@ -25,7 +25,7 @@
 
   const text = (value) => value == null || value === "" ? "—" : String(value);
   const date = (value) => value ? new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value)) : "—";
-  const jobStatusLabel = (status) => ({ queued: "Sırada", dispatching: "Gönderiliyor", processing: "Üretiliyor", succeeded: "Tamamlandı", failed_retryable: "Yeniden denenecek", failed_terminal: "Başarısız", cancelled: "İptal edildi" }[status] || text(status));
+  const jobStatusLabel = (status) => ({ queued: "Sırada", dispatching: "Gönderiliyor", processing: "Üretiliyor", succeeded: "Tamamlandı", approved: "Onaylandı", failed_retryable: "Yeniden denenecek", failed_terminal: "Başarısız", cancelled: "İptal edildi" }[status] || text(status));
   const palette = (brand) => brand.colorPalette || {};
   const packPrompt = (text, background, image) => JSON.stringify({ text, background, image });
   const unpackPrompt = (value) => {

@@ -44,12 +44,13 @@
         metaPost: { name: "Meta Post", dimensions: "1080x1350", keywords: [] }
       },
       statuses: {
-        values: ["queued", "dispatching", "processing", "succeeded", "failed_retryable", "failed_terminal", "cancelled"],
+        values: ["queued", "dispatching", "processing", "succeeded", "approved", "failed_retryable", "failed_terminal", "cancelled"],
         labels: {
           queued: "Sırada",
           dispatching: "Gönderiliyor",
           processing: "Üretiliyor",
           succeeded: "Tamamlandı",
+          approved: "Onaylandı",
           failed_retryable: "Yeniden Denenecek",
           failed_terminal: "Başarısız",
           cancelled: "İptal Edildi"

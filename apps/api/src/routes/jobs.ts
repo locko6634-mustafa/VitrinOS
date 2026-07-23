@@ -7,6 +7,7 @@ import {
   jobAttempts, 
   jobEvents, 
   outboxJobs, 
+  securityAuditLog,
   brands, 
   assets, 
   eq, 
@@ -21,6 +22,10 @@ const CreateJobSchema = z.object({
   briefText: z.string().min(5, 'Brief en az 5 karakter olmalıdır'),
   format: z.enum(['Banner', 'Meta Post', 'Story']),
   imageId: z.string().uuid('Geçersiz imageId').optional().nullable(),
+});
+
+const RevisionRequestSchema = z.object({
+  revisionNote: z.string().trim().min(6, 'Revizyon notu en az 6 karakter olmalıdır').max(2000),
 });
 
 // SSE için global PG listener bağlantısı
@@ -197,6 +202,89 @@ export const jobsRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     return reply.send({ data: job });
+  });
+
+  // POST /api/v1/jobs/:jobId/approve
+  fastify.post('/api/v1/jobs/:jobId/approve', async (request, reply) => {
+    const { jobId } = request.params as { jobId: string };
+    const job = await fastify.db.query.jobs.findFirst({
+      where: request.user!.role === 'admin'
+        ? eq(jobs.id, jobId)
+        : and(eq(jobs.id, jobId), eq(jobs.ownerId, request.user!.id))
+    });
+
+    if (!job) return reply.code(404).send({ code: 'NOT_FOUND', message: 'İş bulunamadı' });
+    if (job.status !== 'succeeded') {
+      return reply.code(400).send({ code: 'INVALID_STATUS', message: `Yalnızca tamamlanan işler onaylanabilir. Mevcut durum: ${job.status}` });
+    }
+
+    const updatedJob = await fastify.db.transaction(async (tx) => {
+      const [updated] = await tx.update(jobs)
+        .set({ status: 'approved', updatedAt: new Date() })
+        .where(eq(jobs.id, jobId))
+        .returning();
+      await tx.insert(jobEvents).values({ jobId, eventType: 'status_changed', payload: { status: 'approved' } });
+      await tx.insert(securityAuditLog).values({
+        actorId: request.user!.id,
+        action: 'job_approved',
+        targetType: 'job',
+        targetId: jobId,
+        result: 'success',
+      });
+      return updated;
+    });
+
+    await notifyJobUpdate(jobId, 'approved', job.ownerId);
+    return reply.send({ data: updatedJob });
+  });
+
+  // POST /api/v1/jobs/:jobId/revision
+  fastify.post('/api/v1/jobs/:jobId/revision', async (request, reply) => {
+    const { jobId } = request.params as { jobId: string };
+    const { revisionNote } = RevisionRequestSchema.parse(request.body);
+    const job = await fastify.db.query.jobs.findFirst({
+      where: request.user!.role === 'admin'
+        ? eq(jobs.id, jobId)
+        : and(eq(jobs.id, jobId), eq(jobs.ownerId, request.user!.id))
+    });
+
+    if (!job) return reply.code(404).send({ code: 'NOT_FOUND', message: 'İş bulunamadı' });
+    if (!['succeeded', 'approved'].includes(job.status)) {
+      return reply.code(400).send({ code: 'INVALID_STATUS', message: `Yalnızca tamamlanan veya onaylanan işler revizyona gönderilebilir. Mevcut durum: ${job.status}` });
+    }
+
+    const currentAttempts = await fastify.db.query.jobAttempts.findMany({ where: eq(jobAttempts.jobId, jobId) });
+    const nextAttemptNumber = currentAttempts.length + 1;
+    const revisionCount = job.revisionCount + 1;
+    const updatedJob = await fastify.db.transaction(async (tx) => {
+      const [attempt] = await tx.insert(jobAttempts).values({ jobId, status: 'queued', attemptNumber: nextAttemptNumber }).returning();
+      const [updated] = await tx.update(jobs)
+        .set({ status: 'queued', revisionCount, revisionNote, updatedAt: new Date() })
+        .where(eq(jobs.id, jobId))
+        .returning();
+      await tx.insert(jobEvents).values({
+        jobId,
+        eventType: 'revision_requested',
+        payload: { status: 'queued', attemptId: attempt.id, revisionNote, revisionCount },
+      });
+      await tx.insert(outboxJobs).values({
+        type: 'n8n_dispatch',
+        payload: { jobId, attemptId: attempt.id, brandId: job.brandId, format: job.format, briefText: job.briefText, revisionNote, revisionCount },
+        status: 'queued',
+      });
+      await tx.insert(securityAuditLog).values({
+        actorId: request.user!.id,
+        action: 'job_revision_requested',
+        targetType: 'job',
+        targetId: jobId,
+        result: 'success',
+        metadata: { revisionCount },
+      });
+      return updated;
+    });
+
+    await notifyJobUpdate(jobId, 'queued', job.ownerId);
+    return reply.send({ data: updatedJob });
   });
 
   // POST /api/v1/jobs/:jobId/retry

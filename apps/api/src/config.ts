@@ -3,6 +3,24 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+const productionSecrets = [
+  'DATABASE_URL',
+  'N8N_WEBHOOK_SECRET',
+  'SESSION_SECRET',
+  'MFA_ENCRYPTION_KEY',
+  'S3_ENDPOINT',
+  'S3_ACCESS_KEY_ID',
+  'S3_SECRET_ACCESS_KEY',
+  'INTERNAL_API_TOKEN',
+] as const;
+
+if (process.env.NODE_ENV === 'production') {
+  const missing = productionSecrets.filter((key) => !process.env[key]?.trim());
+  if (missing.length > 0) {
+    throw new Error(`Production ortamında zorunlu yapılandırmalar eksik: ${missing.join(', ')}`);
+  }
+}
+
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().default(3000),
@@ -17,6 +35,8 @@ const envSchema = z.object({
   S3_BUCKET_NAME: z.string().default('vitrinos-assets'),
   S3_FORCE_PATH_STYLE: z.coerce.boolean().default(true),
   INTERNAL_API_TOKEN: z.string().min(16).default('super_secret_internal_api_token_for_n8n_and_worker'),
+  PUBLIC_API_BASE_URL: z.string().startsWith('/').default('/api/v1'),
+  PUBLIC_APP_BASE_PATH: z.string().startsWith('/').default('/'),
 });
 
 const parsed = envSchema.safeParse(process.env);

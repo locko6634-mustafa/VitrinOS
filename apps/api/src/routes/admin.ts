@@ -41,6 +41,7 @@ export const adminRoutes: FastifyPluginAsync = async (fastify) => {
       columns: {
         id: true,
         email: true,
+        displayName: true,
         role: true,
         status: true,
         lastSignInAt: true,
@@ -53,11 +54,15 @@ export const adminRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   fastify.post('/api/v1/admin/users', async (request, reply) => {
-    const { email } = request.body as { email?: string; name?: string };
+    const { email, name } = request.body as { email?: string; name?: string };
     const normalizedEmail = email?.trim().toLowerCase();
+    const displayName = name?.trim();
 
     if (!normalizedEmail || !/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
       return reply.code(400).send({ code: 'INVALID_EMAIL', message: 'Geçerli bir e-posta adresi girin' });
+    }
+    if (!displayName || displayName.length < 2 || displayName.length > 120) {
+      return reply.code(400).send({ code: 'INVALID_NAME', message: 'Kullanıcı adı 2-120 karakter arasında olmalıdır' });
     }
 
     const existingUser = await fastify.db.query.users.findFirst({ where: eq(users.email, normalizedEmail) });
@@ -68,7 +73,7 @@ export const adminRoutes: FastifyPluginAsync = async (fastify) => {
     const activationToken = generateSessionToken();
     const temporaryPassword = await hashPassword(generateSessionToken());
     const [newUser] = await fastify.db.transaction(async (tx) => {
-      const [createdUser] = await tx.insert(users).values({ email: normalizedEmail, role: 'user', status: 'active' }).returning();
+      const [createdUser] = await tx.insert(users).values({ email: normalizedEmail, displayName, role: 'user', status: 'active' }).returning();
       await tx.insert(passwordCredentials).values({ userId: createdUser.id, passwordHash: temporaryPassword });
       await tx.insert(oneTimeTokens).values({
         userId: createdUser.id,
@@ -91,7 +96,7 @@ export const adminRoutes: FastifyPluginAsync = async (fastify) => {
       result: 'success'
     });
 
-    return reply.code(201).send({ data: { id: newUser.id, email: newUser.email } });
+    return reply.code(201).send({ data: { id: newUser.id, email: newUser.email, displayName: newUser.displayName } });
   });
 
   // Başvurular yalnızca yönetici yüzeyinden okunur ve güncellenir.

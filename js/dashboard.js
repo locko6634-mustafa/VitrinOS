@@ -335,9 +335,10 @@
       resultCreative.append(brandNode, headlineNode, metaNode);
     }
 
-    const canReview = ["succeeded", "approved"].includes(job.status);
-    if (approveButton) approveButton.hidden = !canReview;
-    if (reviseButton) reviseButton.hidden = !canReview;
+    const canApprove = job.status === "succeeded";
+    const canRevise = ["succeeded", "approved"].includes(job.status);
+    if (approveButton) approveButton.hidden = !canApprove;
+    if (reviseButton) reviseButton.hidden = !canRevise;
   }
 
   function renderAssets() {
@@ -457,12 +458,16 @@
   approveButton?.addEventListener("click", async () => {
     if (!state.currentJob) return;
     setStatus(briefStatus, "Onaylandı olarak işaretleniyor...");
+    setLoading(true);
     try {
-      // Approve action
+      await window.VitrinOS.api.post(`/jobs/${state.currentJob.id}/approve`, {});
       await fetchData();
+      setStatus(briefStatus, "Kreatif onaylandı.");
       renderAll();
     } catch (err) {
       setStatus(briefStatus, "Onaylama hatası: " + err.message, "error");
+    } finally {
+      setLoading(false);
     }
   });
 
@@ -478,7 +483,7 @@
     setStatus(briefStatus, "Revizyon talebi gönderiliyor...");
 
     try {
-      await window.VitrinOS.api.post(`/jobs/${state.currentJob.id}/retry`, { revisionNote: note });
+      await window.VitrinOS.api.post(`/jobs/${state.currentJob.id}/revision`, { revisionNote: note });
       await fetchData();
       setLoading(false);
       if (revisionBox) revisionBox.hidden = true;
