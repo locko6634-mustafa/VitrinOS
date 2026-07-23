@@ -78,9 +78,16 @@
                 <span>Marka ara</span>
                 <input id="brandSearch" type="search" placeholder="Marka adı veya kullanıcı">
               </label>
+              <label>
+                <span>Tema</span>
+                <select id="brandThemeFilter">
+                  <option value="all">Tümü</option>
+                  <option value="koyu">Koyu</option>
+                  <option value="acik">Açık</option>
+                </select>
+              </label>
               <button class="button secondary compact-button" type="button" id="newBrandButton">Yeni marka</button>
             </div>
-
             <div class="admin-grid-with-detail">
               <article class="admin-card admin-table-card">
                 <div class="admin-card-head">
@@ -91,10 +98,11 @@
                   <table class="admin-table">
                     <thead>
                       <tr>
-                        <th>Marka</th>
-                        <th>Web sitesi</th>
-                        <th>Tarih</th>
-                        <th>İşlemler</th>
+                        <th><button type="button" data-sort-brands="name">Marka</button></th>
+                        <th>Kullanıcı</th>
+                        <th>Tema</th>
+                        <th><button type="button" data-sort-brands="formatCount">Format</button></th>
+                        <th><button type="button" data-sort-brands="updatedAt">Güncelleme</button></th>
                       </tr>
                     </thead>
                     <tbody id="brandRows"></tbody>
@@ -104,52 +112,167 @@
 
               <form class="admin-card admin-form-card" id="brandForm" novalidate>
                 <div class="admin-card-head">
-                  <span>Marka ekle / düzenle</span>
-                  <strong id="brandFormTitle">Yeni marka</strong>
+                  <span>Marka detayı</span>
+                  <strong id="brandFormTitle">Marka seç</strong>
                 </div>
+                <input type="hidden" id="brandId">
                 <div class="admin-form-grid">
-                  <label>Marka adı<input name="name" id="brandName" required></label>
-                  <label>Web sitesi<input name="websiteUrl" id="brandWebsite" type="url"></label>
+                  <label>Marka adı<input id="brandName" required></label>
+                  <label>Logo URL<input id="brandLogo" type="url"></label>
+                  <label>Web sitesi<input id="brandWebsite" type="url"></label>
+                  <label>Marka sahibi<select id="brandOwner"><option value="">Atanmamış</option></select></label>
+                  <label>Tema<select id="brandTheme"><option value="koyu">Koyu</option><option value="acik">Açık</option></select></label>
+                  <label>Birincil renk<input id="brandPrimary" type="color"></label>
+                  <label>İkincil renk<input id="brandSecondary" type="color"></label>
                 </div>
-                <button class="button primary" type="submit">Markayı kaydet</button>
+                <label>Marka tonu ve kuralları<textarea id="brandTone" rows="3"></textarea></label>
+                <label>Yasaklı kelimeler<input id="brandBanned" placeholder="virgül ile ayır"></label>
+
+                <div class="admin-prompt-accordion">
+                  <details class="prompt-details">
+                    <summary>Base Prompt (Brief Analiz Ajanı)</summary>
+                    <div class="prompt-content">
+                      <label>Brief Analiz Prompt Şablonu
+                        <textarea id="basePrompt" rows="4"></textarea>
+                        <button type="button" data-copy-template="base_prompt" class="admin-row-button">Şablonu Kopyala</button>
+                      </label>
+                    </div>
+                  </details>
+                  
+                  <details class="prompt-details">
+                    <summary>Story (Dikey 9:16) Prompts</summary>
+                    <div class="prompt-content">
+                      <label>Story Metin Oluşturucu<textarea id="storyTextPrompt" rows="3"></textarea><button type="button" data-copy-template="story_text_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                      <label>Story Arka Plan Oluşturucu<textarea id="storyBgPrompt" rows="3"></textarea><button type="button" data-copy-template="story_bg_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                      <label>Story Görsel Entegrasyon<textarea id="storyImgPrompt" rows="3"></textarea><button type="button" data-copy-template="story_img_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                    </div>
+                  </details>
+                  
+                  <details class="prompt-details">
+                    <summary>Banner (Yatay) Prompts</summary>
+                    <div class="prompt-content">
+                      <label>Banner Metin Oluşturucu<textarea id="bannerTextPrompt" rows="3"></textarea><button type="button" data-copy-template="banner_text_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                      <label>Banner Arka Plan Oluşturucu<textarea id="bannerBgPrompt" rows="3"></textarea><button type="button" data-copy-template="banner_bg_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                      <label>Banner Görsel Entegrasyon<textarea id="bannerImgPrompt" rows="3"></textarea><button type="button" data-copy-template="banner_img_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                    </div>
+                  </details>
+
+                  <details class="prompt-details">
+                    <summary>Meta Post (Kare/Dikey) Prompts</summary>
+                    <div class="prompt-content">
+                      <label>Meta Post Metin Oluşturucu<textarea id="metaPostTextPrompt" rows="3"></textarea><button type="button" data-copy-template="meta_post_text_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                      <label>Meta Post Arka Plan Oluşturucu<textarea id="metaPostBgPrompt" rows="3"></textarea><button type="button" data-copy-template="meta_post_bg_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                      <label>Meta Post Görsel Entegrasyon<textarea id="metaPostImgPrompt" rows="3"></textarea><button type="button" data-copy-template="meta_post_img_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                    </div>
+                  </details>
+
+                  <details class="prompt-details">
+                    <summary>Revizyon (Görsel Düzenleme) Prompt</summary>
+                    <div class="prompt-content">
+                      <label>Görsel Revize Ajanı<textarea id="revizePrompt" rows="4"></textarea><button type="button" data-copy-template="revize_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                    </div>
+                  </details>
+                </div>
+                <button class="button primary" type="submit">Marka ayarlarını güncelle</button>
                 <p class="form-status" id="brandStatus" role="status" aria-live="polite"></p>
               </form>
             </div>
           </section>
 
           <section class="admin-panel" id="admin-panel-users" role="tabpanel" aria-labelledby="admin-tab-users" data-admin-panel="users" hidden>
+            <div class="admin-toolbar">
+              <label class="admin-search"><span>Kullanıcı ara</span><input id="userSearch" type="search" placeholder="e-posta veya marka"></label>
+              <label><span>Durum</span><select id="userStatusFilter"><option value="all">Tümü</option><option value="active">Aktif</option><option value="inactive">Pasif</option></select></label>
+              <button class="button secondary compact-button" type="button" id="inviteUserButton">Kullanıcı davet et</button>
+            </div>
             <article class="admin-card admin-table-card">
               <div class="admin-card-head"><span>Kullanıcı yönetimi</span><strong id="userCount">0 kullanıcı</strong></div>
               <div class="admin-table-wrap">
                 <table class="admin-table">
-                  <thead><tr><th>E-posta</th><th>Rol</th><th>Durum</th><th>Kayıt tarihi</th><th>İşlemler</th></tr></thead>
+                  <thead><tr><th>E-posta</th><th>Marka</th><th>Job</th><th>Son giriş</th><th>Durum</th><th>Aksiyon</th></tr></thead>
                   <tbody id="userRows"></tbody>
                 </table>
               </div>
             </article>
           </section>
 
-          <section class="admin-panel" id="admin-panel-jobs" role="tabpanel" aria-labelledby="admin-tab-jobs" data-admin-panel="jobs" hidden>
+          <section class="admin-panel" id="admin-panel-leads" role="tabpanel" aria-labelledby="admin-tab-leads" data-admin-panel="leads" hidden>
+            <div class="admin-toolbar">
+              <label class="admin-search"><span>Başvuru ara</span><input id="leadSearch" type="search" placeholder="ad, şirket veya e-posta"></label>
+              <label><span>Durum</span><select id="leadStatusFilter"><option value="all">Tümü</option><option value="new">Yeni</option><option value="reviewed">İncelendi</option><option value="approved">Onaylandı</option><option value="rejected">Reddedildi</option></select></label>
+            </div>
             <article class="admin-card admin-table-card">
-              <div class="admin-card-head"><span>İş takibi</span><strong id="jobCount">0 iş</strong></div>
+              <div class="admin-card-head"><span>Başvuru yönetimi</span><strong id="leadCount">0 başvuru</strong></div>
               <div class="admin-table-wrap">
                 <table class="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Brief</th>
-                      <th>Format</th>
-                      <th>Durum</th>
-                      <th>Saat</th>
-                    </tr>
-                  </thead>
-                  <tbody id="jobRows"></tbody>
+                  <thead><tr><th>Ad</th><th>Şirket</th><th>E-posta</th><th>İhtiyaç</th><th>Durum</th><th>Aksiyon</th></tr></thead>
+                  <tbody id="leadRows"></tbody>
                 </table>
               </div>
             </article>
           </section>
+
+          <section class="admin-panel" id="admin-panel-jobs" role="tabpanel" aria-labelledby="admin-tab-jobs" data-admin-panel="jobs" hidden>
+            <div class="admin-toolbar">
+              <label><span>Marka</span><select id="jobBrandFilter"><option value="all">Tümü</option></select></label>
+              <label><span>Format</span><select id="jobFormatFilter"><option value="all">Tümü</option><option value="Banner">Banner</option><option value="Meta Post">Meta Post</option><option value="Story">Story</option></select></label>
+              <label><span>Durum</span><select id="jobStatusFilter"><option value="all">Tümü</option><option value="pending">Pending</option><option value="processing">Processing</option><option value="completed">Completed</option><option value="failed">Failed</option><option value="approved">Approved</option><option value="revision_requested">Revision requested</option></select></label>
+            </div>
+            <div class="admin-grid-with-detail">
+              <article class="admin-card admin-table-card">
+                <div class="admin-card-head"><span>Job izleme</span><strong id="jobCount">0 job</strong></div>
+                <div class="admin-table-wrap">
+                  <table class="admin-table">
+                    <thead>
+                      <tr>
+                        <th><button type="button" data-sort-jobs="id">Job ID</button></th>
+                        <th>Marka</th>
+                        <th>Format</th>
+                        <th><button type="button" data-sort-jobs="status">Durum</button></th>
+                        <th>Revizyon</th>
+                        <th><button type="button" data-sort-jobs="createdAt">Tarih</button></th>
+                      </tr>
+                    </thead>
+                    <tbody id="jobRows"></tbody>
+                  </table>
+                </div>
+              </article>
+              <aside class="admin-card admin-detail" id="jobDetail" tabindex="-1" aria-live="polite">
+                <div class="admin-card-head"><span>Job detayı</span><strong>Seçim bekliyor</strong></div>
+                <p class="admin-empty">Tablodan bir job seç.</p>
+              </aside>
+            </div>
+          </section>
         </main>
       </div>
     </div>
+
+    <dialog class="admin-dialog" id="adminConfirmDialog" aria-labelledby="adminConfirmTitle" aria-describedby="adminConfirmMessage">
+      <form method="dialog">
+        <p class="kicker">Operasyon onayı</p>
+        <h2 id="adminConfirmTitle">İşlemi onayla</h2>
+        <p id="adminConfirmMessage"></p>
+        <div class="admin-dialog-actions">
+          <button class="button secondary" type="submit" value="cancel">Vazgeç</button>
+          <button class="button primary" id="adminConfirmButton" type="submit" value="confirm">Onayla</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="admin-dialog" id="adminInviteDialog" aria-labelledby="adminInviteTitle">
+      <form method="dialog" id="adminInviteForm">
+        <p class="kicker">Güvenli davet</p>
+        <h2 id="adminInviteTitle">Yeni kullanıcı davet et</h2>
+        <label>E-posta adresi<input id="adminInviteEmail" type="email" autocomplete="email" required></label>
+        <label>Kullanıcı adı<input id="adminInviteName" autocomplete="name" required></label>
+        <div class="admin-dialog-actions">
+          <button class="button secondary" type="submit" value="cancel" formnovalidate>Vazgeç</button>
+          <button class="button primary" type="submit" value="confirm">Daveti gönder</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast-region" id="adminToastRegion" role="status" aria-live="polite" aria-atomic="false"></div>
 
     <script src="js/config.js?v=1.1"></script>
     <script src="js/observability.js?v=1.1"></script>
