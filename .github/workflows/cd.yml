@@ -25,6 +25,6 @@ jobs:
             set -e
             echo "==> Updating VitrinOS production deployment..."
             cd /opt/vitrinos/app
-            git pull origin main
+            git pull https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/locko6634-mustafa/VitrinOS.git main
             docker compose -f infra/compose/docker-compose.production.yml --env-file infra/compose/production.env up -d --build
             echo "==> Deployment completed successfully!"
