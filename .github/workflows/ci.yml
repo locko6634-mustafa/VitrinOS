@@ -25,5 +25,18 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: npm
       - run: npm ci
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Start static server
+        run: |
+          python3 -m http.server 8000 > /tmp/vitrinos-http.log 2>&1 &
+          for attempt in {1..10}; do
+            if curl --silent --fail http://localhost:8000/index.html > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/vitrinos-http.log
+          exit 1
       - run: npm run check
       - run: npm audit --audit-level=high
