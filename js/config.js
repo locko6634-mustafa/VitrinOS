@@ -10,9 +10,15 @@
       : appBasePath
   );
 
+  const isLocalhost = Boolean(
+    window.location?.hostname === "localhost" ||
+    window.location?.hostname === "127.0.0.1" ||
+    window.location?.hostname === "[::1]"
+  );
+
   const defaults = {
     apiBaseUrl: "/api/v1",
-    environment: "development",
+    environment: isLocalhost ? "development" : "production",
     appBasePath: runtimeConfig.appBasePath || appBasePath,
     appUrl,
     contactEmail: "",
