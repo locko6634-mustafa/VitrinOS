@@ -167,6 +167,9 @@ services:
     networks:
       - vitrinos_internal
       - vitrinos_automation
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     depends_on:
       postgres:
         condition: service_healthy
