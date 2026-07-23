@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import nodemailer from 'nodemailer';
 import { createDb, claimNextOutboxJob, eq, jobAttempts, jobEvents, jobs, outboxJobs, sql } from '@vitrinos/db';
 import { generateHmacSignature } from '@vitrinos/security';
 import { config } from './config.js';
@@ -8,8 +9,59 @@ type DispatchPayload = {
   attemptId: string;
 };
 
+type EmailPayload = {
+  to: string;
+  template: 'activate_account' | 'forgot_password';
+  data: { token: string; email: string };
+};
+
 const db = createDb(config.DATABASE_URL);
 const workerId = `worker-${crypto.randomUUID()}`;
+
+function getMailTransport() {
+  if (!config.SMTP_HOST || !config.SMTP_USER || !config.SMTP_PASSWORD || !config.MAIL_FROM) {
+    throw new Error('SMTP ayarları eksik: SMTP_HOST, SMTP_USER, SMTP_PASSWORD ve MAIL_FROM zorunludur');
+  }
+
+  return nodemailer.createTransport({
+    host: config.SMTP_HOST,
+    port: config.SMTP_PORT,
+    secure: config.SMTP_SECURE,
+    auth: { user: config.SMTP_USER, pass: config.SMTP_PASSWORD },
+  });
+}
+
+function activationLink(token: string, mode: 'activate' | 'reset'): string {
+  const baseUrl = config.APP_URL.replace(/\/$/, '');
+  return `${baseUrl}/set-password.html?token=${encodeURIComponent(token)}&mode=${mode}`;
+}
+
+async function processEmail(outbox: typeof outboxJobs.$inferSelect): Promise<void> {
+  const payload = outbox.payload as EmailPayload;
+  if (!payload?.to || !payload?.data?.token || !['activate_account', 'forgot_password'].includes(payload.template)) {
+    throw new Error(`Geçersiz e-posta payload'ı: ${outbox.id}`);
+  }
+
+  const isActivation = payload.template === 'activate_account';
+  const subject = isActivation ? 'VitrinOS hesabınızı aktifleştirin' : 'VitrinOS şifre sıfırlama bağlantınız';
+  const heading = isActivation ? 'VitrinOS\'a hoş geldiniz' : 'Şifrenizi yenileyin';
+  const message = isActivation
+    ? 'Hesabınızı aktifleştirmek ve şifrenizi belirlemek için aşağıdaki bağlantıyı kullanın.'
+    : 'Şifrenizi yenilemek için aşağıdaki bağlantıyı kullanın.';
+  const link = activationLink(payload.data.token, isActivation ? 'activate' : 'reset');
+
+  await getMailTransport().sendMail({
+    from: config.MAIL_FROM,
+    to: payload.to,
+    subject,
+    text: `${heading}\n\n${message}\n\n${link}\n\nBu bağlantı ${isActivation ? '24 saat' : '1 saat'} geçerlidir.`,
+    html: `<h1>${heading}</h1><p>${message}</p><p><a href="${link}">${isActivation ? 'Hesabımı aktifleştir' : 'Şifremi yenile'}</a></p><p>Bu bağlantı ${isActivation ? '24 saat' : '1 saat'} geçerlidir.</p>`,
+  });
+
+  await db.update(outboxJobs)
+    .set({ status: 'succeeded', lockedAt: null, lockedBy: null, updatedAt: new Date() })
+    .where(eq(outboxJobs.id, outbox.id));
+}
 
 function retryAt(attemptCount: number): Date {
   const delaySeconds = Math.min(300, 10 * 2 ** Math.max(0, attemptCount - 1));
@@ -109,12 +161,14 @@ async function workLoop(): Promise<void> {
   try {
     const outbox = await db.transaction((tx) => claimNextOutboxJob(tx, workerId));
     if (!outbox) return;
-    if (outbox.type !== 'n8n_dispatch') {
-      await db.update(outboxJobs).set({ status: 'succeeded', lockedAt: null, lockedBy: null, updatedAt: new Date() }).where(eq(outboxJobs.id, outbox.id));
-      return;
-    }
     try {
-      await processDispatch(outbox);
+      if (outbox.type === 'n8n_dispatch') {
+        await processDispatch(outbox);
+      } else if (outbox.type === 'email') {
+        await processEmail(outbox);
+      } else {
+        throw new Error(`Desteklenmeyen outbox iÅŸ tipi: ${outbox.type}`);
+      }
     } catch (error) {
       await handleFailure(outbox, error);
     }

@@ -157,6 +157,13 @@ services:
       N8N_WEBHOOK_URL: http://n8n:5678/webhook/vitrinos-brief-v2
       N8N_WEBHOOK_SECRET: ${N8N_WEBHOOK_SECRET:?N8N_WEBHOOK_SECRET zorunludur}
       WORKER_POLL_INTERVAL_MS: 5000
+      SMTP_HOST: ${SMTP_HOST:?SMTP_HOST zorunludur}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_SECURE: ${SMTP_SECURE:-true}
+      SMTP_USER: ${SMTP_USER:?SMTP_USER zorunludur}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:?SMTP_PASSWORD zorunludur}
+      MAIL_FROM: ${MAIL_FROM:?MAIL_FROM zorunludur}
+      APP_URL: ${APP_URL:?APP_URL zorunludur}
     networks:
       - vitrinos_internal
       - vitrinos_automation
