@@ -44,16 +44,15 @@
         metaPost: { name: "Meta Post", dimensions: "1080x1350", keywords: [] }
       },
       statuses: {
-        values: ["pending", "processing", "completed", "approved", "failed", "revision_requested", "failed_dispatch", "pending_retry"],
+        values: ["queued", "dispatching", "processing", "succeeded", "failed_retryable", "failed_terminal", "cancelled"],
         labels: {
-          pending: "Bekliyor",
+          queued: "Sırada",
+          dispatching: "Gönderiliyor",
           processing: "Üretiliyor",
-          completed: "Tamamlandı",
-          approved: "Onaylandı",
-          failed: "Başarısız",
-          revision_requested: "Revizyon istendi",
-          failed_dispatch: "Tetikleme Başarısız",
-          pending_retry: "Yeniden Denenecek"
+          succeeded: "Tamamlandı",
+          failed_retryable: "Yeniden Denenecek",
+          failed_terminal: "Başarısız",
+          cancelled: "İptal Edildi"
         }
       },
       dashboard: {

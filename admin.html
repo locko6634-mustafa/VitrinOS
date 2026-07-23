@@ -8,7 +8,6 @@
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" fill="%23f8f4ec"/%3E%3Cpath d="M11 15h11l10 30 10-30h11L38 53H26L11 15Z" fill="%231d1e22"/%3E%3Cpath d="M46 42h9v9h-9z" fill="%23f46b22"/%3E%3C/svg%3E'>
     <link rel="stylesheet" href="css/style.css?v=2.1">
-    <link rel="stylesheet" href="css/dashboard.css?v=2.1">
     <link rel="stylesheet" href="css/admin.css?v=2.5">
   </head>
   <body class="app-body admin-body" data-surface="admin">
@@ -42,38 +41,13 @@
             <span>Creative command desk</span>
             <strong>Operasyon merkezi</strong>
           </div>
-          <ul class="admin-nav" role="tablist" aria-label="Yönetim sekmeleri">
-            <li role="presentation">
-              <button class="admin-nav-button is-active" id="admin-tab-overview" role="tab" aria-selected="true" aria-controls="admin-panel-overview" data-admin-tab="overview">
-                <span class="nav-icon" aria-hidden="true">01</span>
-                <span class="nav-text">Kontrol merkezi</span>
-              </button>
-            </li>
-            <li role="presentation">
-              <button class="admin-nav-button" id="admin-tab-brands" role="tab" aria-selected="false" aria-controls="admin-panel-brands" data-admin-tab="brands">
-                <span class="nav-icon" aria-hidden="true">02</span>
-                <span class="nav-text">Markalar</span>
-              </button>
-            </li>
-            <li role="presentation">
-              <button class="admin-nav-button" id="admin-tab-users" role="tab" aria-selected="false" aria-controls="admin-panel-users" data-admin-tab="users">
-                <span class="nav-icon" aria-hidden="true">03</span>
-                <span class="nav-text">Kullanıcılar</span>
-              </button>
-            </li>
-            <li role="presentation">
-              <button class="admin-nav-button" id="admin-tab-leads" role="tab" aria-selected="false" aria-controls="admin-panel-leads" data-admin-tab="leads">
-                <span class="nav-icon" aria-hidden="true">04</span>
-                <span class="nav-text">Başvurular</span>
-              </button>
-            </li>
-            <li role="presentation">
-              <button class="admin-nav-button" id="admin-tab-jobs" role="tab" aria-selected="false" aria-controls="admin-panel-jobs" data-admin-tab="jobs">
-                <span class="nav-icon" aria-hidden="true">05</span>
-                <span class="nav-text">Job izleme</span>
-              </button>
-            </li>
-          </ul>
+          <nav class="admin-nav" aria-label="Operasyon bölümleri" role="tablist" aria-orientation="vertical">
+            <button class="admin-nav-button is-active" id="admin-tab-overview" type="button" role="tab" aria-controls="admin-panel-overview" aria-selected="true" tabindex="0" data-admin-tab="overview"><span>01</span>Kontrol merkezi</button>
+            <button class="admin-nav-button" id="admin-tab-brands" type="button" role="tab" aria-controls="admin-panel-brands" aria-selected="false" tabindex="-1" data-admin-tab="brands"><span>02</span>Markalar</button>
+            <button class="admin-nav-button" id="admin-tab-users" type="button" role="tab" aria-controls="admin-panel-users" aria-selected="false" tabindex="-1" data-admin-tab="users"><span>03</span>Kullanıcılar</button>
+            <button class="admin-nav-button" id="admin-tab-leads" type="button" role="tab" aria-controls="admin-panel-leads" aria-selected="false" tabindex="-1" data-admin-tab="leads"><span>04</span>Başvurular</button>
+            <button class="admin-nav-button" id="admin-tab-jobs" type="button" role="tab" aria-controls="admin-panel-jobs" aria-selected="false" tabindex="-1" data-admin-tab="jobs"><span>05</span>Job izleme</button>
+          </nav>
 
           <div class="app-rail-footer admin-sidebar-actions">
             <a class="admin-nav-button" href="dashboard.html">
@@ -215,7 +189,7 @@
           <section class="admin-panel" id="admin-panel-users" role="tabpanel" aria-labelledby="admin-tab-users" data-admin-panel="users" hidden>
             <div class="admin-toolbar">
               <label class="admin-search"><span>Kullanıcı ara</span><input id="userSearch" type="search" placeholder="e-posta veya marka"></label>
-              <label><span>Durum</span><select id="userStatusFilter"><option value="all">Tümü</option><option value="active">Aktif</option><option value="inactive">Pasif</option></select></label>
+              <label><span>Durum</span><select id="userStatusFilter"><option value="all">Tümü</option><option value="active">Aktif</option><option value="suspended">Askıda</option></select></label>
               <button class="button secondary compact-button" type="button" id="inviteUserButton">Kullanıcı davet et</button>
             </div>
             <article class="admin-card admin-table-card">
@@ -249,7 +223,7 @@
             <div class="admin-toolbar">
               <label><span>Marka</span><select id="jobBrandFilter"><option value="all">Tümü</option></select></label>
               <label><span>Format</span><select id="jobFormatFilter"><option value="all">Tümü</option><option value="Banner">Banner</option><option value="Meta Post">Meta Post</option><option value="Story">Story</option></select></label>
-              <label><span>Durum</span><select id="jobStatusFilter"><option value="all">Tümü</option><option value="pending">Pending</option><option value="processing">Processing</option><option value="completed">Completed</option><option value="failed">Failed</option><option value="approved">Approved</option><option value="revision_requested">Revision requested</option></select></label>
+              <label><span>Durum</span><select id="jobStatusFilter"><option value="all">Tümü</option><option value="queued">Sırada</option><option value="dispatching">Gönderiliyor</option><option value="processing">Üretiliyor</option><option value="succeeded">Tamamlandı</option><option value="failed_retryable">Yeniden denenecek</option><option value="failed_terminal">Başarısız</option><option value="cancelled">İptal edildi</option></select></label>
             </div>
             <div class="admin-grid-with-detail">
               <article class="admin-card admin-table-card">
@@ -306,7 +280,7 @@
 
     <div class="toast-region" id="adminToastRegion" role="status" aria-live="polite" aria-atomic="false"></div>
 
-    <script src="js/config.js?v=1.1"></script>
+    <script src="js/config.js?v=1.2"></script>
     <script src="js/observability.js?v=1.1"></script>
     <script src="js/api-client.js"></script>
     <script src="js/auth-store.js"></script>

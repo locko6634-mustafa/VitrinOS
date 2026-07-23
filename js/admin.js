@@ -25,6 +25,7 @@
 
   const text = (value) => value == null || value === "" ? "—" : String(value);
   const date = (value) => value ? new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value)) : "—";
+  const jobStatusLabel = (status) => ({ queued: "Sırada", dispatching: "Gönderiliyor", processing: "Üretiliyor", succeeded: "Tamamlandı", failed_retryable: "Yeniden denenecek", failed_terminal: "Başarısız", cancelled: "İptal edildi" }[status] || text(status));
   const palette = (brand) => brand.colorPalette || {};
   const packPrompt = (text, background, image) => JSON.stringify({ text, background, image });
   const unpackPrompt = (value) => {
@@ -141,7 +142,7 @@
     if (nodes.jobCount) nodes.jobCount.textContent = `${jobs.length} job`;
     jobs.forEach((item) => {
       const row = document.createElement("tr"); const brand = state.brands.find((entry) => entry.id === item.brandId);
-      appendCell(row, item.id.slice(0, 8)); appendCell(row, brand?.name); appendCell(row, item.format); appendCell(row, item.status); appendCell(row, item.revisionCount); appendCell(row, date(item.createdAt));
+      appendCell(row, item.id.slice(0, 8)); appendCell(row, brand?.name); appendCell(row, item.format); appendCell(row, jobStatusLabel(item.status)); appendCell(row, item.revisionCount); appendCell(row, date(item.createdAt));
       row.addEventListener("click", () => {
         if (!nodes.jobDetail) return;
         nodes.jobDetail.replaceChildren(); const title = document.createElement("strong"); title.textContent = `${brand?.name || "Marka"} · ${item.format}`;
