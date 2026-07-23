@@ -3,7 +3,7 @@ import { access, readFile } from "node:fs/promises";
 const requiredFiles = [
   "quality/docs/ops-resilience-runbook.md",
   "quality/docs/restore-drill.md",
-  "supabase/migrations/20260714140000_protect_lead_attempt_hashes_and_retention.sql"
+  "packages/db/src/schema.ts"
 ];
 
 for (const file of requiredFiles) await access(file);

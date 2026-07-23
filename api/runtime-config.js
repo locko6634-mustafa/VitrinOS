@@ -26,9 +26,6 @@ function handler(_request, response) {
     `window.VitrinOSRuntimeConfig = ${JSON.stringify({
       environment: process.env.VERCEL_ENV || "development",
       appUrl,
-      supabaseUrl: process.env.SUPABASE_URL || defaults.supabaseUrl || "",
-      supabasePublishableKey: process.env.SUPABASE_PUBLISHABLE_KEY || defaults.supabasePublishableKey || "",
-      supabaseProjectRef: process.env.SUPABASE_PROJECT_REF || defaults.supabaseProjectRef || "",
       contactEmail: process.env.PUBLIC_CONTACT_EMAIL || "",
       sentryDsn: process.env.SENTRY_DSN || process.env.PUBLIC_SENTRY_DSN || defaults.sentryDsn || "",
       observabilitySampleRate: process.env.OBSERVABILITY_SAMPLE_RATE ? parseFloat(process.env.OBSERVABILITY_SAMPLE_RATE) : defaults.observabilitySampleRate,

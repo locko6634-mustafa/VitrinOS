@@ -11,28 +11,25 @@ test("frontend config gözlemlenebilirlik ayarlarını içerir", async () => {
   assert.equal(typeof context.window.VitrinOS.config.observabilitySampleRate, "number");
 });
 
-test("frontend Supabase bağlantısı runtime config üzerinden gelir", async () => {
+test("frontend runtime config ortam değişkenlerini başarıyla alır", async () => {
   const source = await readFile("js/config.js", "utf8");
   assert.doesNotMatch(source, /wrzalebhnlwppufdcmiz|sb_publishable_/);
   const context = {
     window: {
       VitrinOSRuntimeConfig: {
         environment: "preview",
-        supabaseUrl: "https://preview.supabase.co",
-        supabasePublishableKey: "preview-key"
+        appUrl: "https://preview.vitrinos.local"
       }
     }
   };
   vm.runInNewContext(source, context);
   assert.equal(context.window.VitrinOS.config.environment, "preview");
-  assert.equal(context.window.VitrinOS.config.supabaseUrl, "https://preview.supabase.co");
-  assert.equal(context.window.VitrinOS.config.supabasePublishableKey, "preview-key");
+  assert.equal(context.window.VitrinOS.config.appUrl, "https://preview.vitrinos.local");
 });
 
 test("runtime endpoint secret değerleri dışarı aktarmıyor", async () => {
   const source = await readFile("api/runtime-config.js", "utf8");
   assert.match(source, /PUBLIC_APP_URL/);
-  assert.match(source, /SUPABASE_PUBLISHABLE_KEY/);
   assert.match(source, /VERCEL_ENV/);
   assert.doesNotMatch(source, /SERVICE_ROLE|N8N_WEBHOOK_SECRET|LEAD_HASH_SECRET/);
 });

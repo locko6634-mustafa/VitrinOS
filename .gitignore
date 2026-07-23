@@ -41,7 +41,4 @@ web_modules/
 *.env
 *.env.local
 
-# Supabase local files
-supabase/.temp/
-
 *.md
