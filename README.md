@@ -1,8 +1,8 @@
 # 🌟 VitrinOS
 
-VitrinOS, e-ticaret markaları için yapay zeka destekli, otomatik pazarlama görselleri (Banner, Meta Post, Story) ve reklam metinleri üreten, uçtan uca yapılandırılmış modern bir görsel otomasyon platformudur. 
+VitrinOS, e-ticaret markaları için yapay zeka destekli, otomatik pazarlama görselleri (Banner, Meta Post, Story) ve reklam metinleri üreten, uçtan uca yapılandırılmış modern ve self-hosted bir görsel otomasyon platformudur.
 
-Sistem; temiz bir web arayüzü (Vanilla HTML/CSS/JS), güçlü bir ilişkisel veritabanı (Supabase) ve esnek bir yapay zeka orkestrasyon motorunu (n8n & OpenAI DALL-E / GPT) bir araya getirir.
+Sistem; temiz bir web arayüzü (Vanilla HTML/CSS/JS), özelleştirilmiş self-hosted backend (Node.js/Express API, PostgreSQL & S3/MinIO Storage) ve esnek bir yapay zeka orkestrasyon motorunu (n8n & OpenAI DALL-E / GPT) bir araya getirir.
 
 ---
 
@@ -12,23 +12,24 @@ Sistemin temel çalışma mantığı ve veri akışı aşağıdaki şemada özet
 
 ```mermaid
 graph TD
-    A[Müşteri / Dashboard] -->|1. Brief & Format Gönder| B[n8n Webhook / VitrinOS_BASE]
-    B -->|2. Marka & Prompt Bilgisi Sorgula| C[(Supabase Database)]
-    C -->|3. Kurallar & Şablonlar| B
-    B -->|4. Brief Analizi & Filtreleme| D[LLM Brief Analiz Ajanı]
-    D -->|5. Yapılandırılmış JSON Çıktısı| B
-    B -->|6. Format Router| E{Görsel Formatı?}
+    A[Müşteri / Dashboard] -->|1. Brief & Format Gönder| B[Self-Hosted Node.js API /apps/api]
+    B -->|2. Webhook Tetikle| C[n8n Webhook / VitrinOS_BASE]
+    C -->|3. Marka & Prompt Sorgula| D[(Self-Hosted PostgreSQL)]
+    D -->|4. Kurallar & Şablonlar| C
+    C -->|5. Brief Analizi & Filtreleme| E[LLM Brief Analiz Ajanı]
+    E -->|6. Yapılandırılmış JSON Çıktısı| C
+    C -->|7. Format Router| F{Görsel Formatı?}
     
-    E -->|Meta Post| F[VitrinOS_META_POST]
-    E -->|Story| G[VitrinOS_STORY]
-    E -->|Banner| H[VitrinOS_BANNER]
-    E -->|Revizyon| I[VitrinOS_REVIZE]
+    F -->|Meta Post| G[VitrinOS_META_POST]
+    F -->|Story| H[VitrinOS_STORY]
+    F -->|Banner| I[VitrinOS_BANNER]
+    F -->|Revizyon| J[VitrinOS_REVIZE]
     
-    F & G & H & I -->|7. Görsel ve Metin Üretimi| J[OpenAI DALL-E & GPT]
-    J -->|8. Logo Ekleme & Boyutlandırma| K[Jimp Image Engine]
-    K -->|9. Nihai Görseli Storage'a Yükle| L[(Supabase Storage)]
-    L -->|10. URL & Durum Güncelle| C
-    C -->|11. Gerçek Zamanlı Bildirim| A
+    G & H & I & J -->|8. Görsel ve Metin Üretimi| K[OpenAI DALL-E & GPT]
+    K -->|9. Logo Ekleme & Boyutlandırma| L[Jimp Image Engine]
+    L -->|10. Nihai Görseli Storage'a Yükle| M[(Self-Hosted Storage / MinIO)]
+    M -->|11. URL & Durum Güncelle| D
+    D -->|12. Canlı Bildirim / SSE| A
 ```
 
 ---
@@ -41,50 +42,43 @@ Platform, hafif ve hızlı olması amacıyla harici framework bağımlılığı 
 * **[login.html](file:///c:/Users/Mustafa/Desktop/VitrinOS/login.html):** Güvenli kullanıcı ve yönetici giriş paneli.
 * **[dashboard.html](file:///c:/Users/Mustafa/Desktop/VitrinOS/dashboard.html):** Müşterilerin yeni brief tanımlayabildiği, geçmiş işleri takip ettiği, üretilen görselleri ve metinleri görüntüleyip onayladığı ya da revizyon talep ettiği ana kontrol paneli.
 * **[admin.html](file:///c:/Users/Mustafa/Desktop/VitrinOS/admin.html):** Yöneticilerin markaları, markalara özel AI prompt şablonlarını yönetebildiği ve tüm iş akışlarını denetleyebildiği yönetim paneli.
+* **[mfa-setup.html](file:///c:/Users/Mustafa/Desktop/VitrinOS/mfa-setup.html) & [mfa-challenge.html](file:///c:/Users/Mustafa/Desktop/VitrinOS/mfa-challenge.html):** İki faktörlü kimlik doğrulama ekranları.
 
-### 2. Backend & Veritabanı (Supabase)
-Backend hizmetleri, PostgreSQL tabanlı Supabase üzerinde barındırılmaktadır.
-* **Brands (`brands`):** Markaların adları, logoları, web siteleri, renk paletleri ve marka ses tonu kuralları (`tone_rules`, `banned_words`) burada saklanır.
-* **Brand Prompts (`brand_prompts`):** Her markanın Banner, Meta Post, Story formatları ve revizyon işlemleri için özelleştirilmiş sistem prompt şablonlarını barındırır.
-* **Jobs (`jobs`):** Görsel üretim taleplerini (brief, format, durum, üretilen resim URL'si, revizyon notları ve LLM'den dönen normalize JSON) takip eder.
-* **Leads (`leads`):** İletişim formu üzerinden gelen müşteri adayı taleplerini saklar.
-* **Güvenlik (RLS):** Row Level Security politikaları sıkılaştırılarak kullanıcıların yalnızca kendi markalarına ve işlerine erişmesi, yöneticilerin ise tüm sistemi yönetebilmesi garanti altına alınmıştır.
+### 2. Self-Hosted Backend & Veritabanı
+Backend altyapısı tamamen self-hosted mimariye taşınmış olup Node.js Express API ve PostgreSQL veritabanı üzerinde barındırılmaktadır.
+* **API Servisi (`apps/api`):** Kimlik doğrulama (JWT & MFA), lead yönetimi, iş takibi, SSE canlı yayınları ve admin endpoint'lerini sunan Express tabanlı API.
+* **Arka Plan İşleyici (`apps/worker`):** Zamanlanmış görevler ve arka plan iş akışlarını yürüten servis.
+* **Veritabanı Paketleri (`packages/db`):** PostgreSQL şema yönetimi, migration'lar ve sorgu katmanı.
+* **Depolama Katmanı (`packages/storage`):** Üretilen görsel ve varlıkların self-hosted S3/MinIO üzerinde yönetimi.
 
 ### 3. Yapay Zeka & Orkestrasyon (n8n)
-Sistemin beyni, n8n üzerinde çalışan 5 adet entegre iş akışından oluşmaktadır.
+Sistemin beyni, self-hosted n8n sunucusu üzerinde çalışan 5 adet entegre iş akışından oluşmaktadır.
 
 ---
 
 ## 🤖 n8n İş Akışları (Workflows)
 
 ### 1. `VitrinOS_BASE`
-Sistemin ana kontrol merkezidir. Dashboard'dan gelen webhook isteklerini karşılar ve yönlendirir.
-* **Akış Türü:** Tetikleyici (Webhook - `/vitrinos-brief`).
+Sistemin ana kontrol merkezidir. Backend API'den gelen webhook isteklerini karşılar ve yönlendirir.
+* **Akış Türü:** Tetikleyici (Webhook - `/webhook/vitrinos-brief`).
 * **Çalışma Mantığı:**
   1. Gelen isteğin yeni bir brief mi yoksa revizyon isteği mi olduğunu ayırt eder.
-  2. Supabase'den ilgili markanın ses tonu ve prompt şablonu verilerini çeker.
-  3. **Yeni Brief ise:** `LLM_Brief_Analiz_Ajani` (GPT-4o-mini) kullanarak brief metnini marka kurallarına ve yasaklı kelimelere göre süzgeçten geçirir. Çıktıyı JSON formatına parse eder. `Gorsel_Formati_Router` ile işi alt akışlara (Meta Post, Story, Banner) yönlendirir.
+  2. Veritabanından ilgili markanın ses tonu ve prompt şablonu verilerini çeker.
+  3. **Yeni Brief ise:** Brief metnini marka kurallarına ve yasaklı kelimelere göre süzgeçten geçirir. Çıktıyı JSON formatına parse eder. Format Router ile işi alt akışlara (Meta Post, Story, Banner) yönlendirir.
   4. **Revizyon ise:** Revizyon limit kontrolü yapar (Maksimum 3 hak). Limit aşılmadıysa eski görseli indirip `VitrinOS_REVIZE` akışına gönderir.
-  5. Alt akışlardan dönen nihai görseli Supabase Storage (`generated-assets`) bucket'ına yükler ve veritabanındaki ilgili işi günceller.
+  5. Alt akışlardan dönen nihai görseli Storage (`generated-assets`) alanına yükler ve veritabanındaki ilgili işi günceller.
 
 ### 2. `VitrinOS_META_POST`
 Instagram dikey post (1080x1350) formatında reklam görseli ve metni üretir.
-* **Çalışma Mantığı:**
-  * **Ürün Resmi Yoksa:** LLM ile taslak görsel promptu üretip sıfırdan konsept reklam tasarımı yapar.
-  * **Ürün Resmi Varsa:** Ürün görselini internetten indirir. LLM ile bir stüdyo/arka plan sahne tasarımı promptu hazırlar. DALL-E ile sadece arka planı üretir. Ardından gelişmiş DALL-E inpainting/editing komutları kullanarak gerçek ürünü, üretilen arka plandaki 3D podyumun üzerine ışık, açı ve gölge uyumuyla yerleştirir.
-  * **Son Dokunuş:** Görseli Jimp motoru yardımıyla 1080x1350 boyutuna getirir ve markanın logosunu dinamik olarak (belirlenen logo konumuna göre) üzerine yerleştirir. Instagram reklam metnini ve emojili caption'ı üretir.
 
 ### 3. `VitrinOS_STORY`
 Instagram Story (1080x1920) formatı için özelleştirilmiş dikey reklam şablonları üretir.
-* **Çalışma Mantığı:** `VitrinOS_META_POST` ile benzer görsel birleştirme ve inpainting mantığını kullanır; ancak sahne boyutlandırmasını ve logo yerleşimini dikey story (1080x1920) formatına göre optimize eder.
 
 ### 4. `VitrinOS_BANNER`
 Web siteleri için yatay Banner (1600x600) formatında görsel içerikler hazırlar.
-* **Çalışma Mantığı:** Yatay kompozisyon kurallarına uygun olarak ürünü sahneye yerleştirir ve Jimp ile banner boyutlarında kırpıp logoyu ekler.
 
 ### 5. `VitrinOS_REVIZE`
 Müşterinin dashboard üzerinden ilettiği revizyon notlarına göre mevcut görseli günceller.
-* **Çalışma Mantığı:** Orijinal brief'i, eski görseli ve kullanıcının revizyon taleplerini alarak LLM ve DALL-E Image Edit API yardımıyla görsel üzerinde lokal düzeltmeler (renk değişimi, konum kaydırma, arka plan detay güncellemesi vb.) gerçekleştirir.
 
 ---
 
@@ -92,29 +86,42 @@ Müşterinin dashboard üzerinden ilettiği revizyon notlarına göre mevcut gö
 
 ```text
 VitrinOS/
+├── apps/                    # Self-Hosted Uygulamalar
+│   ├── api/                 # Express Node.js REST API Servisi
+│   └── worker/              # Arka plan işleyici servis
+├── packages/                # Paylaşılan Paketler
+│   ├── db/                  # PostgreSQL Veritabanı şeması ve sorgular
+│   ├── shared/              # Ortak tip ve yardımcı kütüphaneler
+│   └── storage/             # Self-hosted S3/MinIO depolama sürücüsü
+├── infra/                   # Altyapı ve Konfigürasyon
+│   ├── compose/             # Docker Compose ortam tanımları
+│   └── scripts/             # Sunucu dağıtım ve ops betikleri
 ├── css/                     # Stil Dosyaları
 │   ├── admin.css            # Yönetici paneli özel stilleri
 │   ├── dashboard.css        # Müşteri paneli özel stilleri
 │   ├── index.css            # Ana tanıtım sayfası stilleri
 │   ├── login.css            # Giriş ekranı stilleri
 │   └── style.css            # Ortak CSS bileşenleri
-├── js/                      # JavaScript Mantığı
+├── js/                      # Frontend JavaScript Modülleri
 │   ├── admin.js             # Yönetici paneli DOM ve API işlemleri
-|   |-- config.js            # Supabase istemci ayarlari
+│   ├── api-client.js        # Self-Hosted API İstemcisi
+│   ├── auth-store.js        # Oturum ve Token Yönetimi
+│   ├── config.js            # Uygulama çalışma zamanı konfigürasyonu
 │   ├── dashboard.js         # Müşteri paneli DOM ve API işlemleri
 │   ├── lead-form.js         # Müşteri adayı formu gönderim tetikleyicisi
-│   ├── login.js             # Oturum açma mantığı
+│   ├── login.js             # Oturum açma ve MFA entegrasyonu
 │   ├── main.js              # Ortak JS yardımcıları
-│   ├── reveal.js            # Görsel geçiş efektleri
-│   └── supabase.js          # Supabase SDK sarmalayıcısı ve Auth yönetim kuralları
-├── supabase/                # Supabase Yapılandırmaları
-|   |-- functions/           # Edge Function kaynaklari
-|   `-- migrations/          # SQL Veritabani semalari ve RLS politikalari
+│   └── sse-client.js        # Gerçek zamanlı SSE (Server-Sent Events) istemcisi
+├── quality/                 # Test ve Kalite Güvence Betikleri
 ├── admin.html               # Yönetici Paneli Arayüzü
 ├── dashboard.html           # Müşteri Kontrol Paneli Arayüzü
 ├── index.html               # Ana Sayfa / Landing Page
 ├── login.html               # Giriş Sayfası Arayüzü
-└── .gitignore               # Sürüm Kontrol Dışı Bırakılan Dosyalar
+├── mfa-challenge.html       # MFA Doğrulama Ekranı
+├── mfa-setup.html           # MFA Kurulum Ekranı
+├── Dockerfile               # Production Container Tanımı
+├── run_server.bat           # Windows sunucu başlatma betiği
+└── sunucu_baslat.ps1        # PowerShell sunucu başlatma betiği
 ```
 
 ---
@@ -122,42 +129,30 @@ VitrinOS/
 ## 🚀 Başlangıç ve Yerel Kurulum
 
 1. **Gereksinimler:**
-   * Modern bir web tarayıcısı.
-   * Supabase hesabı (Veritabanı ve Storage yapılandırması için).
-   * n8n entegrasyonu (İş akışlarını çalıştırmak için).
+   * Node.js v20+ ve npm.
+   * Docker & Docker Compose (PostgreSQL ve MinIO servisleri için).
+   * n8n entegrasyonu (Self-hosted n8n sunucusu).
 
-2. **Veritabanı Kurulumu:**
-   * Supabase projenizde `supabase/migrations` altındaki SQL dosyalarını sırasıyla (veya CLI kullanarak) çalıştırarak tabloları, RLS politikalarını ve `generated-assets` storage bucket'ını oluşturun.
+2. **Bağımlılıkların Yüklenmesi:**
+   ```bash
+   npm install
+   ```
 
-3. **n8n İş Akışlarının Yüklenmesi:**
-   * n8n arayüzünde yeni bir workflow oluşturup yukarıda detaylandırılan iş akışlarının JSON şablonlarını import edin. Webhook URL'lerini aktif hale getirin.
+3. **Veritabanı ve Altyapının Başlatılması:**
+   ```bash
+   docker compose -f infra/compose/docker-compose.yml up -d
+   ```
 
-4. **Arayüz Yapılandırması:**
-   * Frontend bağlantı ayarları `/api/runtime-config.js` üzerinden Vercel Environment Variables ile sağlanır. Preview ve Production ortamlarında aşağıdaki public değişkenleri ayrı ayrı tanımlayın:
-
-     `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_PROJECT_REF`, `PUBLIC_APP_URL`, `PUBLIC_CONTACT_EMAIL`
-
-     `PUBLIC_APP_URL` belirtilmezse Vercel'in `VERCEL_URL` değeri kullanılır. n8n webhook URL'sini frontend'e koymayin; Supabase secret olarak tanimlayin:
-     ```bash
-     supabase secrets set LEAD_ALLOWED_ORIGINS="https://vitrin-os.vercel.app"
-     supabase secrets set LEAD_HASH_SECRET="<random-32-byte-secret>"
-     supabase secrets set LEAD_MIN_SUBMIT_MS="3000"
-     supabase secrets set LEAD_IP_WINDOW_MINUTES="60"
-     supabase secrets set LEAD_EMAIL_WINDOW_HOURS="24"
-     supabase secrets set LEAD_DUPLICATE_WINDOW_DAYS="7"
-     supabase secrets set LEAD_IP_LIMIT="5"
-     supabase secrets set LEAD_EMAIL_LIMIT="3"
-     supabase secrets set LEAD_COOLDOWN_SECONDS="60"
-     supabase secrets set LEAD_MAX_NOTE_LENGTH="2000"
-     supabase secrets set N8N_WEBHOOK_URL="https://<N8N_SUNUCUNUZ>/webhook/vitrinos-brief"
-     supabase secrets set N8N_WEBHOOK_SECRET="<N8N_SHARED_SECRET>"
-     supabase secrets set ALLOWED_ORIGINS="https://vitrin-os.vercel.app"
-     supabase secrets set PUBLIC_APP_URL="https://vitrin-os.vercel.app"
-     supabase functions deploy submit-lead
-     supabase functions deploy trigger-brief
+4. **Uygulama Servislerinin Başlatılması:**
+   * PowerShell üzerinden:
+     ```powershell
+     powershell -ExecutionPolicy Bypass -File .\sunucu_baslat.ps1
      ```
-     `public.leads` artik browser `anon` insert kabul etmez; basvurular `submit-lead` function uzerinden honeypot, rate limit, cooldown ve duplicate kontrolleri gecince kaydedilir. IP/e-posta/fingerprint degerleri `LEAD_HASH_SECRET` ile HMAC-SHA-256 olarak tutulur ve `lead_submission_attempts` kayitlari 30 gun sonra pg_cron ile temizlenir.
-     n8n `VitrinOS_BASE` webhook girisinde `x-vitrinos-webhook-secret` header degerini dogrulayin ve eski public webhook path'ini rotate edin.
+   * Veya Windows Batch betiği ile:
+     ```cmd
+     run_server.bat
+     ```
 
-5. **Çalıştırma:**
-   * Projeyi yerelde `python -m http.server 8000` ile baslatip `http://localhost:8000/` adresinden erisebilirsiniz.
+5. **Erişim:**
+   * Web Arayüzü: `http://localhost:8000` (veya sunucu portu)
+   * REST API: `http://localhost:8000/api/v1`
