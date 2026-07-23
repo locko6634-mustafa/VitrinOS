@@ -304,11 +304,11 @@ Ana durumlar: `queued -> dispatching -> processing -> succeeded | failed_retryab
 - [x] Supabase node ve Storage bağımlılıklarını internal API ve sunucudaki MinIO akışıyla değiştir.
 - [→] Her içerik türü, revizyon, timeout, duplicate callback ve sağlayıcı hata senaryosunun uçtan uca testini Faz 6 frontend geçişi tamamlandıktan sonra yap.
 
-### Faz 6 — Frontend
+### Faz 6 — Frontend [TAMAMLANDI]
 
-- Sayfaları sırayla auth, dashboard/jobs, brand/prompt, assets, lead ve admin API'lerine geçir.
-- Realtime yerine SSE ve storage yerine asset sözleşmesini devreye al.
-- Supabase/Vercel script, config ve CSP izinlerini kaldır.
+- [x] Sayfaları sırayla auth, dashboard/jobs, brand/prompt, assets, lead ve admin API'lerine geçir.
+- [x] Realtime yerine SSE ve storage yerine asset sözleşmesini devreye al.
+- [x] Supabase/Vercel script, config ve CSP izinlerini kaldır.
 
 ### Faz 7 — Staging ve prova migration
 

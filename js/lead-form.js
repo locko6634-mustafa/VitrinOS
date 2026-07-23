@@ -87,43 +87,17 @@
       name: formData.get("name").trim(),
       company: formData.get("company").trim(),
       email: formData.get("email").trim(),
-      website: formData.get("website").trim(),
-      need: formData.get("need"),
-      note: formData.get("note").trim(),
-      startedAt: Number(formData.get("startedAt") || "0"),
-      companyFax: String(formData.get("companyFax") || "").trim()
+      website: formData.get("website").trim() || undefined,
+      need: formData.get("need") || undefined,
+      note: formData.get("note").trim() || undefined,
+      leadStartedAt: Number(formData.get("startedAt") || "0"),
+      companyFax: String(formData.get("companyFax") || "").trim() || undefined
     };
   }
 
   async function submitLead(payload) {
-    const config = window.VitrinOS?.config;
-    const functionName = window.VitrinOS?.config?.leadSubmitFunction;
-    if (!config?.supabaseUrl || !config?.supabasePublishableKey || !functionName) {
-      throw new Error("Başvuru servisi şu anda kullanılamıyor.");
-    }
-
-    const response = await fetch(`${config.supabaseUrl.replace(/\/$/, "")}/functions/v1/${functionName}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: config.supabasePublishableKey,
-        Authorization: `Bearer ${config.supabasePublishableKey}`,
-        "x-correlation-id": window.VitrinOS.observability?.getCorrelationId?.() || "",
-        traceparent: window.VitrinOS.observability?.getTraceparent?.() || ""
-      },
-      body: JSON.stringify(payload)
-    });
-
-    let data = null;
-    try {
-      data = await response.json();
-    } catch {
-      data = null;
-    }
-
-    if (!response.ok || !data?.ok) {
-      throw new Error(data?.message || "Başvuru kaydedilemedi.");
-    }
+    const result = await window.VitrinOS.api.post("/leads", payload);
+    return result;
   }
 
   function initLeadForm() {
@@ -168,12 +142,12 @@
       }
 
       try {
-        await submitLead(buildLeadPayload(formData));
+        const res = await submitLead(buildLeadPayload(formData));
         form.reset();
         if (startedAtInput) {
           startedAtInput.value = String(Date.now());
         }
-        statusEl.textContent = "Başvurunuz alındı. Ekibimiz kaydı inceleyip sizinle iletişime geçecek.";
+        statusEl.textContent = res.message || "Başvurunuz alındı. Ekibimiz kaydı inceleyip sizinle iletişime geçecek.";
         statusEl.dataset.kind = "success";
       } catch (error) {
         console.error("Lead kaydı başarısız:", error);

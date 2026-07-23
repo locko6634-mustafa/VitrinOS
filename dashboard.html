@@ -233,16 +233,18 @@
                 <span>Onay ve revizyon kaydı job akışında tutulur</span>
               </div>
             </article>
+              </div>
+            </article>
             <article class="work-panel">
               <div class="panel-heading">
                 <span class="mini-label">Canlı hazırlık</span>
                 <strong>Canlı üretim akışı için hazır</strong>
               </div>
               <div class="readiness-list">
-                <span>Supabase Auth</span>
-                <span>Supabase Storage</span>
+                <span>Fastify API</span>
+                <span>MinIO / S3 Storage</span>
                 <span>n8n webhook tetikleme</span>
-                <span>Gerçek üretim job kuyruğu</span>
+                <span>PostgreSQL job kuyruğu</span>
               </div>
             </article>
           </div>
@@ -251,15 +253,12 @@
       </div>
     </div>
 
-    <script
-      src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"
-      integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug"
-      crossorigin="anonymous"
-    ></script>
     <script src="/api/runtime-config.js?v=2.1"></script>
     <script src="js/config.js?v=1.1"></script>
     <script src="js/observability.js?v=1.1"></script>
-    <script src="js/supabase.js?v=1.3"></script>
+    <script src="js/api-client.js"></script>
+    <script src="js/auth-store.js"></script>
+    <script src="js/sse-client.js"></script>
     <script src="js/dashboard.js?v=2.1"></script>
   </body>
 </html>

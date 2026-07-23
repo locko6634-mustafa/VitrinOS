@@ -8,7 +8,12 @@
   const toggleButtons = Array.from(document.querySelectorAll("[data-password-toggle]"));
   const requirements = document.querySelector("#passwordRequirements");
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get("token");
+  const mode = urlParams.get("mode") || "activate"; // 'activate' or 'reset'
+
   function setStatus(message, kind) {
+    if (!status) return;
     status.textContent = message;
     status.setAttribute("role", kind === "error" ? "alert" : "status");
     if (kind) status.dataset.kind = kind;
@@ -16,9 +21,9 @@
   }
 
   function setFormEnabled(enabled) {
-    passwordInput.disabled = !enabled;
-    confirmInput.disabled = !enabled;
-    submitButton.disabled = !enabled;
+    if (passwordInput) passwordInput.disabled = !enabled;
+    if (confirmInput) confirmInput.disabled = !enabled;
+    if (submitButton) submitButton.disabled = !enabled;
     toggleButtons.forEach((button) => { button.disabled = !enabled; });
   }
 
@@ -34,7 +39,7 @@
   }
 
   function updatePasswordStrength() {
-    const password = passwordInput.value;
+    const password = passwordInput?.value || "";
     const characterGroups = [/[a-z]/, /[A-Z]/, /[0-9]/, /[^A-Za-z0-9]/].filter((pattern) => pattern.test(password)).length;
     let strength = 0;
     if (password.length > 0) strength = 1;
@@ -57,35 +62,22 @@
   }
 
   toggleButtons.forEach((button) => button.addEventListener("click", () => togglePasswordVisibility(button)));
-  passwordInput.addEventListener("input", () => {
+  passwordInput?.addEventListener("input", () => {
     setInvalid(passwordInput, false);
     updatePasswordStrength();
   });
-  confirmInput.addEventListener("input", () => setInvalid(confirmInput, false));
+  confirmInput?.addEventListener("input", () => setInvalid(confirmInput, false));
 
-  async function initialiseInviteSession() {
-    try {
-      const client = window.VitrinOS.auth.getClient();
-      const { data, error } = await client.auth.getSession();
-      if (error) throw error;
-
-      if (!data.session) {
-        setStatus("Bu davet bağlantısı geçersiz veya süresi dolmuş. Yöneticinizden yeni davet isteyin.", "error");
-        status.focus();
-        return;
-      }
-
-      window.history.replaceState({}, document.title, `${window.location.pathname}${window.location.search}`);
-      setFormEnabled(true);
-      setStatus("Davet doğrulandı. Şimdi çalışma alanı şifreni belirleyebilirsin.", "success");
-      passwordInput.focus();
-    } catch (error) {
-      setStatus(error.message || "Davet bağlantısı doğrulanamadı.", "error");
-      status.focus();
-    }
+  if (!token) {
+    setFormEnabled(false);
+    setStatus("Geçersiz veya eksik aktivasyon bağlantısı. Yöneticinizden yeni davet bağlantısı isteyin.", "error");
+  } else {
+    setFormEnabled(true);
+    setStatus("Bağlantı doğrulandı. Şimdi çalışma alanı şifreni belirleyebilirsin.", "success");
+    passwordInput?.focus();
   }
 
-  form.addEventListener("submit", async (event) => {
+  form?.addEventListener("submit", async (event) => {
     event.preventDefault();
     const password = passwordInput.value;
     const confirmation = confirmInput.value;
@@ -110,20 +102,17 @@
     setStatus("Şifren güvenli biçimde kaydediliyor…", "loading");
 
     try {
-      const client = window.VitrinOS.auth.getClient();
-      const { error } = await client.auth.updateUser({ password });
-      if (error) throw error;
+      const endpoint = mode === "reset" ? "/auth/password/reset" : "/auth/password/activate";
+      await window.VitrinOS.api.post(endpoint, { token, password });
 
-      setStatus("Şifren oluşturuldu. Çalışma alanın açılıyor…", "success");
+      setStatus("Şifren başarıyla oluşturuldu. Giriş ekranına yönlendiriliyorsunuz…", "success");
       window.setTimeout(() => {
-        window.location.replace("dashboard.html");
-      }, 700);
+        window.location.replace("login.html");
+      }, 1500);
     } catch (error) {
       setLoading(false);
-      setStatus(error.message || "Şifre kaydedilemedi. Davet bağlantısını yeniden açın.", "error");
-      status.focus();
+      setStatus(error.message || "Şifre kaydedilemedi. Bağlantıyı yeniden açın.", "error");
+      status?.focus();
     }
   });
-
-  initialiseInviteSession();
 })();

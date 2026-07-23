@@ -11,9 +11,7 @@
   );
 
   const defaults = {
-    supabaseUrl: "",
-    supabasePublishableKey: "",
-    supabaseProjectRef: "",
+    apiBaseUrl: "/api/v1",
     environment: "development",
     appBasePath: runtimeConfig.appBasePath || appBasePath,
     appUrl,

@@ -3,7 +3,6 @@
   const loginStatus = document.querySelector("#loginStatus");
   const identifierInput = document.querySelector("#loginEmail");
   const passwordInput = document.querySelector("#loginPassword");
-  const rememberInput = document.querySelector("#rememberLogin");
   const passwordToggle = document.querySelector("#loginPasswordToggle");
   const submitButton = document.querySelector("#loginSubmitButton");
   const submitLabel = submitButton?.querySelector(".button-label");
@@ -23,7 +22,6 @@
     loginForm?.setAttribute("aria-busy", String(isLoading));
     if (identifierInput) identifierInput.disabled = isLoading;
     if (passwordInput) passwordInput.disabled = isLoading;
-    if (rememberInput) rememberInput.disabled = isLoading;
     if (passwordToggle) passwordToggle.disabled = isLoading;
     if (submitButton) {
       submitButton.disabled = isLoading;
@@ -49,19 +47,14 @@
 
   if (!loginForm) return;
 
-  (async function redirectRememberedUser() {
+  (async function checkExistingSession() {
     try {
-      const context = await window.VitrinOS.auth.getCurrentUser();
-      if (!context || !window.VitrinOS.auth.hasRememberedLogin(context.user)) return;
-
-      if (context.role === "admin") {
-        window.VitrinOS.auth.rememberLogin(null, false);
-        return;
+      const user = await window.VitrinOS.authStore.fetchSession();
+      if (user) {
+        window.location.replace(user.role === "admin" ? "admin.html" : "dashboard.html");
       }
-
-      window.location.replace(context.role === "admin" ? "admin.html" : "dashboard.html");
     } catch (error) {
-      console.warn("Hatırlanan oturum otomatik açılamadı.", error);
+      // Oturum yoksa devam et
     }
   })();
 
@@ -73,16 +66,16 @@
     event.preventDefault();
 
     const formData = new FormData(loginForm);
-    const identifier = String(formData.get("email") || "").trim();
+    const email = String(formData.get("email") || "").trim();
     const password = String(formData.get("password") || "");
 
-    const identifierIsInvalid = !identifier;
+    const identifierIsInvalid = !email;
     const passwordIsInvalid = password.length < 8;
     setInvalid(identifierInput, identifierIsInvalid);
     setInvalid(passwordInput, passwordIsInvalid);
 
     if (identifierIsInvalid || passwordIsInvalid) {
-      setStatus("E-posta veya kullanıcı adını ve en az 8 karakterli şifreni gir.", "error");
+      setStatus("E-posta adresini ve en az 8 karakterli şifreni gir.", "error");
       (identifierIsInvalid ? identifierInput : passwordInput)?.focus();
       return;
     }
@@ -92,43 +85,24 @@
     let redirecting = false;
 
     try {
-      const { data, error } = await window.VitrinOS.auth.signInWithPassword(identifier, password);
+      const response = await window.VitrinOS.api.post("/auth/login", { email, password });
 
-      if (error) {
-        setInvalid(identifierInput, true);
-        setInvalid(passwordInput, true);
-        setStatus("Giriş doğrulanamadı. Bilgilerini kontrol edip yeniden dene.", "error");
-        loginStatus?.focus();
-        return;
-      }
-
-      const role = window.VitrinOS.auth.getRole(data.user);
-      window.VitrinOS.auth.rememberLogin(
-        data.user,
-        role !== "admin" && Boolean(rememberInput?.checked)
-      );
-      if (role === "admin") {
-        const { data: assurance, error: assuranceError } = await window.VitrinOS.auth.getClient().auth.mfa.getAuthenticatorAssuranceLevel();
-        if (assuranceError) throw assuranceError;
-        const mfaSatisfied = assurance.currentLevel === "aal2";
-        if (!mfaSatisfied) {
-          const target = assurance.nextLevel === "aal2" ? "mfa-challenge.html" : "mfa-setup.html";
-          setStatus(target === "mfa-challenge.html" ? "İkinci doğrulama adımına geçiliyor…" : "Yönetici güvenlik kurulumu açılıyor…", "mfa");
-          redirecting = true;
-          window.location.href = target;
-          return;
-        }
-        setStatus("Kimlik doğrulandı. Admin paneli açılıyor…", "success");
+      if (response.mfaRequired) {
+        sessionStorage.setItem("mfa_challenge_token", response.challengeToken);
+        setStatus("İkinci doğrulama adımına geçiliyor…", "mfa");
         redirecting = true;
-        window.location.href = "admin.html";
+        window.location.href = "mfa-challenge.html";
         return;
       }
 
-      setStatus("Kimlik doğrulandı. Çalışma alanın açılıyor…", "success");
+      const user = response.user;
+      setStatus("Kimlik doğrulandı. Yönlendiriliyorsunuz…", "success");
       redirecting = true;
-      window.location.href = "dashboard.html";
+      window.location.href = user?.role === "admin" ? "admin.html" : "dashboard.html";
     } catch (error) {
-      setStatus(error.message || "Güvenli bağlantı kurulamadı. Lütfen yeniden dene.", "error");
+      setInvalid(identifierInput, true);
+      setInvalid(passwordInput, true);
+      setStatus(error.message || "Giriş doğrulanamadı. Bilgilerini kontrol edip yeniden dene.", "error");
       loginStatus?.focus();
     } finally {
       if (!redirecting) setLoading(false);
