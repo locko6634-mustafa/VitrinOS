@@ -1,0 +1,30 @@
+name: CD - Production Auto Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: vitrinos-deploy-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy to Live Server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script: |
+            set -e
+            echo "==> Updating VitrinOS production deployment..."
+            cd /opt/vitrinos/app
+            git pull origin main
+            docker compose -f infra/compose/docker-compose.production.yml --env-file infra/compose/production.env up -d --build
+            echo "==> Deployment completed successfully!"
