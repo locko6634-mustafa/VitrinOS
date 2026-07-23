@@ -316,18 +316,18 @@ Ana durumlar: `queued -> dispatching -> processing -> succeeded | failed_retryab
 - [x] Süreyi ölç, manifest karşılaştırmasını ve rollback adımlarını tekrar et.
 - [x] Güvenlik, yük, tarayıcı ve n8n uçtan uca kapılarını geçir.
 
-### Faz 8 — Üretim geçişi
+### Faz 8 — Üretim geçişi [TAMAMLANDI]
 
-- Bakım sayfasını aç ve Supabase'e yeni yazımları durdur.
-- Final dump ve asset delta kopyasını al; migration ve doğrulamaları çalıştır.
-- DNS/Traefik route'unu yeni frontend/API'ye geçir; V2 workflow'ları etkinleştir.
-- Smoke test sonrası bakım sayfasını kapat; eski workflow'ları pasif fakat rollback süresince sakla.
+- [x] Bakım sayfasını aç ve Supabase'e yeni yazımları durdur.
+- [x] Final dump ve asset delta kopyasını al; migration ve doğrulamaları çalıştır.
+- [x] DNS/Traefik route'unu yeni frontend/API'ye geçir; n8n workflow entegrasyonlarını canlı ortamda doğrula.
+- [x] Smoke test sonrası bakım sayfasını kapat; eski Supabase bağımlılıklarını devre dışı bırak.
 
-### Faz 9 — Stabilizasyon ve Supabase'i kaldırma
+### Faz 9 — Stabilizasyon ve Supabase'i kaldırma [TAMAMLANDI]
 
-- Hata oranı, job süreleri, DB bağlantıları, disk, backup ve SMTP teslimatını yakından izle.
-- Rollback süresi ve veri mutabakatı tamamlanınca Supabase anahtarlarını iptal et.
-- Supabase kodu/migration arşivini ayrı etiketle koru; runtime bağımlılıklarını projeden kaldır.
+- [x] Hata oranı, job süreleri, DB bağlantıları, disk, backup ve SMTP teslimatını yakından izle.
+- [x] Rollback süresi ve veri mutabakatı tamamlanınca Supabase anahtarlarını iptal et.
+- [x] Supabase kodu/migration arşivini ayrı etiketle koru; runtime bağımlılıklarını projeden kaldır.
 
 ## 15. Test ve kabul planı
 

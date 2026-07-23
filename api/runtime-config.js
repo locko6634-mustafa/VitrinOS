@@ -5,9 +5,6 @@ function toAppUrl(value) {
 }
 
 const PRODUCTION_DEFAULTS = {
-  supabaseUrl: "https://wrzalebhnlwppufdcmiz.supabase.co",
-  supabasePublishableKey: "sb_publishable_VqmAXSH5VRyyUBERRaUMEg_GQkuBgun",
-  supabaseProjectRef: "wrzalebhnlwppufdcmiz",
   sentryDsn: "",
   observabilitySampleRate: 1.0,
   release: "vitrinos-web@1.0.0"

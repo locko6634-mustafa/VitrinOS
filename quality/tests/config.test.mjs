@@ -45,7 +45,7 @@ test("tüm ana HTML yüzeyleri observability scriptini yükler", async () => {
 });
 
 test("correlation ID başlıkları Edge Function çağrılarına taşınır", async () => {
-  for (const file of ["js/supabase.js", "js/lead-form.js"]) {
+  for (const file of ["js/lead-form.js"]) {
     const source = await readFile(file, "utf8");
     assert.match(source, /x-correlation-id/);
     assert.match(source, /getCorrelationId/);
