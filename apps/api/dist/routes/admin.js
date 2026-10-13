@@ -195,6 +195,26 @@ export const adminRoutes = async (fastify) => {
         });
         return reply.send({ data: updatedLead });
     });
+    // Başvuruyu Silme
+    fastify.delete('/api/v1/admin/leads/:id', async (request, reply) => {
+        const { id } = request.params;
+        const targetLead = await fastify.db.query.leads.findFirst({
+            where: eq(leads.id, id)
+        });
+        if (!targetLead) {
+            return reply.code(404).send({ code: 'LEAD_NOT_FOUND', message: 'Başvuru bulunamadı' });
+        }
+        await fastify.db.delete(leads).where(eq(leads.id, id));
+        await fastify.db.insert(securityAuditLog).values({
+            actorId: request.user.id,
+            action: 'lead_deleted',
+            targetType: 'lead',
+            targetId: id,
+            result: 'success',
+            metadata: { name: targetLead.name, company: targetLead.company, email: targetLead.email }
+        });
+        return reply.send({ data: { success: true, message: 'Başvuru başarıyla silindi' } });
+    });
     // Kullanıcı Durumunu Değiştirme (active/suspended)
     fastify.patch('/api/v1/admin/users/:id/status', async (request, reply) => {
         const { id } = request.params;
