@@ -74,17 +74,92 @@
   const barMetaPost = document.querySelector("#barMetaPost");
   const barStory = document.querySelector("#barStory");
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const appDrawerQuery = window.matchMedia("(max-width: 960px)");
 
-  if (appMenuToggle && appRail) {
-    appMenuToggle.addEventListener("click", () => {
-      const isOpen = appShell?.classList.toggle("menu-open");
-      if (appRail) appRail.inert = !isOpen;
+  if (user.role === "admin") {
+    [adminPanelLink, mobileAdminPanelLink].filter(Boolean).forEach((link) => {
+      link.hidden = false;
     });
-    window.addEventListener("keydown", (event) => {
-      if (event.key === "Tab" && appShell?.classList.contains("menu-open")) {
-        // focus trap
-      }
+  }
+
+  if (appContextUser && user.email) {
+    appContextUser.textContent = user.email;
+  }
+
+  function activateTab(tabName) {
+    const targetButton = tabButtons.find((button) => button.dataset.tab === tabName);
+    const targetPanel = panels.find((panel) => panel.id === `panel-${tabName}`);
+    if (!targetButton || !targetPanel || targetButton.classList.contains("is-active")) {
+      closeAppMenu({ restoreFocus: true });
+      return;
+    }
+
+    const updateTab = () => {
+      tabButtons.forEach((button) => {
+        const isActive = button === targetButton;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-selected", String(isActive));
+        button.tabIndex = isActive ? 0 : -1;
+      });
+
+      panels.forEach((panel) => {
+        const isActive = panel === targetPanel;
+        panel.classList.toggle("is-active", isActive);
+        panel.hidden = !isActive;
+      });
+    };
+
+    if (typeof document.startViewTransition === "function" && !prefersReducedMotion.matches) {
+      document.startViewTransition(updateTab);
+    } else {
+      updateTab();
+    }
+
+    closeAppMenu({ restoreFocus: true });
+  }
+
+  function openAppMenu() {
+    if (!appShell || !appMenuToggle || !appRail || !appDrawerQuery.matches) return;
+    appShell.classList.add("menu-open");
+    document.body.classList.add("app-menu-open");
+    appMenuToggle.setAttribute("aria-expanded", "true");
+    appMenuToggle.setAttribute("aria-label", "Çalışma alanı menüsünü kapat");
+    appRail.inert = false;
+    appRail.setAttribute("aria-hidden", "false");
+    [
+      appMain,
+      appTopbar?.querySelector(".brand"),
+      appTopbar?.querySelector(".app-context"),
+      appTopbar?.querySelector(".app-actions")
+    ].filter(Boolean).forEach((target) => {
+      target.inert = true;
     });
+    if (appMenuScrim) appMenuScrim.hidden = false;
+    window.requestAnimationFrame(() => {
+      (tabButtons.find((button) => button.classList.contains("is-active")) || tabButtons[0])?.focus();
+    });
+  }
+
+  function closeAppMenu({ restoreFocus = false } = {}) {
+    if (!appShell || !appMenuToggle || !appRail) return;
+    const wasOpen = appShell.classList.contains("menu-open");
+    appShell.classList.remove("menu-open");
+    document.body.classList.remove("app-menu-open");
+    appMenuToggle.setAttribute("aria-expanded", "false");
+    appMenuToggle.setAttribute("aria-label", "Çalışma alanı menüsünü aç");
+    appRail.inert = appDrawerQuery.matches;
+    if (appDrawerQuery.matches) appRail.setAttribute("aria-hidden", "true");
+    else appRail.removeAttribute("aria-hidden");
+    [
+      appMain,
+      appTopbar?.querySelector(".brand"),
+      appTopbar?.querySelector(".app-context"),
+      appTopbar?.querySelector(".app-actions")
+    ].filter(Boolean).forEach((target) => {
+      target.inert = false;
+    });
+    if (appMenuScrim) appMenuScrim.hidden = true;
+    if (restoreFocus && wasOpen) appMenuToggle.focus();
   }
 
   if (typeof document.startViewTransition === "function") {
@@ -395,6 +470,69 @@
 
   logoutButtons.forEach((button) => {
     button.addEventListener("click", () => window.VitrinOS.authStore.logout());
+  });
+
+  tabButtons.forEach((button, index) => {
+    button.addEventListener("click", () => activateTab(button.dataset.tab));
+    button.addEventListener("keydown", (event) => {
+      const keyActions = {
+        ArrowRight: Math.min(index + 1, tabButtons.length - 1),
+        ArrowDown: Math.min(index + 1, tabButtons.length - 1),
+        ArrowLeft: Math.max(index - 1, 0),
+        ArrowUp: Math.max(index - 1, 0),
+        Home: 0,
+        End: tabButtons.length - 1
+      };
+      if (!(event.key in keyActions)) return;
+      event.preventDefault();
+      const target = tabButtons[keyActions[event.key]];
+      target?.focus();
+      activateTab(target?.dataset.tab);
+    });
+  });
+
+  appMenuToggle?.addEventListener("click", () => {
+    if (appShell?.classList.contains("menu-open")) closeAppMenu({ restoreFocus: true });
+    else openAppMenu();
+  });
+
+  appMenuScrim?.addEventListener("click", () => closeAppMenu({ restoreFocus: true }));
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeAppMenu({ restoreFocus: true });
+      return;
+    }
+
+    if (event.key === "Tab" && appShell?.classList.contains("menu-open")) {
+      const focusable = [
+        appMenuToggle,
+        ...appRail.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])')
+      ].filter((element) => element.getClientRects().length > 0);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  });
+
+  window.addEventListener("resize", () => closeAppMenu());
+  closeAppMenu();
+
+  document.querySelector("#briefBrand")?.addEventListener("change", renderBrandContext);
+
+  reviseButton?.addEventListener("click", () => {
+    if (revisionBox) {
+      revisionBox.hidden = false;
+      revisionText?.focus();
+      setStatus(briefStatus, "Revizyon notunu yazıp gönderin.");
+    }
   });
 
   dashboardRetryButton?.addEventListener("click", async () => {

@@ -12,6 +12,7 @@
   const qrCode = document.querySelector("#mfaQrCode");
   const manualSecret = document.querySelector("#mfaManualSecret");
   let isVerifying = false;
+  let isMfaAlreadyEnabled = false;
 
   function setStatus(message, kind = "") {
     if (!status) return;
@@ -32,7 +33,11 @@
       startButton.disabled = busy;
       startButton.setAttribute("aria-busy", String(busy));
     }
-    if (startLabel) startLabel.textContent = busy ? "Güvenli kod hazırlanıyor" : "Doğrulayıcı uygulamasını bağla";
+    if (startLabel) {
+      startLabel.textContent = busy
+        ? "Güvenli kod hazırlanıyor"
+        : (isMfaAlreadyEnabled ? "Yeni doğrulayıcı bağla" : "Doğrulayıcı uygulamasını bağla");
+    }
   }
 
   function setVerifyBusy(busy) {
@@ -54,7 +59,16 @@
       }
 
       if (user.mfaEnabled) {
-        window.location.replace("admin.html");
+        isMfaAlreadyEnabled = true;
+        const title = document.querySelector("#mfaTitle");
+        const description = document.querySelector("#mfaDescription") || document.querySelector(".auth-copy p:last-of-type");
+        if (title) title.textContent = "İki adımlı doğrulama aktif.";
+        if (description) {
+          description.textContent = "Yönetici hesabınız TOTP çok faktörlü doğrulama ile korunuyor. Cihazınızı değiştirmek veya anahtarınızı yenilemek isterseniz aşağıdan yeni bir doğrulayıcı bağlayabilirsiniz.";
+        }
+        if (startButton) startButton.hidden = false;
+        if (startLabel) startLabel.textContent = "Yeni doğrulayıcı bağla";
+        setStatus("MFA koruması hesabınızda aktif durumda. Cihazınızı değiştirmek için yeni bir doğrulayıcı bağlayabilirsiniz.", "success");
         return;
       }
 
@@ -143,8 +157,15 @@
       startButton.hidden = false;
       startButton.disabled = false;
     }
+    if (startLabel) {
+      startLabel.textContent = isMfaAlreadyEnabled ? "Yeni doğrulayıcı bağla" : "Doğrulayıcı uygulamasını bağla";
+    }
     updateVerifyState();
-    setStatus("Yeni bir doğrulayıcı kaydı oluşturabilirsin.");
+    setStatus(
+      isMfaAlreadyEnabled
+        ? "MFA koruması aktif. İsterseniz yeni bir doğrulayıcı bağlayabilirsiniz."
+        : "Yeni bir doğrulayıcı kaydı oluşturabilirsin."
+    );
   });
 
   setupForm?.addEventListener("submit", (event) => {
