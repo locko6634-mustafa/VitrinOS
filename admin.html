@@ -189,7 +189,7 @@
           <section class="admin-panel" id="admin-panel-users" role="tabpanel" aria-labelledby="admin-tab-users" data-admin-panel="users" hidden>
             <div class="admin-toolbar">
               <label class="admin-search"><span>Kullanıcı ara</span><input id="userSearch" type="search" placeholder="e-posta veya marka"></label>
-              <label><span>Durum</span><select id="userStatusFilter"><option value="all">Tümü</option><option value="active">Aktif</option><option value="suspended">Askıda</option></select></label>
+              <label><span>Durum</span><select id="userStatusFilter"><option value="all">Tümü</option><option value="active">Aktif</option><option value="suspended">Askıda</option><option value="pending_invite">Davet bekleyen</option></select></label>
               <button class="button secondary compact-button" type="button" id="inviteUserButton">Kullanıcı davet et</button>
             </div>
             <article class="admin-card admin-table-card">
@@ -198,6 +198,15 @@
                 <table class="admin-table">
                   <thead><tr><th>E-posta</th><th>Marka</th><th>Job</th><th>Son giriş</th><th>Durum</th><th>Aksiyon</th></tr></thead>
                   <tbody id="userRows"></tbody>
+                </table>
+              </div>
+            </article>
+            <article class="admin-card admin-table-card" style="margin-top: 24px;">
+              <div class="admin-card-head"><span>Bekleyen davetler</span><strong id="inviteCount">0 davet</strong></div>
+              <div class="admin-table-wrap">
+                <table class="admin-table">
+                  <thead><tr><th>E-posta</th><th>Kullanıcı adı</th><th>Davet tarihi</th><th>Geçerlilik</th><th>Durum</th><th>Aksiyon</th></tr></thead>
+                  <tbody id="inviteRows"></tbody>
                 </table>
               </div>
             </article>

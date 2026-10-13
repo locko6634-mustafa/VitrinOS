@@ -10,7 +10,7 @@ export const createDb = (connectionString: string) => {
   return drizzle(pool, { schema });
 };
 
-export { sql, eq, and, or, gt, lt, lte, gte, isNull } from 'drizzle-orm';
+export { sql, eq, and, or, gt, lt, lte, gte, isNull, inArray } from 'drizzle-orm';
 export * from './schema.js';
 export * from './repository.js';
 

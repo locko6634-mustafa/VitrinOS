@@ -192,3 +192,14 @@ test("review kontrolleri job tamamlanana kadar varsayilan olarak kapalidir", asy
   assert.match(html, /id=["']approveButton["'][^>]*\shidden(?:\s|>)/);
   assert.match(html, /id=["']reviseButton["'][^>]*\shidden(?:\s|>)/);
 });
+
+test("admin paneli kullanıcı ve davet silme operasyon butonlarını tanımlar", async () => {
+  const adminSource = await read("js/admin.js");
+  const adminHtml = await read("admin.html");
+  assert.match(adminSource, /delete-user/);
+  assert.match(adminSource, /delete-invite/);
+  assert.match(adminSource, /\/admin\/users\//);
+  assert.match(adminSource, /\/admin\/invites\//);
+  assert.match(adminHtml, /id=["']inviteRows["']/);
+  assert.match(adminHtml, /id=["']inviteCount["']/);
+});

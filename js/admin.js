@@ -11,15 +11,16 @@
 
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
-  const state = { brands: [], users: [], leads: [], jobs: [], selectedBrand: null, prompts: null };
+  const state = { brands: [], users: [], leads: [], jobs: [], invites: [], selectedBrand: null, prompts: null };
   const nodes = {
     shell: $("#appShell"), rail: $("#dashboardNav"), menu: $("#appMenuToggle"),
     tabs: $$("[data-admin-tab]"), panels: $$("[data-admin-panel]"),
     brandRows: $("#brandRows"), brandCount: $("#brandCount"), brandForm: $("#brandForm"), brandStatus: $("#brandStatus"),
     brandId: $("#brandId"), brandName: $("#brandName"), brandLogo: $("#brandLogo"), brandWebsite: $("#brandWebsite"), brandOwner: $("#brandOwner"), brandTheme: $("#brandTheme"), brandPrimary: $("#brandPrimary"), brandSecondary: $("#brandSecondary"), brandTone: $("#brandTone"), brandBanned: $("#brandBanned"), brandTitle: $("#brandFormTitle"),
-    userRows: $("#userRows"), userCount: $("#userCount"), leadRows: $("#leadRows"), leadCount: $("#leadCount"),
+    userRows: $("#userRows"), userCount: $("#userCount"), inviteRows: $("#inviteRows"), inviteCount: $("#inviteCount"), leadRows: $("#leadRows"), leadCount: $("#leadCount"),
     jobRows: $("#jobRows"), jobCount: $("#jobCount"), jobDetail: $("#jobDetail"),
     recentJobs: $("#recentJobs"), recentLeads: $("#recentLeads"),
+    confirmDialog: $("#adminConfirmDialog"), confirmTitle: $("#adminConfirmTitle"), confirmMessage: $("#adminConfirmMessage"),
     inviteDialog: $("#adminInviteDialog"), inviteForm: $("#adminInviteForm"), inviteEmail: $("#adminInviteEmail"), inviteName: $("#adminInviteName"), toastRegion: $("#adminToastRegion")
   };
 
@@ -70,6 +71,20 @@
     return button;
   }
 
+  function openActionConfirmDialog(title, message) {
+    return new Promise((resolve) => {
+      if (!nodes.confirmDialog) return resolve(false);
+      if (nodes.confirmTitle) nodes.confirmTitle.textContent = title;
+      if (nodes.confirmMessage) nodes.confirmMessage.textContent = message;
+      const handleClose = () => {
+        nodes.confirmDialog.removeEventListener("close", handleClose);
+        resolve(nodes.confirmDialog.returnValue === "confirm");
+      };
+      nodes.confirmDialog.addEventListener("close", handleClose, { once: true });
+      nodes.confirmDialog.showModal();
+    });
+  }
+
   function renderOwners() {
     if (!nodes.brandOwner) return;
     const selected = nodes.brandOwner.value;
@@ -103,7 +118,13 @@
   function filteredUsers() {
     const query = $("#userSearch")?.value.trim().toLowerCase() || "";
     const selectedStatus = $("#userStatusFilter")?.value || "all";
-    return state.users.filter((item) => (!query || item.email.toLowerCase().includes(query)) && (selectedStatus === "all" || item.status === selectedStatus));
+    return state.users.filter((item) => {
+      const matchesQuery = !query || item.email.toLowerCase().includes(query) || (item.displayName && item.displayName.toLowerCase().includes(query));
+      if (!matchesQuery) return false;
+      if (selectedStatus === "all") return true;
+      if (selectedStatus === "pending_invite") return !!item.hasPendingInvite;
+      return item.status === selectedStatus;
+    });
   }
 
   function renderUsers() {
@@ -114,10 +135,39 @@
       appendCell(row, item.email);
       appendCell(row, state.brands.filter((brand) => brand.userId === item.id).map((brand) => brand.name).join(", "));
       appendCell(row, state.jobs.filter((job) => job.ownerId === item.id).length);
-      appendCell(row, date(item.lastSignInAt)); appendCell(row, item.status);
+      appendCell(row, date(item.lastSignInAt));
+      const statusLabel = item.hasPendingInvite ? (item.inviteExpired ? "Davet (Süresi doldu)" : "Davet bekliyor") : (item.status === "active" ? "Aktif" : "Askıda");
+      appendCell(row, statusLabel);
       const actions = document.createElement("td");
-      actions.append(actionButton(item.status === "active" ? "Askıya al" : "Etkinleştir", "status", item.id), actionButton("Oturumları kapat", "revoke", item.id), actionButton("Şifre sıfırla", "reset", item.id));
+      actions.className = "admin-row-actions";
+      actions.append(
+        actionButton(item.status === "active" ? "Askıya al" : "Etkinleştir", "status", item.id),
+        actionButton("Oturumları kapat", "revoke", item.id),
+        actionButton("Şifre sıfırla", "reset", item.id)
+      );
+      if (item.hasPendingInvite) {
+        actions.append(actionButton("Daveti sil", "delete-invite", item.pendingInviteId || item.id, "admin-row-button danger"));
+      }
+      actions.append(actionButton("Kullanıcıyı sil", "delete-user", item.id, "admin-row-button danger"));
       row.append(actions); nodes.userRows?.append(row);
+    });
+  }
+
+  function renderInvites() {
+    clearRows(nodes.inviteRows); const invites = state.invites || [];
+    if (nodes.inviteCount) nodes.inviteCount.textContent = `${invites.length} davet`;
+    invites.forEach((item) => {
+      const row = document.createElement("tr");
+      appendCell(row, item.email);
+      appendCell(row, item.displayName || "—");
+      appendCell(row, date(item.createdAt));
+      appendCell(row, date(item.expiresAt));
+      appendCell(row, item.isExpired ? "Süresi doldu" : "Bekliyor");
+      const actions = document.createElement("td");
+      actions.className = "admin-row-actions";
+      actions.append(actionButton("Daveti sil", "delete-invite", item.id, "admin-row-button danger"));
+      row.append(actions);
+      nodes.inviteRows?.append(row);
     });
   }
 
@@ -179,7 +229,7 @@
     renderList(nodes.recentLeads, state.leads, (lead) => `${lead.name || "Başvuru"} · ${lead.company || ""}`, (lead) => `${lead.need || "İhtiyaç belirtilmedi"} · ${date(lead.createdAt)}`);
   }
 
-  function renderAll() { renderOwners(); renderJobBrandOptions(); renderBrands(); renderUsers(); renderLeads(); renderJobs(); renderOverview(); }
+  function renderAll() { renderOwners(); renderJobBrandOptions(); renderBrands(); renderUsers(); renderInvites(); renderLeads(); renderJobs(); renderOverview(); }
 
   async function selectBrand(id) {
     const brand = state.brands.find((item) => item.id === id); if (!brand) return;
@@ -202,8 +252,14 @@
 
   async function fetchData() {
     try {
-      const [brands, users, leads, jobs] = await Promise.all([window.VitrinOS.api.get("/brands"), window.VitrinOS.api.get("/admin/users"), window.VitrinOS.api.get("/admin/leads"), window.VitrinOS.api.get("/jobs")]);
-      state.brands = brands || []; state.users = users || []; state.leads = leads || []; state.jobs = jobs || [];
+      const [brands, users, leads, jobs, invites] = await Promise.all([
+        window.VitrinOS.api.get("/brands"),
+        window.VitrinOS.api.get("/admin/users"),
+        window.VitrinOS.api.get("/admin/leads"),
+        window.VitrinOS.api.get("/jobs"),
+        window.VitrinOS.api.get("/admin/invites").catch(() => [])
+      ]);
+      state.brands = brands || []; state.users = users || []; state.leads = leads || []; state.jobs = jobs || []; state.invites = invites || [];
       renderAll();
     } catch (error) { notify(error.message || "Yönetim verileri yüklenemedi.", "error"); }
   }
@@ -238,8 +294,37 @@
       if (button.dataset.action === "status") { const target = state.users.find((item) => item.id === button.dataset.id); await window.VitrinOS.api.patch(`/admin/users/${button.dataset.id}/status`, { status: target?.status === "active" ? "suspended" : "active" }); }
       if (button.dataset.action === "revoke") await window.VitrinOS.api.post(`/admin/users/${button.dataset.id}/sessions/revoke`, {});
       if (button.dataset.action === "reset") await window.VitrinOS.api.post(`/admin/users/${button.dataset.id}/password-reset`, {});
+      if (button.dataset.action === "delete-user") {
+        const target = state.users.find((item) => item.id === button.dataset.id);
+        const approved = await openActionConfirmDialog("Kullanıcıyı Sil", `${target?.email || "Bu"} kullanıcısını kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`);
+        if (!approved) return;
+        await window.VitrinOS.api.delete(`/admin/users/${button.dataset.id}`);
+        await fetchData(); notify("Kullanıcı silindi.", "success");
+        return;
+      }
+      if (button.dataset.action === "delete-invite") {
+        const targetUser = state.users.find((item) => item.id === button.dataset.id || item.pendingInviteId === button.dataset.id);
+        const approved = await openActionConfirmDialog("Daveti Sil", `${targetUser?.email || "Bu"} davetini silmek ve iptal etmek istediğinizden emin misiniz?`);
+        if (!approved) return;
+        await window.VitrinOS.api.delete(`/admin/invites/${button.dataset.id}`);
+        await fetchData(); notify("Davet silindi.", "success");
+        return;
+      }
       await fetchData(); notify("Kullanıcı işlemi tamamlandı.", "success");
     } catch (error) { notify(error.message || "Kullanıcı işlemi tamamlanamadı.", "error"); }
+  });
+
+  nodes.inviteRows?.addEventListener("click", async (event) => {
+    const button = event.target.closest("button[data-action]"); if (!button) return;
+    try {
+      if (button.dataset.action === "delete-invite") {
+        const invite = (state.invites || []).find((item) => item.id === button.dataset.id || item.userId === button.dataset.id);
+        const approved = await openActionConfirmDialog("Daveti Sil", `${invite?.email || "Bu"} davetini silmek ve iptal etmek istediğinizden emin misiniz?`);
+        if (!approved) return;
+        await window.VitrinOS.api.delete(`/admin/invites/${button.dataset.id}`);
+        await fetchData(); notify("Davet silindi.", "success");
+      }
+    } catch (error) { notify(error.message || "Davet silinemedi.", "error"); }
   });
 
   nodes.leadRows?.addEventListener("click", (event) => {

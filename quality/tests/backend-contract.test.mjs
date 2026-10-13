@@ -31,3 +31,11 @@ test("davet adı ve runtime dağıtım ayarları sözleşmede yer alır", async 
   assert.match(runtimeConfig, /apiBaseUrl/);
   assert.match(runtimeConfig, /appBasePath/);
 });
+
+test("kullanıcı ve davet silme uçları audit kaydıyla tanımlıdır", async () => {
+  const admin = await source("apps/api/src/routes/admin.ts");
+  assert.match(admin, /\/api\/v1\/admin\/users\/:id/);
+  assert.match(admin, /\/api\/v1\/admin\/invites\/:id/);
+  assert.match(admin, /user_deleted/);
+  assert.match(admin, /invite_deleted/);
+});

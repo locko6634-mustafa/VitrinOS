@@ -8,7 +8,8 @@ import {
   securityAuditLog,
   leads,
   eq,
-  and
+  and,
+  inArray
 } from '@vitrinos/db';
 import { 
   generateSessionToken, 
@@ -50,7 +51,118 @@ export const adminRoutes: FastifyPluginAsync = async (fastify) => {
       orderBy: (users, { desc }) => [desc(users.createdAt)]
     });
 
-    return reply.send({ data: allUsers });
+    const userIds = allUsers.map((u) => u.id);
+    const activeInviteTokens = userIds.length > 0
+      ? await fastify.db.query.oneTimeTokens.findMany({
+          where: and(
+            inArray(oneTimeTokens.userId, userIds),
+            eq(oneTimeTokens.purpose, 'activate_account')
+          )
+        })
+      : [];
+    const inviteMap = new Map(activeInviteTokens.map((t) => [t.userId, t]));
+
+    const enrichedUsers = allUsers.map((user) => {
+      const invite = inviteMap.get(user.id);
+      return {
+        ...user,
+        hasPendingInvite: !!invite,
+        pendingInviteId: invite ? invite.id : null,
+        inviteExpired: invite ? new Date(invite.expiresAt) < new Date() : false
+      };
+    });
+
+    return reply.send({ data: enrichedUsers });
+  });
+
+  // Davetleri Listeleme
+  fastify.get('/api/v1/admin/invites', async (request, reply) => {
+    const pendingTokens = await fastify.db.query.oneTimeTokens.findMany({
+      where: eq(oneTimeTokens.purpose, 'activate_account'),
+      orderBy: (tokens, { desc }) => [desc(tokens.createdAt)]
+    });
+
+    const userIds = [...new Set(pendingTokens.map((t) => t.userId))];
+    const inviteUsers = userIds.length > 0
+      ? await fastify.db.query.users.findMany({
+          where: inArray(users.id, userIds),
+          columns: {
+            id: true,
+            email: true,
+            displayName: true,
+            status: true,
+            createdAt: true
+          }
+        })
+      : [];
+    const userMap = new Map(inviteUsers.map((u) => [u.id, u]));
+    const now = new Date();
+
+    const invites = pendingTokens.map((token) => {
+      const user = userMap.get(token.userId);
+      const isExpired = new Date(token.expiresAt) < now;
+      return {
+        id: token.id,
+        userId: token.userId,
+        email: user?.email || '',
+        displayName: user?.displayName || '',
+        createdAt: token.createdAt,
+        expiresAt: token.expiresAt,
+        isExpired,
+        status: isExpired ? 'expired' : 'pending'
+      };
+    });
+
+    return reply.send({ data: invites });
+  });
+
+  // Daveti Silme / İptal Etme
+  fastify.delete('/api/v1/admin/invites/:id', async (request, reply) => {
+    const { id } = request.params as { id: string };
+
+    let tokenRecord = await fastify.db.query.oneTimeTokens.findFirst({
+      where: and(
+        eq(oneTimeTokens.id, id),
+        eq(oneTimeTokens.purpose, 'activate_account')
+      )
+    });
+
+    if (!tokenRecord) {
+      tokenRecord = await fastify.db.query.oneTimeTokens.findFirst({
+        where: and(
+          eq(oneTimeTokens.userId, id),
+          eq(oneTimeTokens.purpose, 'activate_account')
+        )
+      });
+    }
+
+    if (!tokenRecord) {
+      return reply.code(404).send({ code: 'INVITE_NOT_FOUND', message: 'Davet kaydı bulunamadı' });
+    }
+
+    const targetUser = await fastify.db.query.users.findFirst({
+      where: eq(users.id, tokenRecord.userId)
+    });
+
+    await fastify.db.transaction(async (tx) => {
+      await tx.delete(oneTimeTokens).where(eq(oneTimeTokens.id, tokenRecord.id));
+      if (targetUser && !targetUser.lastSignInAt) {
+        await tx.delete(passwordCredentials).where(eq(passwordCredentials.userId, targetUser.id));
+        await tx.delete(authSessions).where(eq(authSessions.userId, targetUser.id));
+        await tx.delete(users).where(eq(users.id, targetUser.id));
+      }
+    });
+
+    await fastify.db.insert(securityAuditLog).values({
+      actorId: request.user!.id,
+      action: 'invite_deleted',
+      targetType: 'invite',
+      targetId: tokenRecord.id,
+      result: 'success',
+      metadata: { email: targetUser?.email, userId: tokenRecord.userId }
+    });
+
+    return reply.send({ data: { success: true, message: 'Davet başarıyla silindi' } });
   });
 
   fastify.post('/api/v1/admin/users', async (request, reply) => {
@@ -305,5 +417,41 @@ export const adminRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     return reply.send({ data: { success: true, message: 'Şifre sıfırlama bağlantısı e-posta olarak gönderildi' } });
+  });
+
+  // Kullanıcı Silme
+  fastify.delete('/api/v1/admin/users/:id', async (request, reply) => {
+    const { id } = request.params as { id: string };
+
+    const targetUser = await fastify.db.query.users.findFirst({
+      where: eq(users.id, id)
+    });
+
+    if (!targetUser) {
+      return reply.code(404).send({ code: 'USER_NOT_FOUND', message: 'Kullanıcı bulunamadı' });
+    }
+
+    // Kendini silmeyi engelle
+    if (targetUser.id === request.user!.id) {
+      return reply.code(400).send({ code: 'SELF_DELETION_PREVENTED', message: 'Kendi hesabınızı silemezsiniz' });
+    }
+
+    await fastify.db.transaction(async (tx) => {
+      await tx.delete(oneTimeTokens).where(eq(oneTimeTokens.userId, id));
+      await tx.delete(authSessions).where(eq(authSessions.userId, id));
+      await tx.delete(passwordCredentials).where(eq(passwordCredentials.userId, id));
+      await tx.delete(users).where(eq(users.id, id));
+    });
+
+    await fastify.db.insert(securityAuditLog).values({
+      actorId: request.user!.id,
+      action: 'user_deleted',
+      targetType: 'user',
+      targetId: id,
+      result: 'success',
+      metadata: { email: targetUser.email, displayName: targetUser.displayName }
+    });
+
+    return reply.send({ data: { success: true, message: 'Kullanıcı başarıyla silindi' } });
   });
 };
