@@ -57,7 +57,9 @@ test("başvuru akışı WhatsApp üzerine taşınmıştır ve kişisel iletişim
 });
 
 test("optik atölye tasarım sistemi ve hareket güvenliği tanımlıdır", async () => {
-  const css = await read("css/style.css");
+  const fontsCss = await read("css/shared/fonts.css");
+  const baseCss = await read("css/shared/base.css");
+  const css = `${fontsCss}\n${baseCss}`;
   assert.match(css, /@layer\s+tokens,\s*reset,\s*base,\s*components,\s*pages,\s*motion/);
   assert.match(css, /--vo-porcelain:\s*hsl\(38 32% 96%\)/);
   assert.match(css, /--vo-paper:\s*hsl\(38 35% 99%\)/);
@@ -91,9 +93,9 @@ test("auth yüzeylerinde kurgu müşteri kanıtı bulunmaz", async () => {
 });
 
 test("admin MFA doğrulaması güvenli Cookie ve MFA challenge akışını kullanır", async () => {
-  const loginSource = await read("js/login.js");
-  const challengeSource = await read("js/mfa-challenge.js");
-  const adminSource = await read("js/admin.js");
+  const loginSource = await read("js/login/login.js");
+  const challengeSource = await read("js/login/mfa-challenge.js");
+  const adminSource = await read("js/admin/app.js");
 
   assert.match(loginSource, /response\.mfaRequired/);
   assert.match(loginSource, /mfa-challenge\.html/);
@@ -102,7 +104,7 @@ test("admin MFA doğrulaması güvenli Cookie ve MFA challenge akışını kulla
 });
 
 test("admin geri bildirimleri erişilebilir dialog ve toast üzerinden yürür", async () => {
-  const source = await read("js/admin.js");
+  const source = await read("js/admin/app.js");
   assert.doesNotMatch(source, /\b(?:alert|confirm|prompt)\s*\(/);
   assert.match(source, /showModal\(\)/);
   assert.match(source, /notify\(/);
@@ -116,7 +118,7 @@ test("runtime config yerel statik sunucuda tarayıcı hatası üretmez", async (
 });
 
 test("mobil command desk dört üretim adımını da görünür tutar", async () => {
-  const css = await read("css/dashboard.css");
+  const css = await read("css/dashboard/dashboard.css");
   assert.doesNotMatch(css, /\.workspace-signal\s+span:nth-child\(2\)\s*{[^}]*display:\s*none/s);
   assert.match(css, /@media\s*\(max-width:\s*560px\)[\s\S]*?\.workspace-signal\s*{[^}]*grid-template-columns:\s*repeat\(4,\s*1fr\)/);
 });
@@ -142,11 +144,11 @@ test("yerel fontlar ve responsive üretim varlıkları yayın bütçesi içinded
 
 test("sayfa stilleri named cascade layer icinde izole edilir", async () => {
   const pageStyles = [
-    "css/index.css",
-    "css/login.css",
-    "css/set-password.css",
-    "css/dashboard.css",
-    "css/admin.css"
+    "css/home/home.css",
+    "css/login/login.css",
+    "css/login/set-password.css",
+    "css/dashboard/dashboard.css",
+    "css/admin/admin.css"
   ];
 
   for (const file of pageStyles) {
@@ -172,9 +174,9 @@ test("tum ana yuzeyler yeni VitrinOS faviconunu tasir", async () => {
 
 test("mobil workspace ve admin drawer hesap eylemlerini ve odak izolasyonunu korur", async () => {
   const dashboardHtml = await read("dashboard.html");
-  const dashboardJs = await read("js/dashboard.js");
+  const dashboardJs = await read("js/dashboard/app.js");
   const adminHtml = await read("admin.html");
-  const adminJs = await read("js/admin.js");
+  const adminJs = await read("js/admin/app.js");
 
   assert.ok((dashboardHtml.match(/data-dashboard-logout/g) || []).length >= 2);
   assert.match(dashboardHtml, /class=["']app-command-bar["']/);
@@ -188,7 +190,7 @@ test("mobil workspace ve admin drawer hesap eylemlerini ve odak izolasyonunu kor
 });
 
 test("iş durum haritası bağımsız backend durumlarını kapsar", async () => {
-  const source = await read("js/dashboard.js");
+  const source = await read("js/dashboard/app.js");
   assert.match(source, /queued:\s*"Sırada"/);
   assert.match(source, /dispatching:\s*"Gönderiliyor"/);
   assert.match(source, /processing:\s*"Üretiliyor"/);
@@ -204,7 +206,7 @@ test("review kontrolleri job tamamlanana kadar varsayilan olarak kapalidir", asy
 });
 
 test("admin paneli manuel kullanıcı ekleme ve kullanıcı silme operasyon butonlarını tanımlar", async () => {
-  const adminSource = await read("js/admin.js");
+  const adminSource = await read("js/admin/app.js");
   const adminHtml = await read("admin.html");
   assert.match(adminSource, /delete-user/);
   assert.match(adminSource, /\/admin\/users/);

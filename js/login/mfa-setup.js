@@ -1,4 +1,11 @@
-(async function () {
+// VitrinOS İki Adımlı Doğrulama Kurulum Ekranı (ESM & Login)
+import "../shared/observability.js";
+import { api } from "../shared/api-client.js";
+import { authStore } from "../shared/auth-store.js";
+
+export async function initMfaSetup() {
+  if (typeof document === "undefined") return;
+
   const screen = document.querySelector("#mfa-setup-main");
   const status = document.querySelector("#mfaStatus");
   const enrollPanel = document.querySelector("#mfaEnrollPanel");
@@ -52,7 +59,7 @@
 
   async function initializeSetup() {
     try {
-      const user = await window.VitrinOS.authStore.fetchSession();
+      const user = await authStore.fetchSession();
       if (!user || user.role !== "admin") {
         window.location.replace("login.html");
         return;
@@ -74,7 +81,7 @@
 
       if (startButton) startButton.hidden = false;
       setStatus("Kuruluma hazırsınız. Doğrulayıcı uygulamanızı bağlayın.", "mfa");
-    } catch (error) {
+    } catch {
       setStatus("Oturum doğrulanamadı. Lütfen yeniden giriş yapın.", "error");
     } finally {
       screen?.setAttribute("aria-busy", "false");
@@ -86,7 +93,7 @@
     screen?.setAttribute("aria-busy", "true");
     setStatus("Sana özel QR kod güvenli biçimde hazırlanıyor…", "loading");
     try {
-      const data = await window.VitrinOS.api.post("/auth/mfa/enroll", {});
+      const data = await api.post("/auth/mfa/enroll", {});
       const { secret, qrCodeUri } = data;
 
       if (qrCode) {
@@ -99,20 +106,18 @@
       }
       if (enrollPanel) enrollPanel.hidden = false;
       if (startButton) startButton.hidden = true;
-      if (codeInput) codeInput.disabled = false;
-      updateVerifyState();
-      setStatus("QR kodu uygulamanla tara; ardından üretilen 6 haneli kodu gir.", "mfa");
+
+      setStatus("QR kodu doğrulayıcı uygulamanla tara ve 6 haneli kodu gir.", "mfa");
       codeInput?.focus();
     } catch (error) {
-      setStatus(error.message || "MFA kaydı başlatılamadı.", "error");
-      status?.focus();
-    } finally {
+      setStatus(error.message || "Kurulum başlatılamadı. Lütfen sayfayı yenileyip tekrar deneyin.", "error");
       setStartBusy(false);
+    } finally {
       screen?.setAttribute("aria-busy", "false");
     }
   }
 
-  async function verifyEnrollment() {
+  async function verifyAndActivate() {
     const code = codeInput.value.replace(/\D/g, "");
     if (code.length !== 6) {
       codeInput.setAttribute("aria-invalid", "true");
@@ -122,55 +127,32 @@
     }
 
     setVerifyBusy(true);
-    setStatus("Kod ve cihaz bağı doğrulanıyor…", "loading");
+    setStatus("Kod doğrulanıyor ve iki adımlı koruma etkinleştiriliyor…", "loading");
+
     try {
-      await window.VitrinOS.api.post("/auth/mfa/confirm", { code });
-      setStatus("MFA başarıyla aktifleştirildi. Admin paneline yönlendiriliyorsunuz…", "success");
+      await api.post("/auth/mfa/confirm", { code });
+      setStatus("İki adımlı doğrulama başarıyla aktifleştirildi! Yönetici paneline yönlendiriliyorsunuz…", "success");
       setTimeout(() => {
         window.location.replace("admin.html");
       }, 1500);
     } catch (error) {
       setVerifyBusy(false);
       codeInput.setAttribute("aria-invalid", "true");
-      setStatus(error.message || "Kod doğrulanamadı. Güncel kodla yeniden dene.", "error");
+      setStatus(error.message || "Kod doğrulanamadı. Lütfen güncel kodu kontrol edip tekrar deneyin.", "error");
       codeInput.focus();
     }
   }
 
   startButton?.addEventListener("click", beginEnrollment);
   restartButton?.addEventListener("click", () => {
-    if (enrollPanel) enrollPanel.hidden = true;
-    if (qrCode) {
-      qrCode.hidden = true;
-      qrCode.removeAttribute("src");
-    }
-    if (manualSecret) {
-      manualSecret.hidden = true;
-      manualSecret.textContent = "";
-    }
-    if (codeInput) {
-      codeInput.value = "";
-      codeInput.disabled = true;
-      codeInput.setAttribute("aria-invalid", "false");
-    }
-    if (startButton) {
-      startButton.hidden = false;
-      startButton.disabled = false;
-    }
-    if (startLabel) {
-      startLabel.textContent = isMfaAlreadyEnabled ? "Yeni doğrulayıcı bağla" : "Doğrulayıcı uygulamasını bağla";
-    }
-    updateVerifyState();
-    setStatus(
-      isMfaAlreadyEnabled
-        ? "MFA koruması aktif. İsterseniz yeni bir doğrulayıcı bağlayabilirsiniz."
-        : "Yeni bir doğrulayıcı kaydı oluşturabilirsin."
-    );
+    codeInput.value = "";
+    codeInput.setAttribute("aria-invalid", "false");
+    beginEnrollment();
   });
 
   setupForm?.addEventListener("submit", (event) => {
     event.preventDefault();
-    verifyEnrollment();
+    verifyAndActivate();
   });
 
   codeInput?.addEventListener("input", () => {
@@ -179,5 +161,15 @@
     updateVerifyState();
   });
 
-  await initializeSetup();
-})();
+  initializeSetup();
+}
+
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initMfaSetup, { once: true });
+  } else {
+    initMfaSetup();
+  }
+}
+
+export default initMfaSetup;

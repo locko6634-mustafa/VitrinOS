@@ -7,8 +7,9 @@
     <meta name="description" content="VitrinOS markalar, kullanıcılar ve yapay zeka promptları yönetim paneli.">
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" fill="%23f8f4ec"/%3E%3Cpath d="M11 15h11l10 30 10-30h11L38 53H26L11 15Z" fill="%231d1e22"/%3E%3Cpath d="M46 42h9v9h-9z" fill="%23f46b22"/%3E%3C/svg%3E'>
-    <link rel="stylesheet" href="css/style.css?v=2.1">
-    <link rel="stylesheet" href="css/admin.css?v=2.5">
+    <link rel="stylesheet" href="css/shared/fonts.css">
+    <link rel="stylesheet" href="css/shared/base.css">
+    <link rel="stylesheet" href="css/admin/admin.css">
   </head>
   <body class="app-body admin-body" data-surface="admin">
     <a class="skip-link" href="#admin-main">İçeriğe geç</a>
@@ -269,10 +270,7 @@
 
     <div class="toast-region" id="adminToastRegion" role="status" aria-live="polite" aria-atomic="false"></div>
 
-    <script src="js/config.js?v=1.2"></script>
-    <script src="js/observability.js?v=1.1"></script>
-    <script src="js/api-client.js"></script>
-    <script src="js/auth-store.js"></script>
-    <script src="js/admin.js?v=2.7"></script>
+    <script type="module" src="js/shared/observability.js"></script>
+    <script type="module" src="js/admin/app.js"></script>
   </body>
 </html>

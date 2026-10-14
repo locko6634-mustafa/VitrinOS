@@ -4,7 +4,7 @@ import { access } from "node:fs/promises";
 const required = [
   "package.json",
   ".github/workflows/ci.yml",
-  "js/observability.js",
+  "js/shared/observability.js",
   "quality/tests/config.test.mjs",
   "quality/tests/staging-e2e-gate.test.mjs",
   "infra/scripts/dry-run-migration.ts",
@@ -32,7 +32,7 @@ for (const appDir of backendApps) {
   await access(appDir);
 }
 
-const config = await readFile("js/config.js", "utf8");
+const config = await readFile("js/shared/config.js", "utf8");
 if (!config.includes("sentryDsn") || !config.includes("observabilitySampleRate")) {
   throw new Error("Release gate: gözlemlenebilirlik ayarları eksik.");
 }

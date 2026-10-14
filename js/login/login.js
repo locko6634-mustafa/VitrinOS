@@ -1,4 +1,11 @@
-(function () {
+// VitrinOS Kullanıcı Girişi (ESM & Login)
+import "../shared/observability.js";
+import { api } from "../shared/api-client.js";
+import { authStore } from "../shared/auth-store.js";
+
+export function initLogin() {
+  if (typeof document === "undefined") return;
+
   const loginForm = document.querySelector("#loginForm");
   const loginStatus = document.querySelector("#loginStatus");
   const identifierInput = document.querySelector("#loginEmail");
@@ -49,11 +56,11 @@
 
   (async function checkExistingSession() {
     try {
-      const user = await window.VitrinOS.authStore.fetchSession();
+      const user = await authStore.fetchSession();
       if (user) {
         window.location.replace(user.role === "admin" ? (user.mfaEnabled ? "admin.html" : "mfa-setup.html") : "dashboard.html");
       }
-    } catch (error) {
+    } catch {
       // Oturum yoksa devam et
     }
   })();
@@ -85,7 +92,7 @@
     let redirecting = false;
 
     try {
-      const response = await window.VitrinOS.api.post("/auth/login", { email, password });
+      const response = await api.post("/auth/login", { email, password });
 
       if (response.mfaRequired) {
         sessionStorage.setItem("mfa_challenge_token", response.challengeToken);
@@ -108,4 +115,14 @@
       if (!redirecting) setLoading(false);
     }
   });
-})();
+}
+
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initLogin, { once: true });
+  } else {
+    initLogin();
+  }
+}
+
+export default initLogin;

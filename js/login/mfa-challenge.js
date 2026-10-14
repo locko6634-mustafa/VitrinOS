@@ -1,4 +1,10 @@
-(async function () {
+// VitrinOS İki Adımlı Doğrulama Ekranı (ESM & Login)
+import "../shared/observability.js";
+import { api } from "../shared/api-client.js";
+
+export async function initMfaChallenge() {
+  if (typeof document === "undefined") return;
+
   const challengeToken = sessionStorage.getItem("mfa_challenge_token");
   const screen = document.querySelector("#mfa-main");
   const form = document.querySelector("#mfaChallengeForm");
@@ -57,7 +63,7 @@
     setBusy(true, "Kod doğrulanıyor");
     setStatus("Kod ve oturum güvenliği doğrulanıyor…", "loading");
     try {
-      await window.VitrinOS.api.post("/auth/mfa/verify", {
+      await api.post("/auth/mfa/verify", {
         challengeToken,
         code
       });
@@ -89,4 +95,14 @@
     sessionStorage.removeItem("mfa_challenge_token");
     window.location.href = "login.html";
   });
-})();
+}
+
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initMfaChallenge, { once: true });
+  } else {
+    initMfaChallenge();
+  }
+}
+
+export default initMfaChallenge;

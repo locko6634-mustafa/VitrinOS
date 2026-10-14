@@ -1,4 +1,10 @@
-(function () {
+// VitrinOS Şifre Belirleme Ekranı (ESM & Login)
+import "../shared/observability.js";
+import { api } from "../shared/api-client.js";
+
+export function initSetPassword() {
+  if (typeof document === "undefined") return;
+
   const form = document.querySelector("#setPasswordForm");
   const status = document.querySelector("#setPasswordStatus");
   const passwordInput = document.querySelector("#newPassword");
@@ -102,17 +108,29 @@
     setStatus("Şifren güvenli biçimde kaydediliyor…", "loading");
 
     try {
-      const endpoint = mode === "reset" ? "/auth/password/reset" : "/auth/password/activate";
-      await window.VitrinOS.api.post(endpoint, { token, password });
+      const endpoint = mode === "reset" ? "/auth/reset-password" : "/auth/set-password";
+      await api.post(endpoint, {
+        token,
+        password
+      });
 
-      setStatus("Şifren başarıyla oluşturuldu. Giriş ekranına yönlendiriliyorsunuz…", "success");
-      window.setTimeout(() => {
-        window.location.replace("login.html");
+      setStatus("Şifren başarıyla belirlendi! Giriş sayfasına yönlendiriliyorsun…", "success");
+      setTimeout(() => {
+        window.location.href = "login.html";
       }, 1500);
     } catch (error) {
+      setStatus(error.message || "İşlem tamamlanamadı. Bağlantı süresi dolmuş olabilir.", "error");
       setLoading(false);
-      setStatus(error.message || "Şifre kaydedilemedi. Bağlantıyı yeniden açın.", "error");
-      status?.focus();
     }
   });
-})();
+}
+
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSetPassword, { once: true });
+  } else {
+    initSetPassword();
+  }
+}
+
+export default initSetPassword;

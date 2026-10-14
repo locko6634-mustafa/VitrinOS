@@ -7,8 +7,9 @@
     <meta name="description" content="VitrinOS kreatif operasyon masası; brief, üretim takibi, görsel onayı, revizyon ve operasyon geçmişini tek yüzeyde toplar.">
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" fill="%23f8f4ec"/%3E%3Cpath d="M11 15h11l10 30 10-30h11L38 53H26L11 15Z" fill="%231d1e22"/%3E%3Cpath d="M46 42h9v9h-9z" fill="%23f46b22"/%3E%3C/svg%3E'>
-    <link rel="stylesheet" href="css/style.css?v=2.1">
-    <link rel="stylesheet" href="css/dashboard.css?v=2.1">
+    <link rel="stylesheet" href="css/shared/fonts.css">
+    <link rel="stylesheet" href="css/shared/base.css">
+    <link rel="stylesheet" href="css/dashboard/dashboard.css">
   </head>
   <body class="app-body" data-surface="workspace">
     <a class="skip-link" href="#app-main">İçeriğe geç</a>
@@ -252,12 +253,8 @@
       </div>
     </div>
 
-    <script src="/api/runtime-config.js?v=2.1"></script>
-    <script src="js/config.js?v=1.2"></script>
-    <script src="js/observability.js?v=1.1"></script>
-    <script src="js/api-client.js"></script>
-    <script src="js/auth-store.js"></script>
-    <script src="js/sse-client.js"></script>
-    <script src="js/dashboard.js?v=2.2"></script>
+    <script src="/api/runtime-config.js"></script>
+    <script type="module" src="js/shared/observability.js"></script>
+    <script type="module" src="js/dashboard/app.js"></script>
   </body>
 </html>

@@ -1,5 +1,10 @@
-(async function () {
-  const user = await window.VitrinOS.authStore.fetchSession();
+// VitrinOS Yönetici Paneli Uygulama Mantığı (ESM & Admin)
+import "../shared/observability.js";
+import { api } from "../shared/api-client.js";
+import { authStore } from "../shared/auth-store.js";
+
+export async function initAdminApp() {
+  const user = await authStore.fetchSession();
   if (!user || user.role !== "admin") {
     window.location.replace("login.html");
     return;
@@ -28,7 +33,7 @@
   const date = (value) => value ? new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value)) : "—";
   const jobStatusLabel = (status) => ({ queued: "Sırada", dispatching: "Gönderiliyor", processing: "Üretiliyor", succeeded: "Tamamlandı", approved: "Onaylandı", failed_retryable: "Yeniden denenecek", failed_terminal: "Başarısız", cancelled: "İptal edildi" }[status] || text(status));
   const palette = (brand) => brand.colorPalette || {};
-  const packPrompt = (text, background, image) => JSON.stringify({ text, background, image });
+  const packPrompt = (textVal, background, image) => JSON.stringify({ text: textVal, background, image });
   const unpackPrompt = (value) => {
     try { const parsed = JSON.parse(value || ""); return parsed && typeof parsed === "object" ? parsed : { text: value || "", background: "", image: "" }; }
     catch { return { text: value || "", background: "", image: "" }; }
@@ -197,7 +202,7 @@
     nodes.brandTheme.value = colors.theme || "koyu"; nodes.brandPrimary.value = colors.primary || "#d9962a"; nodes.brandSecondary.value = colors.secondary || "#7a4f12"; nodes.brandTone.value = brand.toneRules || ""; nodes.brandBanned.value = (brand.bannedWords || []).join(", ");
     notify("Promptlar yükleniyor…");
     try {
-      state.prompts = await window.VitrinOS.api.get(`/brands/${brand.id}/prompt`);
+      state.prompts = await api.get(`/brands/${brand.id}/prompt`);
       const story = unpackPrompt(state.prompts.storyPrompt); const banner = unpackPrompt(state.prompts.bannerPrompt); const meta = unpackPrompt(state.prompts.metaPostPrompt);
       $("#basePrompt").value = state.prompts.basePrompt || ""; $("#storyTextPrompt").value = story.text; $("#storyBgPrompt").value = story.background; $("#storyImgPrompt").value = story.image; $("#bannerTextPrompt").value = banner.text; $("#bannerBgPrompt").value = banner.background; $("#bannerImgPrompt").value = banner.image; $("#metaPostTextPrompt").value = meta.text; $("#metaPostBgPrompt").value = meta.background; $("#metaPostImgPrompt").value = meta.image; $("#revizePrompt").value = state.prompts.revizePrompt || "";
       notify("Marka ayarları yüklendi.", "success");
@@ -212,9 +217,9 @@
   async function fetchData() {
     try {
       const [brands, users, jobs] = await Promise.all([
-        window.VitrinOS.api.get("/brands"),
-        window.VitrinOS.api.get("/admin/users"),
-        window.VitrinOS.api.get("/jobs")
+        api.get("/brands"),
+        api.get("/admin/users"),
+        api.get("/jobs")
       ]);
       state.brands = brands || []; state.users = users || []; state.jobs = jobs || [];
       renderAll();
@@ -222,9 +227,17 @@
   }
 
   nodes.tabs.forEach((tab) => tab.addEventListener("click", () => switchTab(tab.dataset.adminTab)));
-  nodes.menu?.addEventListener("click", () => { const open = nodes.rail?.classList.toggle("is-open"); const sidebar = nodes.rail; if (sidebar) sidebar.inert = !open; document.body.classList.toggle("admin-sidebar-open", open); nodes.menu.setAttribute("aria-expanded", String(open)); });
-  window.addEventListener("keydown", (event) => { if (event.key === "Tab" && document.body.classList.contains("admin-sidebar-open")) nodes.rail?.focus(); });
-  $$('[data-admin-logout]').forEach((button) => button.addEventListener("click", () => window.VitrinOS.authStore.logout()));
+  nodes.menu?.addEventListener("click", () => {
+    const open = nodes.rail?.classList.toggle("is-open");
+    const sidebar = nodes.rail;
+    if (sidebar) sidebar.inert = !open;
+    document.body.classList.toggle("admin-sidebar-open", open);
+    nodes.menu.setAttribute("aria-expanded", String(open));
+  });
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Tab" && document.body.classList.contains("admin-sidebar-open")) nodes.rail?.focus();
+  });
+  $$('[data-admin-logout]').forEach((button) => button.addEventListener("click", () => authStore.logout()));
   ["#brandSearch", "#brandThemeFilter"].forEach((selector) => $(selector)?.addEventListener("input", renderBrands));
   ["#userSearch", "#userStatusFilter"].forEach((selector) => $(selector)?.addEventListener("input", renderUsers));
   ["#jobBrandFilter", "#jobFormatFilter", "#jobStatusFilter"].forEach((selector) => $(selector)?.addEventListener("input", renderJobs));
@@ -234,23 +247,23 @@
     event.preventDefault(); const name = nodes.brandName.value.trim(); if (name.length < 2) return notify("Marka adı en az 2 karakter olmalıdır.", "error");
     const payload = { name, userId: nodes.brandOwner.value || null, logoUrl: nodes.brandLogo.value.trim(), websiteUrl: nodes.brandWebsite.value.trim(), colorPalette: { theme: nodes.brandTheme.value, primary: nodes.brandPrimary.value, secondary: nodes.brandSecondary.value }, toneRules: nodes.brandTone.value.trim(), bannedWords: nodes.brandBanned.value.split(",").map((item) => item.trim()).filter(Boolean) };
     try {
-      const saved = nodes.brandId.value ? await window.VitrinOS.api.patch(`/brands/${nodes.brandId.value}`, payload) : await window.VitrinOS.api.post("/brands", payload);
+      const saved = nodes.brandId.value ? await api.patch(`/brands/${nodes.brandId.value}`, payload) : await api.post("/brands", payload);
       const prompts = { basePrompt: $("#basePrompt").value, storyPrompt: packPrompt($("#storyTextPrompt").value, $("#storyBgPrompt").value, $("#storyImgPrompt").value), bannerPrompt: packPrompt($("#bannerTextPrompt").value, $("#bannerBgPrompt").value, $("#bannerImgPrompt").value), metaPostPrompt: packPrompt($("#metaPostTextPrompt").value, $("#metaPostBgPrompt").value, $("#metaPostImgPrompt").value), revizePrompt: $("#revizePrompt").value };
-      await window.VitrinOS.api.put(`/brands/${saved.id}/prompt`, prompts); notify("Marka ve prompt ayarları kaydedildi.", "success"); await fetchData(); await selectBrand(saved.id);
+      await api.put(`/brands/${saved.id}/prompt`, prompts); notify("Marka ve prompt ayarları kaydedildi.", "success"); await fetchData(); await selectBrand(saved.id);
     } catch (error) { notify(error.message || "Marka kaydedilemedi.", "error"); }
   });
 
   nodes.userRows?.addEventListener("click", async (event) => {
     const button = event.target.closest("button[data-action]"); if (!button) return;
     try {
-      if (button.dataset.action === "status") { const target = state.users.find((item) => item.id === button.dataset.id); await window.VitrinOS.api.patch(`/admin/users/${button.dataset.id}/status`, { status: target?.status === "active" ? "suspended" : "active" }); }
-      if (button.dataset.action === "revoke") await window.VitrinOS.api.post(`/admin/users/${button.dataset.id}/sessions/revoke`, {});
-      if (button.dataset.action === "reset") await window.VitrinOS.api.post(`/admin/users/${button.dataset.id}/password-reset`, {});
+      if (button.dataset.action === "status") { const target = state.users.find((item) => item.id === button.dataset.id); await api.patch(`/admin/users/${button.dataset.id}/status`, { status: target?.status === "active" ? "suspended" : "active" }); }
+      if (button.dataset.action === "revoke") await api.post(`/admin/users/${button.dataset.id}/sessions/revoke`, {});
+      if (button.dataset.action === "reset") await api.post(`/admin/users/${button.dataset.id}/password-reset`, {});
       if (button.dataset.action === "delete-user") {
         const target = state.users.find((item) => item.id === button.dataset.id);
         const approved = await openActionConfirmDialog("Kullanıcıyı Sil", `${target?.email || "Bu"} kullanıcısını kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`);
         if (!approved) return;
-        await window.VitrinOS.api.delete(`/admin/users/${button.dataset.id}`);
+        await api.delete(`/admin/users/${button.dataset.id}`);
         await fetchData(); notify("Kullanıcı silindi.", "success");
         return;
       }
@@ -263,7 +276,7 @@
     event.preventDefault();
     if (event.submitter?.value === "cancel") return nodes.userDialog.close();
     try {
-      await window.VitrinOS.api.post("/admin/users", {
+      await api.post("/admin/users", {
         name: nodes.userName.value.trim(),
         email: nodes.userEmail.value.trim(),
         password: nodes.userPassword.value,
@@ -280,4 +293,14 @@
 
   await fetchData();
   resetBrandForm();
-})();
+}
+
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAdminApp, { once: true });
+  } else {
+    initAdminApp();
+  }
+}
+
+export default initAdminApp;

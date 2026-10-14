@@ -1,13 +1,20 @@
-(async function () {
-  const user = await window.VitrinOS.authStore.fetchSession();
+// VitrinOS Çalışma Alanı (Dashboard) Uygulama Mantığı (ESM & Dashboard)
+import "../shared/observability.js";
+import { api } from "../shared/api-client.js";
+import { authStore } from "../shared/auth-store.js";
+import { sseClient } from "../shared/sse-client.js";
+import { config } from "../shared/config.js";
+
+export async function initDashboardApp() {
+  const user = await authStore.fetchSession();
   if (!user) {
     window.location.replace("login.html");
     return;
   }
 
-  const dashboardConfig = window.VitrinOS.config.defaults.dashboard;
-  const formatConfig = window.VitrinOS.config.defaults.formats;
-  const colors = window.VitrinOS.config.defaults.colors;
+  const dashboardConfig = config.defaults.dashboard;
+  const formatConfig = config.defaults.formats;
+  const colors = config.defaults.colors;
 
   const state = {
     jobsToday: 0,
@@ -629,7 +636,7 @@
   });
 
   // SSE canlı durum takibi
-  window.VitrinOS.sseClient.subscribe(async (data) => {
+  sseClient.subscribe(async () => {
     await fetchData();
     renderAll();
   });
@@ -637,4 +644,14 @@
   // Başlangıç
   await fetchData();
   renderAll();
-})();
+}
+
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initDashboardApp, { once: true });
+  } else {
+    initDashboardApp();
+  }
+}
+
+export default initDashboardApp;
