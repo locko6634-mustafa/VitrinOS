@@ -53,7 +53,6 @@ test("Responsive yatay tasma ve ekran goruntuleri testi", async (t) => {
         // Ekran goruntusu isimleri
         const filename = `${pageInfo.name}_${width}.png`;
         const localPath = join(SCREENSHOT_DIR, filename);
-        const artifactPath = join(ARTIFACT_DIR, filename);
 
         await page.screenshot({ path: localPath });
         if (ARTIFACT_DIR) {
