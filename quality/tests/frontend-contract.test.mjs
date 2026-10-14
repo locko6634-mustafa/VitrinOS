@@ -51,6 +51,7 @@ test("başvuru akışı WhatsApp üzerine taşınmıştır ve kişisel iletişim
   assert.match(html, /wa\.me\/905510653051/);
   assert.match(html, /0551\s*065\s*30\s*51/);
   assert.match(html, /class=["']whatsapp-float["']/);
+  assert.match(html, /<svg[^>]+width=["']20["'][^>]+height=["']20["']/);
   assert.doesNotMatch(html, /id=["']leadForm["']/);
   assert.doesNotMatch(html, /id=["']basvuru["']/);
 });

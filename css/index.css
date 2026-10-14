@@ -2875,8 +2875,13 @@ body[data-surface="marketing"] .whatsapp-float:focus-visible {
 body[data-surface="marketing"] .whatsapp-float svg {
   width: 20px;
   height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  max-width: 20px;
+  max-height: 20px;
   flex-shrink: 0;
   fill: currentColor;
+  display: block;
 }
 
 @media (max-width: 640px) {
