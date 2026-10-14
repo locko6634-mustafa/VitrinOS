@@ -11,23 +11,22 @@
 
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
-  const state = { brands: [], users: [], leads: [], jobs: [], selectedBrand: null, prompts: null };
+  const state = { brands: [], users: [], jobs: [], selectedBrand: null, prompts: null };
   const nodes = {
     shell: $("#appShell"), rail: $("#dashboardNav"), menu: $("#appMenuToggle"),
     tabs: $$("[data-admin-tab]"), panels: $$("[data-admin-panel]"),
     brandRows: $("#brandRows"), brandCount: $("#brandCount"), brandForm: $("#brandForm"), brandStatus: $("#brandStatus"),
     brandId: $("#brandId"), brandName: $("#brandName"), brandLogo: $("#brandLogo"), brandWebsite: $("#brandWebsite"), brandOwner: $("#brandOwner"), brandTheme: $("#brandTheme"), brandPrimary: $("#brandPrimary"), brandSecondary: $("#brandSecondary"), brandTone: $("#brandTone"), brandBanned: $("#brandBanned"), brandTitle: $("#brandFormTitle"),
-    userRows: $("#userRows"), userCount: $("#userCount"), leadRows: $("#leadRows"), leadCount: $("#leadCount"),
+    userRows: $("#userRows"), userCount: $("#userCount"),
     jobRows: $("#jobRows"), jobCount: $("#jobCount"), jobDetail: $("#jobDetail"),
-    recentJobs: $("#recentJobs"), recentLeads: $("#recentLeads"),
+    recentJobs: $("#recentJobs"), recentUsers: $("#recentUsers"),
     confirmDialog: $("#adminConfirmDialog"), confirmTitle: $("#adminConfirmTitle"), confirmMessage: $("#adminConfirmMessage"),
-    inviteDialog: $("#adminInviteDialog"), inviteForm: $("#adminInviteForm"), inviteEmail: $("#adminInviteEmail"), inviteName: $("#adminInviteName"), toastRegion: $("#adminToastRegion")
+    userDialog: $("#adminUserDialog"), userForm: $("#adminUserForm"), userEmail: $("#adminUserEmail"), userName: $("#adminUserName"), userPassword: $("#adminUserPassword"), userRole: $("#adminUserRole"), toastRegion: $("#adminToastRegion")
   };
 
   const text = (value) => value == null || value === "" ? "—" : String(value);
   const date = (value) => value ? new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value)) : "—";
   const jobStatusLabel = (status) => ({ queued: "Sırada", dispatching: "Gönderiliyor", processing: "Üretiliyor", succeeded: "Tamamlandı", approved: "Onaylandı", failed_retryable: "Yeniden denenecek", failed_terminal: "Başarısız", cancelled: "İptal edildi" }[status] || text(status));
-  const leadStatusLabel = (status) => ({ new: "Yeni", reviewed: "İncelendi", approved: "Onaylandı", rejected: "Reddedildi" }[status] || text(status));
   const palette = (brand) => brand.colorPalette || {};
   const packPrompt = (text, background, image) => JSON.stringify({ text, background, image });
   const unpackPrompt = (value) => {
@@ -122,7 +121,6 @@
       const matchesQuery = !query || item.email.toLowerCase().includes(query) || (item.displayName && item.displayName.toLowerCase().includes(query));
       if (!matchesQuery) return false;
       if (selectedStatus === "all") return true;
-      if (selectedStatus === "pending_invite") return !!item.hasPendingInvite;
       return item.status === selectedStatus;
     });
   }
@@ -136,7 +134,7 @@
       appendCell(row, state.brands.filter((brand) => brand.userId === item.id).map((brand) => brand.name).join(", "));
       appendCell(row, state.jobs.filter((job) => job.ownerId === item.id).length);
       appendCell(row, date(item.lastSignInAt));
-      const statusLabel = item.hasPendingInvite ? (item.inviteExpired ? "Davet (Süresi doldu)" : "Davet bekliyor") : (item.status === "active" ? "Aktif" : "Askıda");
+      const statusLabel = item.status === "active" ? "Aktif" : "Askıda";
       appendCell(row, statusLabel);
       const actions = document.createElement("td");
       actions.className = "admin-row-actions";
@@ -147,28 +145,6 @@
         actionButton("Kullanıcıyı sil", "delete-user", item.id, "admin-row-button danger")
       );
       row.append(actions); nodes.userRows?.append(row);
-    });
-  }
-
-  function renderLeads() {
-    clearRows(nodes.leadRows);
-    const query = $("#leadSearch")?.value.trim().toLocaleLowerCase("tr-TR") || "";
-    const selectedStatus = $("#leadStatusFilter")?.value || "all";
-    const leads = state.leads.filter((item) => (!query || `${item.name} ${item.company} ${item.email}`.toLocaleLowerCase("tr-TR").includes(query)) && (selectedStatus === "all" || item.status === selectedStatus));
-    if (nodes.leadCount) nodes.leadCount.textContent = `${leads.length} başvuru`;
-    leads.forEach((item) => {
-      const row = document.createElement("tr");
-      appendCell(row, item.name); appendCell(row, item.company); appendCell(row, item.email); appendCell(row, item.need);
-      const stateCell = document.createElement("td"); const select = document.createElement("select");
-      ["new", "reviewed", "approved", "rejected"].forEach((value) => select.add(new Option(leadStatusLabel(value), value, false, item.status === value)));
-      select.addEventListener("change", () => updateLead(item.id, select.value)); stateCell.append(select); row.append(stateCell);
-      const actions = document.createElement("td");
-      actions.className = "admin-row-actions";
-      actions.append(
-        actionButton("Davet gönder", "invite", item.id),
-        actionButton("Başvuruyu sil", "delete-lead", item.id, "admin-row-button danger")
-      );
-      row.append(actions); nodes.leadRows?.append(row);
     });
   }
 
@@ -209,10 +185,10 @@
       });
     };
     renderList(nodes.recentJobs, state.jobs, (job) => `${job.id.slice(0, 8)} · ${state.brands.find((brand) => brand.id === job.brandId)?.name || "Marka"}`, (job) => `${job.format || "Format"} · ${date(job.createdAt)}`);
-    renderList(nodes.recentLeads, state.leads, (lead) => `${lead.name || "Başvuru"} · ${lead.company || ""}`, (lead) => `${lead.need || "İhtiyaç belirtilmedi"} · ${date(lead.createdAt)}`);
+    renderList(nodes.recentUsers, state.users, (u) => `${u.displayName || "Kullanıcı"} · ${u.email}`, (u) => `${u.role === "admin" ? "Yönetici" : "Kullanıcı"} · ${date(u.createdAt)}`);
   }
 
-  function renderAll() { renderOwners(); renderJobBrandOptions(); renderBrands(); renderUsers(); renderLeads(); renderJobs(); renderOverview(); }
+  function renderAll() { renderOwners(); renderJobBrandOptions(); renderBrands(); renderUsers(); renderJobs(); renderOverview(); }
 
   async function selectBrand(id) {
     const brand = state.brands.find((item) => item.id === id); if (!brand) return;
@@ -235,19 +211,14 @@
 
   async function fetchData() {
     try {
-      const [brands, users, leads, jobs] = await Promise.all([
+      const [brands, users, jobs] = await Promise.all([
         window.VitrinOS.api.get("/brands"),
         window.VitrinOS.api.get("/admin/users"),
-        window.VitrinOS.api.get("/admin/leads"),
         window.VitrinOS.api.get("/jobs")
       ]);
-      state.brands = brands || []; state.users = users || []; state.leads = leads || []; state.jobs = jobs || [];
+      state.brands = brands || []; state.users = users || []; state.jobs = jobs || [];
       renderAll();
     } catch (error) { notify(error.message || "Yönetim verileri yüklenemedi.", "error"); }
-  }
-
-  async function updateLead(id, value) {
-    try { await window.VitrinOS.api.patch(`/admin/leads/${id}/status`, { status: value }); await fetchData(); } catch (error) { notify(error.message || "Başvuru güncellenemedi.", "error"); }
   }
 
   nodes.tabs.forEach((tab) => tab.addEventListener("click", () => switchTab(tab.dataset.adminTab)));
@@ -256,7 +227,6 @@
   $$('[data-admin-logout]').forEach((button) => button.addEventListener("click", () => window.VitrinOS.authStore.logout()));
   ["#brandSearch", "#brandThemeFilter"].forEach((selector) => $(selector)?.addEventListener("input", renderBrands));
   ["#userSearch", "#userStatusFilter"].forEach((selector) => $(selector)?.addEventListener("input", renderUsers));
-  ["#leadSearch", "#leadStatusFilter"].forEach((selector) => $(selector)?.addEventListener("input", renderLeads));
   ["#jobBrandFilter", "#jobFormatFilter", "#jobStatusFilter"].forEach((selector) => $(selector)?.addEventListener("input", renderJobs));
   $("#newBrandButton")?.addEventListener("click", resetBrandForm);
 
@@ -288,35 +258,24 @@
     } catch (error) { notify(error.message || "Kullanıcı işlemi tamamlanamadı.", "error"); }
   });
 
-  nodes.leadRows?.addEventListener("click", async (event) => {
-    const deleteButton = event.target.closest("button[data-action=\"delete-lead\"]");
-    if (deleteButton) {
-      const lead = state.leads.find((item) => item.id === deleteButton.dataset.id);
-      const approved = await openActionConfirmDialog("Başvuruyu Sil", `${lead?.name || "Bu"} başvurusunu kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`);
-      if (!approved) return;
-      try {
-        await window.VitrinOS.api.delete(`/admin/leads/${deleteButton.dataset.id}`);
-        await fetchData();
-        notify("Başvuru silindi.", "success");
-      } catch (error) {
-        notify(error.message || "Başvuru silinemedi.", "error");
-      }
-      return;
+  $("#addUserButton")?.addEventListener("click", () => nodes.userDialog?.showModal());
+  nodes.userForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (event.submitter?.value === "cancel") return nodes.userDialog.close();
+    try {
+      await window.VitrinOS.api.post("/admin/users", {
+        name: nodes.userName.value.trim(),
+        email: nodes.userEmail.value.trim(),
+        password: nodes.userPassword.value,
+        role: nodes.userRole.value
+      });
+      nodes.userDialog.close();
+      nodes.userForm.reset();
+      await fetchData();
+      notify("Kullanıcı başarıyla oluşturuldu.", "success");
+    } catch (error) {
+      notify(error.message || "Kullanıcı oluşturulamadı.", "error");
     }
-
-    const inviteButton = event.target.closest("button[data-action=\"invite\"]");
-    if (!inviteButton) return;
-    const lead = state.leads.find((item) => item.id === inviteButton.dataset.id);
-    if (!lead) return;
-    nodes.inviteEmail.value = lead.email || "";
-    nodes.inviteName.value = lead.name || "";
-    nodes.inviteDialog?.showModal();
-  });
-
-  $("#inviteUserButton")?.addEventListener("click", () => nodes.inviteDialog?.showModal());
-  nodes.inviteForm?.addEventListener("submit", async (event) => {
-    event.preventDefault(); if (event.submitter?.value === "cancel") return nodes.inviteDialog.close();
-    try { await window.VitrinOS.api.post("/admin/users", { email: nodes.inviteEmail.value, name: nodes.inviteName.value }); nodes.inviteDialog.close(); nodes.inviteForm.reset(); await fetchData(); notify("Davet e-postası kuyruğa alındı.", "success"); } catch (error) { notify(error.message || "Davet gönderilemedi.", "error"); }
   });
 
   await fetchData();

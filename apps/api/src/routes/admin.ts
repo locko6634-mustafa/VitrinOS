@@ -166,9 +166,15 @@ export const adminRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   fastify.post('/api/v1/admin/users', async (request, reply) => {
-    const { email, name } = request.body as { email?: string; name?: string };
+    const { email, name, password, role } = request.body as {
+      email?: string;
+      name?: string;
+      password?: string;
+      role?: 'user' | 'admin';
+    };
     const normalizedEmail = email?.trim().toLowerCase();
     const displayName = name?.trim();
+    const userRole = role === 'admin' ? 'admin' : 'user';
 
     if (!normalizedEmail || !/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
       return reply.code(400).send({ code: 'INVALID_EMAIL', message: 'Geçerli bir e-posta adresi girin' });
@@ -176,39 +182,46 @@ export const adminRoutes: FastifyPluginAsync = async (fastify) => {
     if (!displayName || displayName.length < 2 || displayName.length > 120) {
       return reply.code(400).send({ code: 'INVALID_NAME', message: 'Kullanıcı adı 2-120 karakter arasında olmalıdır' });
     }
+    if (password && password.length < 6) {
+      return reply.code(400).send({ code: 'INVALID_PASSWORD', message: 'Parola en az 6 karakter olmalıdır' });
+    }
 
     const existingUser = await fastify.db.query.users.findFirst({ where: eq(users.email, normalizedEmail) });
     if (existingUser) {
       return reply.code(409).send({ code: 'EMAIL_IN_USE', message: 'Bu e-posta adresi zaten kayıtlı' });
     }
 
-    const activationToken = generateSessionToken();
-    const temporaryPassword = await hashPassword(generateSessionToken());
+    const rawPassword = password || generateSessionToken();
+    const passwordHash = await hashPassword(rawPassword);
+
     const [newUser] = await fastify.db.transaction(async (tx) => {
-      const [createdUser] = await tx.insert(users).values({ email: normalizedEmail, displayName, role: 'user', status: 'active' }).returning();
-      await tx.insert(passwordCredentials).values({ userId: createdUser.id, passwordHash: temporaryPassword });
-      await tx.insert(oneTimeTokens).values({
-        userId: createdUser.id,
-        tokenHash: hashSessionToken(activationToken),
-        purpose: 'activate_account',
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
-      });
-      await tx.insert(outboxJobs).values({
-        type: 'email',
-        payload: { to: normalizedEmail, template: 'activate_account', data: { token: activationToken, email: normalizedEmail } }
-      });
+      const [createdUser] = await tx.insert(users).values({
+        email: normalizedEmail,
+        displayName,
+        role: userRole,
+        status: 'active'
+      }).returning();
+      await tx.insert(passwordCredentials).values({ userId: createdUser.id, passwordHash });
       return [createdUser];
     });
 
     await fastify.db.insert(securityAuditLog).values({
       actorId: request.user!.id,
-      action: 'user_invited',
+      action: 'user_created',
       targetType: 'user',
       targetId: newUser.id,
       result: 'success'
     });
 
-    return reply.code(201).send({ data: { id: newUser.id, email: newUser.email, displayName: newUser.displayName } });
+    return reply.code(201).send({
+      data: {
+        id: newUser.id,
+        email: newUser.email,
+        displayName: newUser.displayName,
+        role: newUser.role,
+        status: newUser.status
+      }
+    });
   });
 
   // Başvurular yalnızca yönetici yüzeyinden okunur ve güncellenir.

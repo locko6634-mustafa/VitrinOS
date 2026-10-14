@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Yönetim paneli | VitrinOS</title>
-    <meta name="description" content="VitrinOS markalar, kullanıcılar, başvurular ve yapay zeka promptları yönetim paneli.">
+    <meta name="description" content="VitrinOS markalar, kullanıcılar ve yapay zeka promptları yönetim paneli.">
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" fill="%23f8f4ec"/%3E%3Cpath d="M11 15h11l10 30 10-30h11L38 53H26L11 15Z" fill="%231d1e22"/%3E%3Cpath d="M46 42h9v9h-9z" fill="%23f46b22"/%3E%3C/svg%3E'>
     <link rel="stylesheet" href="css/style.css?v=2.1">
@@ -45,8 +45,7 @@
             <button class="admin-nav-button is-active" id="admin-tab-overview" type="button" role="tab" aria-controls="admin-panel-overview" aria-selected="true" tabindex="0" data-admin-tab="overview"><span>01</span>Kontrol merkezi</button>
             <button class="admin-nav-button" id="admin-tab-brands" type="button" role="tab" aria-controls="admin-panel-brands" aria-selected="false" tabindex="-1" data-admin-tab="brands"><span>02</span>Markalar</button>
             <button class="admin-nav-button" id="admin-tab-users" type="button" role="tab" aria-controls="admin-panel-users" aria-selected="false" tabindex="-1" data-admin-tab="users"><span>03</span>Kullanıcılar</button>
-            <button class="admin-nav-button" id="admin-tab-leads" type="button" role="tab" aria-controls="admin-panel-leads" aria-selected="false" tabindex="-1" data-admin-tab="leads"><span>04</span>Başvurular</button>
-            <button class="admin-nav-button" id="admin-tab-jobs" type="button" role="tab" aria-controls="admin-panel-jobs" aria-selected="false" tabindex="-1" data-admin-tab="jobs"><span>05</span>Job izleme</button>
+            <button class="admin-nav-button" id="admin-tab-jobs" type="button" role="tab" aria-controls="admin-panel-jobs" aria-selected="false" tabindex="-1" data-admin-tab="jobs"><span>04</span>Job izleme</button>
           </nav>
 
           <div class="app-rail-footer admin-sidebar-actions">
@@ -61,7 +60,7 @@
           </div>
           <div class="admin-sidebar-note">
             <span>Canlı sistem</span>
-            <p>VitrinOS Canlı Otomasyon Sistemi için marka, kullanıcı, başvuru ve üretim operasyonlarını yönetin.</p>
+            <p>VitrinOS Canlı Otomasyon Sistemi için marka, kullanıcı ve üretim operasyonlarını yönetin.</p>
           </div>
         </nav>
 
@@ -69,14 +68,14 @@
           <header class="admin-page-head">
             <div>
               <p class="kicker">Canlı operasyon paneli</p>
-              <h1>Marka, kullanıcı, başvuru<br>ve job akışı tek masada.</h1>
+              <h1>Marka, kullanıcı<br>ve job akışı tek masada.</h1>
             </div>
-            <p class="admin-note">Marka ayarları, kullanıcı yönetimi, başvurular ve job akışı tek merkezden izlenir.</p>
+            <p class="admin-note">Marka ayarları, kullanıcı yönetimi ve job akışı tek merkezden izlenir.</p>
           </header>
           <section class="admin-panel is-active" id="admin-panel-overview" role="tabpanel" aria-labelledby="admin-tab-overview" data-admin-panel="overview">
             <div class="admin-split-grid">
               <article class="admin-card"><div class="admin-card-head"><span>Son joblar</span><strong>Üretim kuyruğu</strong></div><div class="admin-list" id="recentJobs"></div></article>
-              <article class="admin-card"><div class="admin-card-head"><span>Son başvurular</span><strong>Lead akışı</strong></div><div class="admin-list" id="recentLeads"></div></article>
+              <article class="admin-card"><div class="admin-card-head"><span>Son kullanıcılar</span><strong>Kullanıcı akışı</strong></div><div class="admin-list" id="recentUsers"></div></article>
             </div>
           </section>
           <section class="admin-panel" id="admin-panel-brands" role="tabpanel" aria-labelledby="admin-tab-brands" data-admin-panel="brands" hidden>
@@ -189,8 +188,8 @@
           <section class="admin-panel" id="admin-panel-users" role="tabpanel" aria-labelledby="admin-tab-users" data-admin-panel="users" hidden>
             <div class="admin-toolbar">
               <label class="admin-search"><span>Kullanıcı ara</span><input id="userSearch" type="search" placeholder="e-posta veya marka"></label>
-              <label><span>Durum</span><select id="userStatusFilter"><option value="all">Tümü</option><option value="active">Aktif</option><option value="suspended">Askıda</option><option value="pending_invite">Davet bekleyen</option></select></label>
-              <button class="button secondary compact-button" type="button" id="inviteUserButton">Kullanıcı davet et</button>
+              <label><span>Durum</span><select id="userStatusFilter"><option value="all">Tümü</option><option value="active">Aktif</option><option value="suspended">Askıda</option></select></label>
+              <button class="button secondary compact-button" type="button" id="addUserButton">Kullanıcı ekle</button>
             </div>
             <article class="admin-card admin-table-card">
               <div class="admin-card-head"><span>Kullanıcı yönetimi</span><strong id="userCount">0 kullanıcı</strong></div>
@@ -198,22 +197,6 @@
                 <table class="admin-table">
                   <thead><tr><th>E-posta</th><th>Marka</th><th>Job</th><th>Son giriş</th><th>Durum</th><th>Aksiyon</th></tr></thead>
                   <tbody id="userRows"></tbody>
-                </table>
-              </div>
-            </article>
-          </section>
-
-          <section class="admin-panel" id="admin-panel-leads" role="tabpanel" aria-labelledby="admin-tab-leads" data-admin-panel="leads" hidden>
-            <div class="admin-toolbar">
-              <label class="admin-search"><span>Başvuru ara</span><input id="leadSearch" type="search" placeholder="ad, şirket veya e-posta"></label>
-              <label><span>Durum</span><select id="leadStatusFilter"><option value="all">Tümü</option><option value="new">Yeni</option><option value="reviewed">İncelendi</option><option value="approved">Onaylandı</option><option value="rejected">Reddedildi</option></select></label>
-            </div>
-            <article class="admin-card admin-table-card">
-              <div class="admin-card-head"><span>Başvuru yönetimi</span><strong id="leadCount">0 başvuru</strong></div>
-              <div class="admin-table-wrap">
-                <table class="admin-table">
-                  <thead><tr><th>Ad</th><th>Şirket</th><th>E-posta</th><th>İhtiyaç</th><th>Durum</th><th>Aksiyon</th></tr></thead>
-                  <tbody id="leadRows"></tbody>
                 </table>
               </div>
             </article>
@@ -265,15 +248,22 @@
       </form>
     </dialog>
 
-    <dialog class="admin-dialog" id="adminInviteDialog" aria-labelledby="adminInviteTitle">
-      <form method="dialog" id="adminInviteForm">
-        <p class="kicker">Güvenli davet</p>
-        <h2 id="adminInviteTitle">Yeni kullanıcı davet et</h2>
-        <label>E-posta adresi<input id="adminInviteEmail" type="email" autocomplete="email" required></label>
-        <label>Kullanıcı adı<input id="adminInviteName" autocomplete="name" required></label>
+    <dialog class="admin-dialog" id="adminUserDialog" aria-labelledby="adminUserTitle">
+      <form method="dialog" id="adminUserForm">
+        <p class="kicker">Kullanıcı yönetimi</p>
+        <h2 id="adminUserTitle">Yeni kullanıcı ekle</h2>
+        <label>Ad Soyad<input id="adminUserName" autocomplete="name" placeholder="Örn: Ahmet Yılmaz" required></label>
+        <label>E-posta adresi<input id="adminUserEmail" type="email" autocomplete="email" placeholder="kullanici@ornek.com" required></label>
+        <label>Parola<input id="adminUserPassword" type="password" autocomplete="new-password" placeholder="En az 6 karakter" minlength="6" required></label>
+        <label>Rol
+          <select id="adminUserRole">
+            <option value="user" selected>Kullanıcı (Standart)</option>
+            <option value="admin">Yönetici (Admin)</option>
+          </select>
+        </label>
         <div class="admin-dialog-actions">
           <button class="button secondary" type="submit" value="cancel" formnovalidate>Vazgeç</button>
-          <button class="button primary" type="submit" value="confirm">Daveti gönder</button>
+          <button class="button primary" type="submit" value="confirm">Kullanıcıyı kaydet</button>
         </div>
       </form>
     </dialog>

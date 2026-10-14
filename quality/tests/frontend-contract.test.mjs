@@ -30,7 +30,7 @@ test("form ve uygulama DOM hookları dönüşümden sonra korunur", async () => 
     "mfa-setup.html": ["mfaSetupForm", "mfaCode", "mfaStatus", "mfaEnrollPanel"],
     "set-password.html": ["setPasswordForm", "newPassword", "confirmPassword", "setPasswordStatus"],
     "dashboard.html": ["briefForm", "briefText", "briefSubmit", "dashboardNav", "appMain"],
-    "admin.html": ["brandForm", "brandRows", "userRows", "leadRows", "jobRows", "adminConfirmDialog", "adminInviteDialog"]
+    "admin.html": ["brandForm", "brandRows", "userRows", "jobRows", "adminConfirmDialog", "adminUserDialog"]
   };
 
   for (const [file, ids] of Object.entries(contracts)) {
@@ -202,11 +202,14 @@ test("review kontrolleri job tamamlanana kadar varsayilan olarak kapalidir", asy
   assert.match(html, /id=["']reviseButton["'][^>]*\shidden(?:\s|>)/);
 });
 
-test("admin paneli kullanıcı ve başvuru silme operasyon butonlarını tanımlar", async () => {
+test("admin paneli manuel kullanıcı ekleme ve kullanıcı silme operasyon butonlarını tanımlar", async () => {
   const adminSource = await read("js/admin.js");
+  const adminHtml = await read("admin.html");
   assert.match(adminSource, /delete-user/);
-  assert.match(adminSource, /delete-lead/);
-  assert.match(adminSource, /\/admin\/users\//);
-  assert.match(adminSource, /\/admin\/leads\//);
+  assert.match(adminSource, /\/admin\/users/);
+  assert.match(adminHtml, /id=["']addUserButton["']/);
+  assert.match(adminHtml, /id=["']adminUserDialog["']/);
   assert.doesNotMatch(adminSource, /delete-invite/);
+  assert.doesNotMatch(adminHtml, /id=["']admin-panel-leads["']/);
+  assert.doesNotMatch(adminHtml, /id=["']inviteUserButton["']/);
 });
