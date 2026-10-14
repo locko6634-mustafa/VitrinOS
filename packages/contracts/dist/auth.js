@@ -5,6 +5,7 @@ const zod_1 = require("zod");
 exports.LoginRequestSchema = zod_1.z.object({
     email: zod_1.z.string().email('Geçersiz e-posta adresi'),
     password: zod_1.z.string().min(6, 'Parola en az 6 karakter olmalıdır'),
+    rememberMe: zod_1.z.boolean().optional().default(false),
 });
 exports.MfaVerifyRequestSchema = zod_1.z.object({
     challengeToken: zod_1.z.string().min(1, 'Challenge token zorunludur'),
