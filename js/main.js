@@ -244,18 +244,19 @@
     const dashboardLink = document.querySelector("[data-auth-dashboard]");
     const adminLink = document.querySelector("[data-auth-admin]");
 
-    if (!loginLink || !pilotLink || !dashboardLink || !adminLink || !window.VitrinOS?.auth) return;
+    const auth = window.VitrinOS?.authStore;
+    if (!loginLink || !dashboardLink || !auth) return;
 
     try {
-      const context = await window.VitrinOS.auth.getCurrentUser();
-      if (!context || !window.VitrinOS.auth.hasRememberedLogin(context.user)) return;
+      const user = await auth.fetchSession();
+      if (!user) return;
 
       loginLink.hidden = true;
-      pilotLink.hidden = true;
+      if (pilotLink) pilotLink.hidden = true;
       dashboardLink.hidden = false;
-      adminLink.hidden = context.role !== "admin";
-    } catch (error) {
-      console.warn("Ana sayfa oturum durumu alınamadı.", error);
+      if (adminLink) adminLink.hidden = user.role !== "admin";
+    } catch {
+      // Oturum yoksa devam et
     }
   }
 
@@ -297,7 +298,6 @@
 
   function init() {
     window.VitrinOS?.initReveal?.();
-    window.VitrinOS?.initLeadForm?.();
     initHeroMotion();
     initPipeline();
     initMobileMenu();

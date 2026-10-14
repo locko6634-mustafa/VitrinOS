@@ -1,5 +1,4 @@
 import test from "node:test";
-import { chromium } from "playwright";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import fs from "node:fs/promises";
@@ -10,12 +9,23 @@ const PAGES = [
   { name: "login", url: "http://localhost:8000/login.html" }
 ];
 const SCREENSHOT_DIR = "quality/tests/screenshots";
-const ARTIFACT_DIR = "C:/Users/Mustafa/.gemini/antigravity/brain/b8a96c71-b3d9-4e33-b09a-027a8479f983/screenshots";
+const ARTIFACT_DIR = process.env.ARTIFACT_DIR || null;
 
 test("Responsive yatay tasma ve ekran goruntuleri testi", async (t) => {
+  let playwright;
+  try {
+    playwright = await import("playwright");
+  } catch {
+    t.skip("Playwright kurulu olmadığından responsive taşma testi atlandı.");
+    return;
+  }
+  const { chromium } = playwright;
+
   // Klasörleri oluştur
   await mkdir(SCREENSHOT_DIR, { recursive: true });
-  await mkdir(ARTIFACT_DIR, { recursive: true });
+  if (ARTIFACT_DIR) {
+    await mkdir(ARTIFACT_DIR, { recursive: true });
+  }
 
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext();
@@ -46,8 +56,10 @@ test("Responsive yatay tasma ve ekran goruntuleri testi", async (t) => {
         const artifactPath = join(ARTIFACT_DIR, filename);
 
         await page.screenshot({ path: localPath });
-        // Artifacts dizinine de kopyala
-        await page.screenshot({ path: artifactPath });
+        if (ARTIFACT_DIR) {
+          const artifactPath = join(ARTIFACT_DIR, filename);
+          await page.screenshot({ path: artifactPath });
+        }
 
         if (overflow.hasOverflow) {
           overflowResults.push({
@@ -70,6 +82,8 @@ test("Responsive yatay tasma ve ekran goruntuleri testi", async (t) => {
   const reportPath = "quality/tests/overflow-report.json";
   await fs.writeFile(reportPath, JSON.stringify(overflowResults, null, 2), "utf8");
 
-  const artifactReportPath = "C:/Users/Mustafa/.gemini/antigravity/brain/b8a96c71-b3d9-4e33-b09a-027a8479f983/overflow-report.json";
-  await fs.writeFile(artifactReportPath, JSON.stringify(overflowResults, null, 2), "utf8");
+  if (ARTIFACT_DIR) {
+    const artifactReportPath = join(ARTIFACT_DIR, "overflow-report.json");
+    await fs.writeFile(artifactReportPath, JSON.stringify(overflowResults, null, 2), "utf8");
+  }
 });

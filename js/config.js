@@ -22,11 +22,6 @@
     appBasePath: runtimeConfig.appBasePath || appBasePath,
     appUrl,
     contactEmail: "",
-    leadSubmitFunction: "submit-lead",
-    briefTriggerFunction: "trigger-brief",
-    sourceImageUploadFunction: "upload-source-image",
-    adminUserActionFunction: "admin-user-actions",
-    jobActionFunction: "job-actions",
     external: {
       sentryCdnUrl: "https://browser.sentry-cdn.com/8.55.0/bundle.min.js"
     },

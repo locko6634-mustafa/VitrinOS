@@ -8,7 +8,6 @@
   const dashboardConfig = window.VitrinOS.config.defaults.dashboard;
   const formatConfig = window.VitrinOS.config.defaults.formats;
   const colors = window.VitrinOS.config.defaults.colors;
-  const JOB_PAGE_SIZE = dashboardConfig.jobPageSize;
 
   const state = {
     jobsToday: 0,
@@ -17,13 +16,8 @@
     brandMatch: "-",
     currentJob: null,
     brands: [],
-    formatSample: [],
     assets: [],
-    history: [],
-    assetPage: 0,
-    historyPage: 0,
-    hasMoreAssets: false,
-    hasMoreHistory: false
+    history: []
   };
 
   const logoutButtons = Array.from(document.querySelectorAll("[data-dashboard-logout]"));
@@ -69,10 +63,6 @@
 
   const appContextBrand = document.querySelector("#appContextBrand");
   const appContextUser = document.querySelector("#appContextUser");
-  const pipelineList = document.querySelector("#pipelineList");
-  const barBanner = document.querySelector("#barBanner");
-  const barMetaPost = document.querySelector("#barMetaPost");
-  const barStory = document.querySelector("#barStory");
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const appDrawerQuery = window.matchMedia("(max-width: 960px)");
 
@@ -375,6 +365,8 @@
   function renderResult() {
     const job = state.currentJob;
     if (!job) {
+      if (activeJobTitle) activeJobTitle.textContent = "-";
+      if (pipelineCurrent) pipelineCurrent.textContent = "Brief bekliyor";
       resultTitle.textContent = "Kreatif Hazırlanıyor";
       resultBrand.textContent = "-";
       resultHeadline.textContent = "Brief Girişi Bekleniyor";
@@ -386,6 +378,8 @@
       return;
     }
 
+    if (activeJobTitle) activeJobTitle.textContent = job.title;
+    if (pipelineCurrent) pipelineCurrent.textContent = statusLabel(job.status);
     resultTitle.textContent = job.title;
     resultBrand.textContent = job.brand;
     resultHeadline.textContent = `${job.format} önizleme`;
