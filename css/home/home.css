@@ -484,17 +484,42 @@ h3 {
 }
 
 /* Canlı Mockup Önizleme Alanı */
+.stage-card {
+  transition: all 450ms var(--ease-out);
+}
+
 .stage-mockup-frame {
   position: relative;
   border-radius: var(--radius-md);
   overflow: hidden;
-  min-height: 300px;
   background: var(--bg-tertiary);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   padding: 24px;
-  transition: all var(--duration-normal) var(--ease-out);
+  transition: all 450ms var(--ease-out);
+  width: 100%;
+}
+
+/* Formatlara göre dinamik mockup boyutlandırması */
+.stage-card[data-format-mode="landscape"] .stage-mockup-frame {
+  aspect-ratio: 16 / 9;
+  min-height: 280px;
+}
+
+.stage-card[data-format-mode="portrait"] .stage-mockup-frame {
+  aspect-ratio: 9 / 14;
+  min-height: 480px;
+}
+
+.stage-card[data-format-mode="post"] .stage-mockup-frame {
+  aspect-ratio: 4 / 5;
+  min-height: 380px;
+}
+
+.stage-card[data-format-mode="banner"] .stage-mockup-frame {
+  aspect-ratio: 16 / 8;
+  min-height: 250px;
 }
 
 .mockup-artwork {

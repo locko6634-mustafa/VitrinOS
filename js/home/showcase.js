@@ -7,6 +7,7 @@
 export const SCENARIOS = {
   tech: {
     id: "tech",
+    formatMode: "landscape",
     badgeLetter: "S",
     brandName: "Stratos Cloud Systems",
     brandType: "Yazılım & B2B SaaS",
@@ -19,7 +20,7 @@ export const SCENARIOS = {
     ctaText: "Pozisyona Başvur",
     ctaBg: "#2b66ff",
     ctaColor: "#ffffff",
-    artworkUrl: "assets/hero-operations.png",
+    artworkUrl: "assets/hero-tech-workspace.jpg",
     paletteColor: "#2b66ff",
     rules: {
       tone: "Profesyonel & Doğrudan",
@@ -29,6 +30,7 @@ export const SCENARIOS = {
   },
   cafe: {
     id: "cafe",
+    formatMode: "portrait",
     badgeLetter: "A",
     brandName: "Artisan Coffee Lab",
     brandType: "Butik Kafe & Atölye",
@@ -41,7 +43,7 @@ export const SCENARIOS = {
     ctaText: "Menüyü İncele",
     ctaBg: "#d49b6a",
     ctaColor: "#1a120c",
-    artworkUrl: "assets/format-gallery.png",
+    artworkUrl: "assets/showcase-coffee-story.jpg",
     paletteColor: "#d49b6a",
     rules: {
       tone: "Sıcak & Samimi",
@@ -51,6 +53,7 @@ export const SCENARIOS = {
   },
   agency: {
     id: "agency",
+    formatMode: "post",
     badgeLetter: "V",
     brandName: "Vortex Creative",
     brandType: "Kreatif & Dijital Ajans",
@@ -63,7 +66,7 @@ export const SCENARIOS = {
     ctaText: "Vaka Analizini Oku",
     ctaBg: "#ccff00",
     ctaColor: "#0d0e12",
-    artworkUrl: "assets/hero-operations.png",
+    artworkUrl: "assets/showcase-agency-post.jpg",
     paletteColor: "#ccff00",
     rules: {
       tone: "Cesur & Yüksek Enerji",
@@ -73,6 +76,7 @@ export const SCENARIOS = {
   },
   fashion: {
     id: "fashion",
+    formatMode: "banner",
     badgeLetter: "N",
     brandName: "Natura Studio",
     brandType: "Minimal Tasarım & Perakende",
@@ -85,7 +89,7 @@ export const SCENARIOS = {
     ctaText: "Koleksiyonu Keşfet",
     ctaBg: "#f5f5f5",
     ctaColor: "#0d0e12",
-    artworkUrl: "assets/format-gallery.png",
+    artworkUrl: "assets/showcase-fashion-banner.jpg",
     paletteColor: "#e5e5e5",
     rules: {
       tone: "Zarif & Minimal",
@@ -112,6 +116,7 @@ export function initShowcase() {
   const ruleColor = document.querySelector("[data-rule-color]");
   const ruleSafe = document.querySelector("[data-rule-safe]");
   const paletteDot = document.querySelector("[data-palette-dot]");
+  const mockupArtwork = document.querySelector("[data-mockup-artwork]");
 
   function applyScenario(key) {
     const data = SCENARIOS[key];
@@ -121,6 +126,9 @@ export function initShowcase() {
     buttons.forEach(btn => {
       btn.classList.toggle("is-active", btn.dataset.scenarioBtn === key);
     });
+
+    // Format modu ile dinamik boyutlandırma (Dikey görsel dikey görünsün)
+    stageMockup.dataset.formatMode = data.formatMode;
 
     // Sahne içerik güncellemesi
     if (brandBadge) {
@@ -150,6 +158,14 @@ export function initShowcase() {
     if (ruleColor) ruleColor.textContent = data.rules.colorCode;
     if (ruleSafe) ruleSafe.textContent = data.rules.safeZone;
     if (paletteDot) paletteDot.style.backgroundColor = data.paletteColor;
+
+    if (mockupArtwork) {
+      mockupArtwork.style.opacity = "0.7";
+      setTimeout(() => {
+        mockupArtwork.src = data.artworkUrl;
+        mockupArtwork.style.opacity = "1";
+      }, 100);
+    }
   }
 
   // Tıklama dinleyicileri

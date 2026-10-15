@@ -74,9 +74,9 @@ test("optik atölye tasarım sistemi ve hareket güvenliği tanımlıdır", asyn
 test("landing anlatısı ve responsive görsel sözleşmesi uygulanır", async () => {
   const html = await read("index.html");
   assert.match(html, /Markanızın kurallarıyla çalışan akıllı tasarım atölyeniz/);
-  assert.match(html, /hero-operations-1600\.avif/);
-  assert.match(html, /format-gallery-1440\.avif/);
-  assert.doesNotMatch(html, /loading=["']eager["'][^>]+format-gallery/i);
+  assert.match(html, /hero-tech-workspace\.jpg/);
+  assert.match(html, /showcase-coffee-story\.jpg/);
+  assert.doesNotMatch(html, /loading=["']eager["'][^>]+showcase-coffee-story/i);
 });
 
 test("auth yüzeylerinde kurgu müşteri kanıtı bulunmaz", async () => {

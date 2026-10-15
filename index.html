@@ -41,12 +41,15 @@
           </div>
 
           <div class="nav-actions" id="navActions">
-            <a class="btn btn-primary" href="https://wa.me/905510653051?text=Merhaba%2C%20VitrinOS%20hakk%C4%B1nda%20bilgi%20almak%20ve%20markam%20i%C3%A7in%20denemek%20istiyorum." target="_blank" rel="noopener noreferrer">
+            <a class="btn btn-secondary nav-login" href="login.html" data-auth-login>Giriş Yap</a>
+            <a class="btn btn-primary" href="https://wa.me/905510653051?text=Merhaba%2C%20VitrinOS%20hakk%C4%B1nda%20bilgi%20almak%20ve%20markam%20i%C3%A7in%20denemek%20istiyorum." target="_blank" rel="noopener noreferrer" data-auth-pilot>
               <span>WhatsApp ile Tanışın</span>
               <svg class="btn-icon" aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
               </svg>
             </a>
+            <a class="btn btn-secondary nav-login" href="dashboard.html" data-auth-dashboard hidden>Kullanıcı Paneli</a>
+            <a class="btn btn-primary" href="admin.html" data-auth-admin hidden>Admin Paneli</a>
             <button class="nav-toggle" id="navToggle" type="button" aria-label="Menüyü aç/kapat" aria-expanded="false">
               <span class="bar" aria-hidden="true"></span>
               <span class="bar" aria-hidden="true"></span>
@@ -122,7 +125,7 @@
 
               <!-- Canlı Mockup Önizleme Çerçevesi -->
               <div class="stage-mockup-frame">
-                <img class="mockup-artwork" src="assets/hero-operations.png" alt="Canlı tasarım çıktısı önizlemesi">
+                <img class="mockup-artwork" data-mockup-artwork src="assets/hero-tech-workspace.jpg" alt="Canlı tasarım çıktısı önizlemesi">
                 <div class="mockup-gradient-scrim" aria-hidden="true"></div>
 
                 <div class="mockup-content">
@@ -176,11 +179,7 @@
             <!-- 9:16 Instagram Story -->
             <article class="mosaic-card card-story" data-reveal>
               <div class="mosaic-media">
-                <picture>
-                  <source type="image/avif" srcset="assets/format-gallery-768.avif 768w, assets/format-gallery-1440.avif 1440w" sizes="(max-width: 960px) calc(100vw - 28px), min(58vw, 760px)">
-                  <source type="image/webp" srcset="assets/format-gallery-768.webp 768w, assets/format-gallery-1440.webp 1440w" sizes="(max-width: 960px) calc(100vw - 28px), min(58vw, 760px)">
-                  <img src="assets/format-gallery.png" alt="Instagram Story formatında butik kafe tasarımı" loading="lazy" decoding="async">
-                </picture>
+                <img src="assets/showcase-coffee-story.jpg" alt="Instagram Story formatında butik kafe tasarımı" loading="lazy" decoding="async">
                 <div class="mosaic-scrim" aria-hidden="true"></div>
                 <div class="mosaic-overlay">
                   <span class="mosaic-badge" style="background: rgba(212, 155, 106, 0.25); color: #f3c295;">INSTAGRAM STORY</span>
@@ -200,7 +199,7 @@
             <!-- 4:5 Instagram / LinkedIn Post -->
             <article class="mosaic-card card-post" data-reveal>
               <div class="mosaic-media">
-                <img src="assets/hero-operations.png" alt="Sosyal medya akışı için ajans vaka tasarımı" loading="lazy">
+                <img src="assets/showcase-agency-post.jpg" alt="Sosyal medya akışı için ajans vaka tasarımı" loading="lazy" decoding="async">
                 <div class="mosaic-scrim" aria-hidden="true"></div>
                 <div class="mosaic-overlay">
                   <span class="mosaic-badge" style="background: rgba(204, 255, 0, 0.2); color: #ccff00;">SOSYAL MEDYA POST</span>
@@ -220,7 +219,7 @@
             <!-- 16:9 LinkedIn / İş İlanı -->
             <article class="mosaic-card card-hiring" data-reveal>
               <div class="mosaic-media">
-                <img src="assets/hero-operations.png" alt="Yazılım şirketi iş ilanı bannerı" loading="lazy">
+                <img src="assets/hero-tech-workspace.jpg" alt="Yazılım şirketi iş ilanı bannerı" loading="lazy" decoding="async">
                 <div class="mosaic-scrim" aria-hidden="true"></div>
                 <div class="mosaic-overlay">
                   <span class="mosaic-badge" style="background: rgba(43, 102, 255, 0.25); color: #598bff;">KARİYER & İŞ İLANI</span>
@@ -240,7 +239,7 @@
             <!-- 16:6 Web & Tanıtım Bannerı -->
             <article class="mosaic-card card-banner" data-reveal>
               <div class="mosaic-media">
-                <img src="assets/format-gallery.png" alt="Geniş web sitesi lansman bannerı" loading="lazy">
+                <img src="assets/showcase-fashion-banner.jpg" alt="Geniş web sitesi lansman bannerı" loading="lazy" decoding="async">
                 <div class="mosaic-scrim" aria-hidden="true"></div>
                 <div class="mosaic-overlay">
                   <span class="mosaic-badge" style="background: rgba(255, 255, 255, 0.2); color: #ffffff;">WEB & KAMPANYA BANNER</span>
@@ -545,6 +544,7 @@
             <a href="#nasil-calisir">Nasıl Çalışır?</a>
             <a href="#neden-vitrinos">Neden VitrinOS?</a>
             <a href="#paketler">Paketler</a>
+            <a href="login.html">Müşteri Girişi</a>
           </div>
           <span class="footer-copy">© 2026 VitrinOS. Tüm hakları saklıdır.</span>
         </div>
