@@ -19,6 +19,22 @@
     <link rel="stylesheet" href="css/home/home.css">
   </head>
   <body data-surface="marketing">
+    <!-- =====================================================================
+         Site Yükleme Ekranı (Preloader — FOUT & Sıçrama Önleyici)
+         ===================================================================== -->
+    <div class="site-preloader" id="sitePreloader" aria-hidden="true">
+      <div class="preloader-backdrop"></div>
+      <div class="preloader-content">
+        <div class="preloader-brand">
+          <span class="brand-vitrin">Vitrin</span><span class="brand-os">OS</span><sup>®</sup>
+        </div>
+        <div class="preloader-bar">
+          <div class="preloader-progress" id="preloaderProgress"></div>
+        </div>
+        <span class="preloader-status">Tasarım atölyesi hazırlanıyor...</span>
+      </div>
+    </div>
+
     <a class="skip-link" href="#main">İçeriğe geç</a>
 
     <!-- =====================================================================
@@ -186,7 +202,7 @@
 
           <div class="mosaic-grid">
             <!-- 9:16 Instagram Story -->
-            <article class="mosaic-card card-story" data-reveal>
+            <article class="mosaic-card card-story" data-reveal data-reveal-delay="100">
               <div class="mosaic-media">
                 <img src="assets/showcase-coffee-story.jpg" alt="Instagram Story formatında butik kafe tasarımı" loading="lazy" decoding="async">
                 <div class="mosaic-scrim" aria-hidden="true"></div>
@@ -206,7 +222,7 @@
             </article>
 
             <!-- 4:5 Instagram / LinkedIn Post -->
-            <article class="mosaic-card card-post" data-reveal>
+            <article class="mosaic-card card-post" data-reveal data-reveal-delay="200">
               <div class="mosaic-media">
                 <img src="assets/showcase-agency-post.jpg" alt="Sosyal medya akışı için ajans vaka tasarımı" loading="lazy" decoding="async">
                 <div class="mosaic-scrim" aria-hidden="true"></div>
@@ -226,7 +242,7 @@
             </article>
 
             <!-- 16:9 LinkedIn / İş İlanı -->
-            <article class="mosaic-card card-hiring" data-reveal>
+            <article class="mosaic-card card-hiring" data-reveal data-reveal-delay="300">
               <div class="mosaic-media">
                 <img src="assets/hero-tech-workspace.jpg" alt="Yazılım şirketi iş ilanı bannerı" loading="lazy" decoding="async">
                 <div class="mosaic-scrim" aria-hidden="true"></div>
@@ -246,7 +262,7 @@
             </article>
 
             <!-- 16:6 Web & Tanıtım Bannerı -->
-            <article class="mosaic-card card-banner" data-reveal>
+            <article class="mosaic-card card-banner" data-reveal data-reveal-delay="200">
               <div class="mosaic-media">
                 <img src="assets/showcase-fashion-banner.jpg" alt="Geniş web sitesi lansman bannerı" loading="lazy" decoding="async">
                 <div class="mosaic-scrim" aria-hidden="true"></div>
@@ -469,7 +485,7 @@
 
           <div class="comparison-grid">
             <!-- Sıradan AI Aracı -->
-            <article class="comparison-box is-generic" data-reveal>
+            <article class="comparison-box is-generic" data-reveal data-reveal-delay="100">
               <div>
                 <div class="comparison-header">
                   <h3>Sıradan AI Araçları</h3>
@@ -491,7 +507,7 @@
             </article>
 
             <!-- VitrinOS -->
-            <article class="comparison-box is-vitrinos" data-reveal>
+            <article class="comparison-box is-vitrinos" data-reveal data-reveal-delay="200">
               <div>
                 <div class="comparison-header">
                   <h3>VitrinOS Akıllı Atölye</h3>
@@ -542,7 +558,7 @@
           <!-- Fiyatlandırma Kartları -->
           <div class="pricing-cards-grid">
             <!-- Başlangıç Planı -->
-            <article class="price-card" data-reveal>
+            <article class="price-card" data-reveal data-reveal-delay="100">
               <div>
                 <div class="price-header">
                   <h3>Başlangıç</h3>
@@ -570,7 +586,7 @@
             </article>
 
             <!-- Büyüme Planı (Öne Çıkan) -->
-            <article class="price-card is-featured" data-reveal>
+            <article class="price-card is-featured" data-reveal data-reveal-delay="200">
               <span class="featured-ribbon">En Popüler</span>
               <div>
                 <div class="price-header">
@@ -600,7 +616,7 @@
             </article>
 
             <!-- Kurumsal & Ajans Planı -->
-            <article class="price-card" data-reveal>
+            <article class="price-card" data-reveal data-reveal-delay="300">
               <div>
                 <div class="price-header">
                   <h3>Kurumsal & Ajans</h3>
