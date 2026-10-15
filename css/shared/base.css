@@ -204,7 +204,6 @@
     color: var(--vo-paper);
     padding: 0 1rem;
     font-weight: 650;
-    box-shadow: var(--vo-shadow-2);
     transition: transform 0.2s ease;
   }
 
