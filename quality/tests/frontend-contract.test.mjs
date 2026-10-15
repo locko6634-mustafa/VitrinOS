@@ -73,9 +73,7 @@ test("optik atölye tasarım sistemi ve hareket güvenliği tanımlıdır", asyn
 
 test("landing anlatısı ve responsive görsel sözleşmesi uygulanır", async () => {
   const html = await read("index.html");
-  assert.match(html, /AI destekli kreatif operasyon sistemi/);
-  assert.match(html, /Brief girer\. Marka aklı çalışır\. Görsel şekillenir\./);
-  assert.match(html, /id=["']uretim-hatti["']/);
+  assert.match(html, /Markanızın kurallarıyla çalışan akıllı tasarım atölyeniz/);
   assert.match(html, /hero-operations-1600\.avif/);
   assert.match(html, /format-gallery-1440\.avif/);
   assert.doesNotMatch(html, /loading=["']eager["'][^>]+format-gallery/i);

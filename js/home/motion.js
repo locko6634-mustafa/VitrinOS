@@ -1,46 +1,50 @@
-// VitrinOS Hero Motion & Depth Efektleri (ESM & Home)
-export function initHeroMotion() {
-  if (typeof window === "undefined" || typeof document === "undefined") return;
+/**
+ * VitrinOS — Modern Motion Controller
+ * Scroll esnasında zarif giriş animasyonu (gentleRise), yapışkan başlık
+ * durumu ve mobil menü etkileşimlerini yönetir.
+ */
 
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const hero = document.querySelector(".hero");
-  const visual = document.querySelector(".hero-visual");
+export function initMotion() {
+  const revealElements = document.querySelectorAll("[data-reveal]");
 
-  if (!hero || reducedMotion.matches) return;
+  if (revealElements.length && "IntersectionObserver" in window) {
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-entering");
+          obs.unobserve(entry.target);
+        }
+      });
+    }, {
+      rootMargin: "80px 0px 80px 0px",
+      threshold: 0.05
+    });
 
-  let frameRequested = false;
-
-  function updateDepth() {
-    const rect = hero.getBoundingClientRect();
-    const progress = Math.min(1, Math.max(0, -rect.top / Math.max(1, rect.height)));
-    document.documentElement.style.setProperty("--scroll-depth", progress.toFixed(3));
-    frameRequested = false;
+    revealElements.forEach(el => observer.observe(el));
   }
 
-  function requestDepthUpdate() {
-    if (frameRequested) return;
-    frameRequested = true;
-    window.requestAnimationFrame(updateDepth);
+  // 2. Header Scroll Durumu
+  const header = document.querySelector(".site-header");
+  if (header) {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        header.classList.add("is-scrolled");
+      } else {
+        header.classList.remove("is-scrolled");
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
   }
 
-  function updatePointer(event) {
-    const rect = visual.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / Math.max(1, rect.width) - 0.5) * 2;
-    const y = ((event.clientY - rect.top) / Math.max(1, rect.height) - 0.5) * 2;
-    visual.style.setProperty("--pointer-x", x.toFixed(3));
-    visual.style.setProperty("--pointer-y", y.toFixed(3));
+  // 3. Mobil Menü Toggle
+  const navToggle = document.getElementById("navToggle");
+  const navLinks = document.getElementById("navLinks");
+  if (navToggle && navLinks) {
+    navToggle.addEventListener("click", () => {
+      const isExpanded = navToggle.getAttribute("aria-expanded") === "true";
+      navToggle.setAttribute("aria-expanded", !isExpanded);
+      navLinks.classList.toggle("is-open", !isExpanded);
+    });
   }
-
-  function resetPointer() {
-    visual.style.setProperty("--pointer-x", "0");
-    visual.style.setProperty("--pointer-y", "0");
-  }
-
-  updateDepth();
-  window.addEventListener("scroll", requestDepthUpdate, { passive: true });
-  window.addEventListener("resize", requestDepthUpdate, { passive: true });
-  visual?.addEventListener("pointermove", updatePointer, { passive: true });
-  visual?.addEventListener("pointerleave", resetPointer, { passive: true });
 }
-
-export default initHeroMotion;

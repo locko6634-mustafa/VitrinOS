@@ -1,40 +1,76 @@
-// VitrinOS Fiyatlandırma ve Billing Toggle Mantığı (ESM & Home)
+/**
+ * VitrinOS — Fiyatlandırma ve Faturalama Seçicisi (Pricing Controller)
+ * Aylık / Yıllık faturalandırma seçimine göre fiyatları, indirimleri
+ * ve WhatsApp yönlendirme metinlerini dinamik olarak günceller.
+ */
+
 export function initPricing() {
-  if (typeof document === "undefined") return;
+  const toggleBtn = document.getElementById("billingToggle");
+  const labelMonthly = document.getElementById("labelMonthly");
+  const labelYearly = document.getElementById("labelYearly");
+  if (!toggleBtn) return;
 
-  const toggle = document.getElementById("billingToggle");
-  const labelMonthly = document.getElementById("label-monthly");
-  const labelYearly = document.getElementById("label-yearly");
-  const priceValues = document.querySelectorAll(".price-value");
-  const yearlyHints = document.querySelectorAll("[data-billing-yearly]");
-  const monthlyHints = document.querySelectorAll("[data-billing-monthly]");
+  const starterPrice = document.querySelector("[data-price-starter]");
+  const growthPrice = document.querySelector("[data-price-growth]");
+  const starterNote = document.querySelector("[data-note-starter]");
+  const growthNote = document.querySelector("[data-note-growth]");
 
-  if (!toggle || !priceValues.length) return;
+  const starterCta = document.querySelector("[data-cta-starter]");
+  const growthCta = document.querySelector("[data-cta-growth]");
 
-  toggle.addEventListener("click", () => {
-    const isYearly = toggle.getAttribute("aria-checked") === "true";
-    const nextState = !isYearly;
+  let isYearly = false;
 
-    toggle.setAttribute("aria-checked", String(nextState));
-    labelMonthly?.classList.toggle("active", !nextState);
-    labelYearly?.classList.toggle("active", nextState);
+  function updatePricing() {
+    toggleBtn.setAttribute("aria-checked", isYearly ? "true" : "false");
+    labelMonthly.classList.toggle("is-active", !isYearly);
+    labelYearly.classList.toggle("is-active", isYearly);
 
-    priceValues.forEach((el) => {
-      el.style.transition = "opacity 120ms ease, transform 120ms ease";
-      el.style.opacity = "0";
-      el.style.transform = "translateY(-4px)";
+    if (isYearly) {
+      if (starterPrice) starterPrice.textContent = "39";
+      if (growthPrice) growthPrice.textContent = "119";
+      if (starterNote) starterNote.textContent = "Yıllık faturalandırılır (yılda $468)";
+      if (growthNote) growthNote.textContent = "Yıllık faturalandırılır (yılda $1.428)";
 
-      setTimeout(() => {
-        const newVal = nextState ? el.dataset.yearly : el.dataset.monthly;
-        el.textContent = newVal;
-        el.style.opacity = "1";
-        el.style.transform = "translateY(0)";
-      }, 120);
-    });
+      if (starterCta) {
+        starterCta.href = "https://wa.me/905510653051?text=" + encodeURIComponent("Merhaba, VitrinOS Başlangıç Planı (Yıllık %20 İndirimli) hakkında bilgi almak istiyorum.");
+      }
+      if (growthCta) {
+        growthCta.href = "https://wa.me/905510653051?text=" + encodeURIComponent("Merhaba, VitrinOS Büyüme Planı (Yıllık %20 İndirimli) hakkında bilgi almak istiyorum.");
+      }
+    } else {
+      if (starterPrice) starterPrice.textContent = "49";
+      if (growthPrice) growthPrice.textContent = "149";
+      if (starterNote) starterNote.textContent = "Aylık faturalandırılır, taahhüt yok";
+      if (growthNote) growthNote.textContent = "Aylık faturalandırılır, taahhüt yok";
 
-    yearlyHints.forEach((hint) => (hint.hidden = !nextState));
-    monthlyHints.forEach((hint) => (hint.hidden = nextState));
+      if (starterCta) {
+        starterCta.href = "https://wa.me/905510653051?text=" + encodeURIComponent("Merhaba, VitrinOS Başlangıç Planı (Aylık) hakkında bilgi almak istiyorum.");
+      }
+      if (growthCta) {
+        growthCta.href = "https://wa.me/905510653051?text=" + encodeURIComponent("Merhaba, VitrinOS Büyüme Planı (Aylık) hakkında bilgi almak istiyorum.");
+      }
+    }
+  }
+
+  toggleBtn.addEventListener("click", () => {
+    isYearly = !isYearly;
+    updatePricing();
   });
-}
 
-export default initPricing;
+  if (labelMonthly) {
+    labelMonthly.addEventListener("click", () => {
+      isYearly = false;
+      updatePricing();
+    });
+  }
+
+  if (labelYearly) {
+    labelYearly.addEventListener("click", () => {
+      isYearly = true;
+      updatePricing();
+    });
+  }
+
+  // İlk durum
+  updatePricing();
+}

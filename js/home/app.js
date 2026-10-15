@@ -1,27 +1,22 @@
-// VitrinOS Ana Sayfa (Landing Page) Uygulama Giriş Noktası (ESM)
-import "../shared/observability.js";
-import { initReveal } from "./reveal.js";
-import { initHeroMotion } from "./motion.js";
-import { initPipeline } from "./pipeline.js";
+/**
+ * VitrinOS Landing Page Bootstrap
+ * Modern Creative Studio frontend giriş noktası
+ */
+
+import { initShowcase } from "./showcase.js";
+import { initFlow } from "./flow.js";
 import { initPricing } from "./pricing.js";
-import { initMobileMenu, initAnchorNavigation, initAuthNavigation } from "./navigation.js";
+import { initMotion } from "./motion.js";
 
-export function initHomeApp() {
-  initReveal();
-  initHeroMotion();
-  initPipeline();
-  initMobileMenu();
-  initAnchorNavigation();
-  initAuthNavigation();
+function bootstrap() {
+  initShowcase();
+  initFlow();
   initPricing();
+  initMotion();
 }
 
-if (typeof document !== "undefined") {
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initHomeApp, { once: true });
-  } else {
-    initHomeApp();
-  }
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", bootstrap);
+} else {
+  bootstrap();
 }
-
-export default initHomeApp;
