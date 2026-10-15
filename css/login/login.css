@@ -302,11 +302,17 @@ body[data-surface="auth"]::before {
 .remember-checkbox {
   appearance: none;
   -webkit-appearance: none;
-  width: 15px;
-  height: 15px;
+  padding: 0;
   margin: 0;
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  min-height: 14px;
+  max-width: 14px;
+  max-height: 14px;
+  box-sizing: border-box;
   border: 1px solid #303746;
-  border-radius: 4px;
+  border-radius: 3.5px;
   background: #191c24;
   cursor: pointer;
   display: inline-grid;
