@@ -40,6 +40,10 @@
             <input id="mfaCode" class="mfa-code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000 000" aria-describedby="mfaCodeHint mfaStatus" aria-invalid="false" required disabled>
             <p class="field-hint" id="mfaCodeHint">Kod her 30 saniyede yenilenir.</p>
           </div>
+          <label class="remember-option" for="rememberDevice">
+            <input id="rememberDevice" name="rememberDevice" type="checkbox">
+            <span>Bu cihazı 30 gün hatırla</span>
+          </label>
           <button id="mfaVerifyButton" class="button primary auth-submit" type="submit" disabled>
             <span class="button-label">Doğrula ve devam et</span>
             <span class="button-loader" aria-hidden="true"></span>

@@ -57,6 +57,17 @@ export const mfaRecoveryCodes = appSchema.table('mfa_recovery_codes', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+export const mfaTrustedDevices = appSchema.table('mfa_trusted_devices', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  hashedToken: text('hashed_token').notNull().unique(),
+  expiresAt: timestamp('expires_at').notNull(),
+  ipDigest: text('ip_digest'),
+  userAgentDigest: text('user_agent_digest'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 export const oneTimeTokens = appSchema.table('one_time_tokens', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),

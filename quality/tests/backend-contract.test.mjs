@@ -39,3 +39,13 @@ test("kullanıcı ve başvuru silme uçları audit kaydıyla tanımlıdır", asy
   assert.match(admin, /user_deleted/);
   assert.match(admin, /lead_deleted/);
 });
+
+test("MFA güvenilen cihaz sözleşmesi ve tablosu tanımlıdır", async () => {
+  const schema = await source("packages/db/src/schema.ts");
+  const authRoutes = await source("apps/api/src/routes/auth.ts");
+  const contracts = await source("packages/contracts/src/auth.ts");
+  assert.match(schema, /mfa_trusted_devices/);
+  assert.match(contracts, /rememberDevice/);
+  assert.match(authRoutes, /mfaTrustedDevices/);
+  assert.match(authRoutes, /mfa_device/);
+});

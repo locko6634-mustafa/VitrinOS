@@ -10,6 +10,7 @@ export async function initMfaChallenge() {
   const form = document.querySelector("#mfaChallengeForm");
   const status = document.querySelector("#mfaStatus");
   const codeInput = document.querySelector("#mfaCode");
+  const rememberDeviceInput = document.querySelector("#rememberDevice");
   const verifyButton = document.querySelector("#mfaVerifyButton");
   const verifyLabel = verifyButton?.querySelector(".button-label");
   const signOutButton = document.querySelector("#mfaSignOutButton");
@@ -35,6 +36,7 @@ export async function initMfaChallenge() {
     form?.setAttribute("aria-busy", String(busy));
     verifyButton?.setAttribute("aria-busy", String(busy));
     codeInput.disabled = busy;
+    if (rememberDeviceInput) rememberDeviceInput.disabled = busy;
     if (verifyLabel) verifyLabel.textContent = label;
     updateVerifyState();
   };
@@ -60,12 +62,15 @@ export async function initMfaChallenge() {
       return;
     }
 
+    const rememberDevice = Boolean(rememberDeviceInput?.checked);
+
     setBusy(true, "Kod doğrulanıyor");
     setStatus("Kod ve oturum güvenliği doğrulanıyor…", "loading");
     try {
       await api.post("/auth/mfa/verify", {
         challengeToken,
-        code
+        code,
+        rememberDevice
       });
 
       sessionStorage.removeItem("mfa_challenge_token");

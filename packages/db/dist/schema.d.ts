@@ -642,6 +642,7 @@ export declare const mfaRecoveryCodes: import("drizzle-orm/pg-core").PgTableWith
     };
     dialect: "pg";
 }>;
+export declare const mfaTrustedDevices: any;
 export declare const oneTimeTokens: import("drizzle-orm/pg-core").PgTableWithColumns<{
     name: "one_time_tokens";
     schema: "app";

@@ -11,6 +11,7 @@ export type LoginRequest = z.infer<typeof LoginRequestSchema>;
 export const MfaVerifyRequestSchema = z.object({
   challengeToken: z.string().min(1, 'Challenge token zorunludur'),
   code: z.string().length(6, 'TOTP kodu 6 haneli olmalıdır').regex(/^\d+$/, 'TOTP kodu sadece rakamlardan oluşmalıdır'),
+  rememberDevice: z.boolean().optional().default(false),
 });
 
 export type MfaVerifyRequest = z.infer<typeof MfaVerifyRequestSchema>;

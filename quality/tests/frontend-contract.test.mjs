@@ -100,6 +100,7 @@ test("admin MFA doğrulaması güvenli Cookie ve MFA challenge akışını kulla
   assert.match(loginSource, /response\.mfaRequired/);
   assert.match(loginSource, /mfa-challenge\.html/);
   assert.match(challengeSource, /\/auth\/mfa\/verify/);
+  assert.match(challengeSource, /rememberDevice/);
   assert.match(adminSource, /\/admin\/users/);
 });
 

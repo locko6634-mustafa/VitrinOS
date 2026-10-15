@@ -10,6 +10,7 @@ exports.LoginRequestSchema = zod_1.z.object({
 exports.MfaVerifyRequestSchema = zod_1.z.object({
     challengeToken: zod_1.z.string().min(1, 'Challenge token zorunludur'),
     code: zod_1.z.string().length(6, 'TOTP kodu 6 haneli olmalıdır').regex(/^\d+$/, 'TOTP kodu sadece rakamlardan oluşmalıdır'),
+    rememberDevice: zod_1.z.boolean().optional().default(false),
 });
 exports.ResetPasswordRequestSchema = zod_1.z.object({
     token: zod_1.z.string().min(1, 'Token zorunludur'),

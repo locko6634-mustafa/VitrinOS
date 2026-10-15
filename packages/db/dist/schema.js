@@ -52,6 +52,16 @@ exports.mfaRecoveryCodes = exports.appSchema.table('mfa_recovery_codes', {
     createdAt: (0, pg_core_1.timestamp)('created_at').defaultNow().notNull(),
     updatedAt: (0, pg_core_1.timestamp)('updated_at').defaultNow().notNull(),
 });
+exports.mfaTrustedDevices = exports.appSchema.table('mfa_trusted_devices', {
+    id: (0, pg_core_1.uuid)('id').primaryKey().defaultRandom(),
+    userId: (0, pg_core_1.uuid)('user_id').references(() => exports.users.id, { onDelete: 'cascade' }).notNull(),
+    hashedToken: (0, pg_core_1.text)('hashed_token').notNull().unique(),
+    expiresAt: (0, pg_core_1.timestamp)('expires_at').notNull(),
+    ipDigest: (0, pg_core_1.text)('ip_digest'),
+    userAgentDigest: (0, pg_core_1.text)('user_agent_digest'),
+    createdAt: (0, pg_core_1.timestamp)('created_at').defaultNow().notNull(),
+    updatedAt: (0, pg_core_1.timestamp)('updated_at').defaultNow().notNull(),
+});
 exports.oneTimeTokens = exports.appSchema.table('one_time_tokens', {
     id: (0, pg_core_1.uuid)('id').primaryKey().defaultRandom(),
     userId: (0, pg_core_1.uuid)('user_id').references(() => exports.users.id, { onDelete: 'cascade' }).notNull(),

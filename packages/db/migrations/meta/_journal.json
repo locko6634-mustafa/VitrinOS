@@ -15,6 +15,13 @@
       "when": 1784813137920,
       "tag": "0001_complex_charles_xavier",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785500000000,
+      "tag": "0002_add_mfa_trusted_devices",
+      "breakpoints": true
     }
   ]
 }

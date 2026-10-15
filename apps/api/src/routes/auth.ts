@@ -4,6 +4,7 @@ import {
   passwordCredentials, 
   authSessions, 
   mfaFactors, 
+  mfaTrustedDevices,
   oneTimeTokens, 
   outboxJobs,
   securityAuditLog,
@@ -81,29 +82,51 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
       )
     });
 
+    let isMfaTrusted = false;
     if (activeMfa) {
-      // MFA Aktif, geçici challenge token oluştur
-      const challengeToken = generateSessionToken();
-      const hashedChallenge = hashSessionToken(challengeToken);
-      
-      // Geçici session olarak 5 dakika süreli kaydet, isRevoked=true yapalım ki normal API kullanamasın
-      await fastify.db.insert(authSessions).values({
-        hashedSessionId: hashedChallenge,
-        userId: userRecord.id,
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 dakika geçerli
-        isRevoked: true, // Henüz verified değil
-        ipDigest: request.ip,
-        userAgentDigest: request.headers['user-agent'] || null
-      });
+      const mfaDeviceCookie = request.cookies.mfa_device;
+      if (mfaDeviceCookie) {
+        const hashedDeviceCookie = hashSessionToken(mfaDeviceCookie);
+        const trustedRecord = await fastify.db.query.mfaTrustedDevices.findFirst({
+          where: and(
+            eq(mfaTrustedDevices.userId, userRecord.id),
+            eq(mfaTrustedDevices.hashedToken, hashedDeviceCookie),
+            gt(mfaTrustedDevices.expiresAt, new Date())
+          )
+        });
 
-      await fastify.db.insert(securityAuditLog).values({
-        actorId: userRecord.id,
-        action: 'login_challenge',
-        result: 'success',
-        metadata: { email: normalizedEmail }
-      });
+        if (trustedRecord) {
+          isMfaTrusted = true;
+          await fastify.db.update(mfaTrustedDevices).set({
+            updatedAt: new Date()
+          }).where(eq(mfaTrustedDevices.id, trustedRecord.id));
+        }
+      }
 
-      return reply.send({ data: { mfaRequired: true, challengeToken } });
+      if (!isMfaTrusted) {
+        // MFA Aktif ve cihaz hatırlanmamış, geçici challenge token oluştur
+        const challengeToken = generateSessionToken();
+        const hashedChallenge = hashSessionToken(challengeToken);
+
+        // Geçici session olarak 5 dakika süreli kaydet, isRevoked=true yapalım ki normal API kullanamasın
+        await fastify.db.insert(authSessions).values({
+          hashedSessionId: hashedChallenge,
+          userId: userRecord.id,
+          expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 dakika geçerli
+          isRevoked: true, // Henüz verified değil
+          ipDigest: request.ip,
+          userAgentDigest: request.headers['user-agent'] || null
+        });
+
+        await fastify.db.insert(securityAuditLog).values({
+          actorId: userRecord.id,
+          action: 'login_challenge',
+          result: 'success',
+          metadata: { email: normalizedEmail }
+        });
+
+        return reply.send({ data: { mfaRequired: true, challengeToken } });
+      }
     }
 
     // Normal Session Oluştur
@@ -131,7 +154,7 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
 
     await fastify.db.insert(securityAuditLog).values({
       actorId: userRecord.id,
-      action: 'login',
+      action: isMfaTrusted ? 'login_mfa_trusted_device' : 'login',
       result: 'success',
       metadata: { email: normalizedEmail }
     });
@@ -145,12 +168,12 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
     if (sessionMaxAge) cookieOptions.maxAge = sessionMaxAge;
     reply.setCookie('session', sessionToken, cookieOptions as any);
 
-    return reply.send({ data: { user: { id: userRecord.id, email: userRecord.email, role: userRecord.role, mfaEnabled: false } } });
+    return reply.send({ data: { user: { id: userRecord.id, email: userRecord.email, role: userRecord.role, mfaEnabled: Boolean(activeMfa) } } });
   });
 
   // MFA Doğrulama Rotaları
   fastify.post('/api/v1/auth/mfa/verify', async (request, reply) => {
-    const { challengeToken, code } = MfaVerifyRequestSchema.parse(request.body);
+    const { challengeToken, code, rememberDevice } = MfaVerifyRequestSchema.parse(request.body);
     const hashedChallenge = hashSessionToken(challengeToken);
 
     const challengeSession = await fastify.db.query.authSessions.findFirst({
@@ -220,10 +243,34 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
     // Last sign in güncelle
     await fastify.db.update(users).set({ lastSignInAt: new Date() }).where(eq(users.id, challengeSession.userId));
 
+    // Güvenilen Cihaz (Remember Device 30 gün)
+    if (rememberDevice) {
+      const deviceToken = generateSessionToken();
+      const hashedDeviceToken = hashSessionToken(deviceToken);
+      const deviceExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+      await fastify.db.insert(mfaTrustedDevices).values({
+        userId: challengeSession.userId,
+        hashedToken: hashedDeviceToken,
+        expiresAt: deviceExpiresAt,
+        ipDigest: request.ip,
+        userAgentDigest: request.headers['user-agent'] || null
+      });
+
+      reply.setCookie('mfa_device', deviceToken, {
+        path: '/',
+        secure: config.NODE_ENV === 'production',
+        httpOnly: true,
+        sameSite: 'lax',
+        maxAge: 30 * 24 * 60 * 60
+      });
+    }
+
     await fastify.db.insert(securityAuditLog).values({
       actorId: challengeSession.userId,
       action: 'login_mfa',
-      result: 'success'
+      result: 'success',
+      metadata: { rememberedDevice: Boolean(rememberDevice) }
     });
 
     const mfaCookieOptions: Record<string, unknown> = {
@@ -352,6 +399,9 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
       
       // Kullanıcının tüm aktif session'larını iptal et (güvenlik için)
       await tx.update(authSessions).set({ isRevoked: true }).where(eq(authSessions.userId, tokenRecord.userId));
+
+      // Kullanıcının güvenilen cihazlarını iptal et
+      await tx.delete(mfaTrustedDevices).where(eq(mfaTrustedDevices.userId, tokenRecord.userId));
     });
 
     await fastify.db.insert(securityAuditLog).values({
@@ -492,6 +542,8 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     await fastify.db.delete(mfaFactors).where(eq(mfaFactors.userId, request.user.id));
+    await fastify.db.delete(mfaTrustedDevices).where(eq(mfaTrustedDevices.userId, request.user.id));
+    reply.clearCookie('mfa_device', { path: '/' });
 
     await fastify.db.insert(securityAuditLog).values({
       actorId: request.user.id,
