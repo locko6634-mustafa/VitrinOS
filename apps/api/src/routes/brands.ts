@@ -52,7 +52,7 @@ export const brandsRoutes: FastifyPluginAsync = async (fastify) => {
       bannedWords: body.bannedWords,
     }).returning();
 
-    return reply.code(211).send({ data: newBrand }); // 211 veya standart 201 kullanılabilir. Canlı projeye uygun şekilde 201 yapalım ya da fark etmez.
+    return reply.code(201).send({ data: newBrand });
   });
 
   // PATCH /api/v1/brands/:brandId
