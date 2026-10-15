@@ -1,93 +1,153 @@
 <!doctype html>
-<html lang="tr">
+<html lang="tr" class="has-js">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Güvenli giriş | VitrinOS</title>
-    <meta name="description" content="VitrinOS kreatif operasyon paneline giriş yapın.">
+    <title>Müşteri Girişi | VitrinOS</title>
+    <meta name="description" content="VitrinOS akıllı görsel tasarım atölyenize giriş yapın.">
     <meta name="robots" content="noindex, nofollow">
-    <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" fill="%23f8f4ec"/%3E%3Cpath d="M11 15h11l10 30 10-30h11L38 53H26L11 15Z" fill="%231d1e22"/%3E%3Cpath d="M46 42h9v9h-9z" fill="%23f46b22"/%3E%3C/svg%3E'>
+    <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" fill="%230d0e12"/%3E%3Cpath d="M11 15h11l10 30 10-30h11L38 53H26L11 15Z" fill="%23ffffff"/%3E%3Cpath d="M46 42h9v9h-9z" fill="%23f46b22"/%3E%3C/svg%3E'>
     <link rel="stylesheet" href="css/shared/fonts.css">
     <link rel="stylesheet" href="css/shared/base.css">
     <link rel="stylesheet" href="css/login/login.css">
   </head>
-  <body class="app-body auth-body" data-surface="auth">
+  <body class="auth-body" data-surface="auth">
     <a class="skip-link" href="#login-main">İçeriğe geç</a>
 
-    <main class="auth-screen" id="login-main" aria-labelledby="authTitle">
-      <section class="auth-panel">
-        <div class="auth-nav">
-          <a class="brand auth-brand" href="index.html" aria-label="VitrinOS ana sayfa">
-            <span class="brand-word">Vitrin</span><span class="brand-os">OS</span><sup class="brand-reg" aria-hidden="true">®</sup>
+    <main class="auth-layout" id="login-main" aria-labelledby="authTitle">
+      <!-- Sol Panel: Giriş Formu -->
+      <section class="auth-card-panel">
+        <header class="auth-top-nav">
+          <a class="brand" href="index.html" aria-label="VitrinOS ana sayfa">
+            <span class="brand-vitrin">Vitrin</span><span class="brand-os">OS</span><sup>®</sup>
           </a>
-          <a class="auth-back" href="index.html"><span aria-hidden="true">←</span> Ana sayfa</a>
-        </div>
-        <div class="auth-copy">
-          <p class="kicker">Güvenli kreatif stüdyo</p>
-          <h1 id="authTitle">Operasyon masanı kaldığın yerden aç.</h1>
-          <p>
-            Brief, üretim ve onay akışına yalnızca yetkilendirilmiş hesabınla eriş. Yönetici oturumları ikinci doğrulama katmanıyla korunur.
+          <a class="auth-back-link" href="index.html">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>Ana Sayfa</span>
+          </a>
+        </header>
+
+        <div class="auth-intro">
+          <div class="auth-badge">
+            <span class="auth-badge-dot" aria-hidden="true"></span>
+            <span>GÜVENLİ MÜŞTERİ PANELİ</span>
+          </div>
+          <h1 id="authTitle">Tasarım atölyenize giriş yapın.</h1>
+          <p class="auth-desc">
+            Kayıtlı marka kurallarınızla yeni görseller üretmek, revizyon istemek veya tamamlanan çıktılarınızı indirmek için oturum açın.
           </p>
         </div>
+
         <form class="auth-form" id="loginForm" novalidate aria-describedby="loginStatus">
-          <div class="form-row">
-            <label for="loginEmail">E-posta veya kullanıcı adı</label>
-            <input id="loginEmail" name="email" type="text" autocomplete="username" value="" required aria-invalid="false">
+          <div class="form-group">
+            <label class="form-label" for="loginEmail">E-posta Adresi veya Kullanıcı Adı</label>
+            <div class="input-shell">
+              <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              <input class="form-input" id="loginEmail" name="email" type="text" autocomplete="username" placeholder="ornek@sirketiniz.com" required aria-invalid="false">
+            </div>
           </div>
-          <div class="form-row">
-            <label for="loginPassword">Şifre</label>
-            <div class="password-control">
-              <input id="loginPassword" name="password" type="password" autocomplete="current-password" value="" required aria-invalid="false">
-              <button class="password-toggle" id="loginPasswordToggle" type="button" aria-controls="loginPassword" aria-pressed="false" aria-label="Şifreyi göster">
-                <span class="password-toggle-icon" aria-hidden="true"></span>
+
+          <div class="form-group">
+            <div class="label-row">
+              <label class="form-label" for="loginPassword">Şifre</label>
+              <a class="forgot-link" href="https://wa.me/905510653051?text=Merhaba%2C%20VitrinOS%20hesab%C4%B1m%C4%B1n%20%C5%9Fifresini%20s%C4%B1f%C4%B1rlamak%20istiyorum." target="_blank" rel="noopener noreferrer">
+                Şifremi Unuttum
+              </a>
+            </div>
+            <div class="input-shell">
+              <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <input class="form-input" id="loginPassword" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required aria-invalid="false">
+              <button class="password-toggle-btn" id="loginPasswordToggle" type="button" aria-controls="loginPassword" aria-pressed="false" aria-label="Şifreyi göster">
                 <span class="password-toggle-text">Göster</span>
               </button>
             </div>
           </div>
-          <label class="remember-option" for="rememberLogin">
-            <input id="rememberLogin" name="rememberLogin" type="checkbox">
-            <span>Beni hatırla</span>
-          </label>
-          <button class="button primary auth-submit" id="loginSubmitButton" type="submit">
-            <span class="button-label">Güvenli giriş yap</span>
-            <span class="button-loader" aria-hidden="true"></span>
+
+          <div class="form-aux-row">
+            <label class="remember-label" for="rememberLogin">
+              <input class="remember-checkbox" id="rememberLogin" name="rememberLogin" type="checkbox">
+              <span class="custom-checkbox" aria-hidden="true"></span>
+              <span>Bu cihazda beni hatırla</span>
+            </label>
+          </div>
+
+          <button class="btn btn-primary auth-submit-btn" id="loginSubmitButton" type="submit">
+            <span class="button-label">Güvenli Giriş Yap</span>
+            <svg class="btn-arrow" width="16" height="16" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
           </button>
+
           <p class="form-status" id="loginStatus" role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></p>
         </form>
-        <p class="auth-footnote"><span aria-hidden="true">⌁</span> Oturum ve yetki denetimi güvenli bağlantı üzerinden yapılır.</p>
+
+        <footer class="auth-card-footer">
+          <p class="no-account-text">
+            Henüz VitrinOS hesabınız yok mu?
+            <a class="cta-link" href="https://wa.me/905510653051?text=Merhaba%2C%20VitrinOS%20hakk%C4%B1nda%20bilgi%20almak%20ve%20markam%20i%C3%A7in%20hesap%20a%C3%A7t%C4%B1rmak%20istiyorum." target="_blank" rel="noopener noreferrer">
+              WhatsApp ile Tanışın →
+            </a>
+          </p>
+        </footer>
       </section>
 
-      <aside class="auth-visual auth-studio-scene" aria-labelledby="studioSceneTitle">
-        <div class="studio-grid" aria-hidden="true"></div>
-        <div class="studio-header">
-          <span class="scene-index">VOS / ACCESS 01</span>
-          <span class="scene-live"><i aria-hidden="true"></i> Korunan oturum</span>
+      <!-- Sağ Panel: Dinamik Dönen Canlı Stüdyo Vitrini -->
+      <aside class="auth-showcase-panel" aria-labelledby="showcaseTitle">
+        <div class="showcase-glow" aria-hidden="true"></div>
+
+        <div class="showcase-terminal-card">
+          <!-- Terminal Başlığı -->
+          <div class="showcase-top-bar" aria-hidden="true">
+            <div class="window-dots">
+              <span class="dot-red"></span>
+              <span class="dot-yellow"></span>
+              <span class="dot-green"></span>
+            </div>
+            <span class="terminal-title">VitrinOS Design Studio — Canlı Çıktı</span>
+            <div class="terminal-badge">
+              <span class="terminal-beacon"></span>
+              <span>ÇEVRİMİÇİ</span>
+            </div>
+          </div>
+
+          <!-- Canlı Mockup Sahnesi -->
+          <div class="showcase-media-frame">
+            <img class="showcase-img" id="loginShowcaseImg" src="assets/showcase-coffee-story.jpg" alt="VitrinOS güncel tasarım çıktısı önizlemesi">
+            <div class="showcase-scrim" aria-hidden="true"></div>
+
+            <div class="showcase-meta-overlay">
+              <div class="showcase-tag" id="loginShowcaseTag">Instagram Story (9:16)</div>
+              <h2 class="showcase-title" id="showcaseTitle">Marka Kurallarınızla Üretilen Çıktılar</h2>
+              <p class="showcase-sub" id="loginShowcaseSub">Artisan Specialty Coffee Atölyesi — Fındık & Karamel Paleti Doğrulandı</p>
+            </div>
+          </div>
+
+          <!-- Sahne Alt Bilgisi -->
+          <div class="showcase-footer-bar">
+            <div class="showcase-chips">
+              <span class="showcase-chip" id="loginShowcaseBrand">Artisan Coffee Lab</span>
+              <span class="showcase-chip accent">✓ Marka DNA'sı Kilitli</span>
+            </div>
+            <div class="showcase-dots-nav" id="loginShowcaseDots" aria-hidden="true">
+              <span class="nav-dot is-active"></span>
+              <span class="nav-dot"></span>
+              <span class="nav-dot"></span>
+            </div>
+          </div>
         </div>
-        <div class="studio-optic" aria-hidden="true">
-          <span class="optic-orbit optic-orbit-one"></span>
-          <span class="optic-orbit optic-orbit-two"></span>
-          <span class="optic-aperture"></span>
-          <span class="optic-prism"></span>
-          <span class="optic-beam"></span>
-        </div>
-        <div class="studio-caption">
-          <p class="scene-label">Kontrollü üretim hattı</p>
-          <h2 id="studioSceneTitle">Bir fikir, üç kontrollü aşamada yayına hazırlanır.</h2>
-        </div>
-        <ol class="studio-flow">
-          <li class="is-current">
-            <span>01</span>
-            <div><strong>Brief</strong><small>Niyet ve marka bağlamı</small></div>
-          </li>
-          <li>
-            <span>02</span>
-            <div><strong>Çıktı</strong><small>Formatlara göre üretim</small></div>
-          </li>
-          <li>
-            <span>03</span>
-            <div><strong>Onay</strong><small>İnsan kontrolü ve kayıt</small></div>
-          </li>
-        </ol>
+
+        <p class="showcase-hint">
+          Tasarımcı bekleme süresi veya saatler süren revizyon döngüleri yok. Markanızın renkleri ve logosuyla her mecrada anında hazır.
+        </p>
       </aside>
     </main>
 
