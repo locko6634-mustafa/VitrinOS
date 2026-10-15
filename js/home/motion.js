@@ -19,13 +19,15 @@ export function initMotion() {
  */
 function initPreloader() {
   const preloader = document.getElementById("sitePreloader");
+  const heroReveals = document.querySelectorAll(".hero-section [data-reveal]");
+
   if (!preloader) {
-    document.body.classList.add("motion-ready");
+    heroReveals.forEach(el => el.classList.add("is-visible"));
     return;
   }
 
   const startTime = Date.now();
-  const MIN_DISPLAY_TIME = 450; // Çok ani sıçramayı önleyen mikro bekleme
+  const MIN_DISPLAY_TIME = 400; // Çok ani sıçramayı önleyen mikro bekleme
   const MAX_FALLBACK_TIME = 1500; // Herhangi bir varlık takılırsa maksimum bekleme
 
   function dismiss() {
@@ -34,9 +36,13 @@ function initPreloader() {
 
     setTimeout(() => {
       preloader.classList.add("is-loaded");
-      document.body.classList.add("motion-ready");
 
-      // Geçiş animasyonu (700ms) bittiğinde DOM'dan tamamen gizle
+      // Hero elemanlarını preloader kalkarken sahneye al
+      setTimeout(() => {
+        heroReveals.forEach(el => el.classList.add("is-visible"));
+      }, 150);
+
+      // Geçiş animasyonu bittiğinde DOM'dan tamamen gizle
       setTimeout(() => {
         preloader.hidden = true;
       }, 750);
@@ -61,14 +67,14 @@ function initPreloader() {
 
 /**
  * 2. Akıcı Scroll Reveal Animasyon Sistemi
+ * Kullanıcı sayfayı aşağı kaydırdıkça bölümler ve kartlar 44px aşağıdan yukarı süzülür.
  */
 function initScrollReveal() {
-  const revealElements = document.querySelectorAll("[data-reveal]");
-  if (!revealElements.length) return;
+  const scrollElements = document.querySelectorAll("main > section:not(.hero-section) [data-reveal], footer [data-reveal]");
+  if (!scrollElements.length) return;
 
   if (!("IntersectionObserver" in window)) {
-    // Tarayıcı desteklemiyorsa hepsini doğrudan görünür yap
-    revealElements.forEach(el => el.classList.add("is-visible"));
+    scrollElements.forEach(el => el.classList.add("is-visible"));
     return;
   }
 
@@ -76,16 +82,16 @@ function initScrollReveal() {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         entry.target.classList.add("is-visible");
-        entry.target.classList.add("is-entering"); // geriye dönük uyumluluk
+        entry.target.classList.add("is-entering");
         obs.unobserve(entry.target);
       }
     });
   }, {
-    rootMargin: "0px 0px -40px 0px",
-    threshold: 0.1
+    rootMargin: "0px 0px -50px 0px",
+    threshold: 0.12
   });
 
-  revealElements.forEach(el => observer.observe(el));
+  scrollElements.forEach(el => observer.observe(el));
 }
 
 /**
