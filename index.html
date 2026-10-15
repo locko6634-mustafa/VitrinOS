@@ -41,7 +41,13 @@
           </div>
 
           <div class="nav-actions" id="navActions">
-            <a class="btn btn-secondary nav-login" href="login.html" data-auth-login>Giriş Yap</a>
+            <a class="btn btn-nav-login" href="login.html" data-auth-login aria-label="Müşteri Girişi">
+              <svg class="nav-login-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>Giriş Yap</span>
+            </a>
             <a class="btn btn-primary" href="https://wa.me/905510653051?text=Merhaba%2C%20VitrinOS%20hakk%C4%B1nda%20bilgi%20almak%20ve%20markam%20i%C3%A7in%20denemek%20istiyorum." target="_blank" rel="noopener noreferrer" data-auth-pilot>
               <span>WhatsApp ile Tanışın</span>
               <svg class="btn-icon" aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
@@ -57,6 +63,9 @@
             </button>
           </div>
         </nav>
+      </div>
+      <div class="header-scroll-progress" aria-hidden="true">
+        <div class="header-scroll-bar" id="headerScrollBar"></div>
       </div>
     </header>
 
@@ -273,72 +282,172 @@
             <div class="flow-steps" role="tablist" aria-label="Nasıl çalışır adımları">
               <!-- Adım 1 -->
               <button class="flow-step-btn is-active" type="button" data-flow-step="0" role="tab" aria-selected="true">
+                <div class="step-progress-track" aria-hidden="true"><div class="step-progress-fill"></div></div>
                 <div class="flow-step-header">
                   <span class="step-num-pill">ADIM 1</span>
+                  <span class="step-status-tag">DOĞAL DİL İSTEĞİ</span>
                 </div>
                 <h3>İhtiyacınızı Yazın</h3>
-                <p>Karmaşık teknik terimler yok. "Instagram için kahve atölyesi duyurusu" veya "Kıdemli mühendis iş ilanı" demeniz yeterli.</p>
+                <p>Teknik jargona gerek yok. Sohbet eder gibi istediğiniz görseli, mecrayı veya duyuruyu yazmanız yeterli.</p>
               </button>
 
               <!-- Adım 2 -->
               <button class="flow-step-btn" type="button" data-flow-step="1" role="tab" aria-selected="false">
+                <div class="step-progress-track" aria-hidden="true"><div class="step-progress-fill"></div></div>
                 <div class="flow-step-header">
                   <span class="step-num-pill">ADIM 2</span>
+                  <span class="step-status-tag">MARKA DNA KİLİDİ</span>
                 </div>
                 <h3>Markanız Şekillendirsin</h3>
-                <p>Sistem önceden kaydettiğiniz kurumsal renklerinizi, logonuzu, yazı stilinizi ve kurallarınızı otomatik olarak uygular.</p>
+                <p>Kayıtlı kurumsal renkleriniz, logonuz, yazı tipiniz ve görsel kurallarınız yapay zekaya kılavuzluk eder.</p>
               </button>
 
               <!-- Adım 3 -->
               <button class="flow-step-btn" type="button" data-flow-step="2" role="tab" aria-selected="false">
+                <div class="step-progress-track" aria-hidden="true"><div class="step-progress-fill"></div></div>
                 <div class="flow-step-header">
                   <span class="step-num-pill">ADIM 3</span>
+                  <span class="step-status-tag">ANINDA ÇIKTI</span>
                 </div>
                 <h3>Onaylayın veya Tek Tıkla Revize Edin</h3>
-                <p>Hazırlanan görselleri anında indirin ya da "Yazıyı biraz büyüt" diyerek tek bir cümleyle saniyeler içinde yenileyin.</p>
+                <p>Story, Post veya Banner formatında anında indirin ya da tek bir cümleyle saniyeler içinde yenileyin.</p>
               </button>
             </div>
           </div>
 
           <!-- Sağ Taraf: Süreç Simülasyon Sahnesi -->
           <div class="flow-visual-card" data-reveal>
-            <!-- Sahne 1: Yazma -->
+            <!-- macOS Pencere Başlığı -->
+            <div class="studio-window-header" aria-hidden="true">
+              <div class="window-dots">
+                <span class="dot-red"></span>
+                <span class="dot-yellow"></span>
+                <span class="dot-green"></span>
+              </div>
+              <span class="studio-window-title">VitrinOS Studio Engine v2.4 — Simülasyon</span>
+              <div class="studio-status-indicator">
+                <span class="pulse-beacon"></span>
+                <span class="status-text">CANLI</span>
+              </div>
+            </div>
+
+            <!-- Sahne 1: Yazma & Analiz -->
             <div class="flow-scene is-active" data-flow-scene="0">
               <div class="scene-prompt-box">
-                <span style="font-size: 11px; color: var(--text-dim); text-transform: uppercase; font-weight: 700; margin-bottom: 6px; display: block;">Tasarım İsteği</span>
+                <div class="prompt-box-top">
+                  <span class="prompt-meta-label">SİSTEME İLETİLEN DOĞAL DİL İSTEĞİ</span>
+                  <span class="prompt-mode-tag" id="simSectorTag">Sektör Analizi</span>
+                </div>
                 <div class="prompt-typing-sim">
-                  <span>"Hafta sonu kahve atölyemiz için yeni bir Instagram story'si ve duyuru postu hazırla."</span>
+                  <span id="simPromptText" class="sim-prompt-text">"..."</span>
                   <span class="typing-cursor" aria-hidden="true"></span>
                 </div>
               </div>
               <div class="scene-preview-stage">
-                <p style="color: var(--text-muted); font-size: 14px;">İstek doğal dille alındı. Sistem sektör ve mecra formatlarını ayrıştırıyor...</p>
+                <div class="sim-analysis-header">
+                  <span class="analysis-indicator-icon">⚡</span>
+                  <h4>Otomatik Parametre Ayrıştırma</h4>
+                </div>
+                <div class="sim-analysis-grid">
+                  <div class="analysis-item">
+                    <span class="item-label">Sektör & Alan</span>
+                    <strong class="item-value" id="simMetaSector">-</strong>
+                  </div>
+                  <div class="analysis-item">
+                    <span class="item-label">Hedef Format</span>
+                    <strong class="item-value" id="simMetaFormat">-</strong>
+                  </div>
+                  <div class="analysis-item">
+                    <span class="item-label">Tasarım Amacı</span>
+                    <strong class="item-value" id="simMetaIntent">-</strong>
+                  </div>
+                  <div class="analysis-item">
+                    <span class="item-label">İletişim Tonu</span>
+                    <strong class="item-value" id="simMetaTone">-</strong>
+                  </div>
+                </div>
+                <div class="analysis-status-bar">
+                  <span class="spinner-line" aria-hidden="true"></span>
+                  <span id="simAnalysisStatusText">İstek çözümlendi. Kayıtlı marka profiline bağlanılıyor...</span>
+                </div>
               </div>
             </div>
 
             <!-- Sahne 2: Marka Kuralı Uygulama -->
             <div class="flow-scene" data-flow-scene="1">
-              <div class="scene-preview-stage" style="align-items: flex-start; text-align: left;">
-                <span class="rule-applied-toast">MARKA KURALLARI KİLİTLENDİ</span>
-                <h4 style="margin-bottom: 12px; font-size: 1.1rem; color: #ffffff;">Kurumsal Kimlik Doğrulandı:</h4>
-                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; color: var(--text-muted);">
-                  <span>✓ Kurumsal Renk: <strong>#d49b6a (Fındık Tonu)</strong></span>
-                  <span>✓ Tipografi: <strong>Instrument Sans Bold / Regular</strong></span>
-                  <span>✓ Logo Konumu: <strong>Üst Sol Güvenli Alan</strong></span>
-                  <span>✓ Yasaklı Kelime Filtresi: <strong>Aktif</strong></span>
+              <div class="scene-preview-stage brand-rules-stage">
+                <div class="rules-stage-top">
+                  <span class="rule-applied-toast" id="simRuleBadge">✓ MARKA DNA'SI KİLİTLENDİ</span>
+                  <span class="rule-profile-id" id="simProfileId">PROFİL: #VO-8421</span>
+                </div>
+                <h4 class="brand-rules-heading" id="simBrandHeading">Kurumsal Kimlik Doğrulandı:</h4>
+
+                <!-- Canlı Renk Paleti -->
+                <div class="sim-palette-block">
+                  <span class="palette-title">Aktif Renk Paleti:</span>
+                  <div class="palette-swatches" id="simPaletteSwatches">
+                    <!-- JS ile doldurulacak -->
+                  </div>
+                </div>
+
+                <!-- Kurallar Listesi -->
+                <div class="rules-checklist">
+                  <div class="rule-item">
+                    <span class="rule-check">✓</span>
+                    <span>Tipografi: <strong id="simRuleFont">-</strong></span>
+                  </div>
+                  <div class="rule-item">
+                    <span class="rule-check">✓</span>
+                    <span>Logo Konumu: <strong id="simRuleLogo">-</strong></span>
+                  </div>
+                  <div class="rule-item">
+                    <span class="rule-check">✓</span>
+                    <span>Görsel Dili: <strong id="simRuleVisual">-</strong></span>
+                  </div>
+                  <div class="rule-item">
+                    <span class="rule-check">✓</span>
+                    <span>Halüsinasyon Kilidi: <strong>Aktif (Marka dışı renk & font engellendi)</strong></span>
+                  </div>
                 </div>
               </div>
             </div>
 
             <!-- Sahne 3: Onay & Revizyon -->
             <div class="flow-scene" data-flow-scene="2">
-              <div class="scene-preview-stage">
-                <span style="font-size: 32px; color: var(--accent-lime); margin-bottom: 8px;">✓</span>
-                <h4 style="margin-bottom: 6px; font-size: 1.2rem; color: #ffffff;">3 Formatında Tasarımlar Hazır!</h4>
-                <p style="color: var(--text-muted); font-size: 13.5px; margin-bottom: 20px;">Story (9:16), Post (4:5) ve Banner (16:9) kurumsal kimliğinize uygun üretildi.</p>
-                <div style="display: flex; gap: 10px;">
-                  <span class="btn btn-primary" style="font-size: 13px; padding: 8px 18px; min-height: 38px;">Görselleri İndir</span>
-                  <span class="btn btn-secondary" style="font-size: 13px; padding: 8px 18px; min-height: 38px;">Hızlı Revize İste</span>
+              <div class="scene-preview-stage result-output-stage">
+                <div class="result-stage-top">
+                  <span class="result-ready-badge" id="simReadyBadge">✓ 3 Formatında Tasarımlar Hazır!</span>
+                  <span class="render-speed-pill">⚡ 3.2 sn</span>
+                </div>
+
+                <div class="sim-visual-viewport">
+                  <div class="sim-artwork-frame" id="simArtworkFrame">
+                    <img id="simArtworkImg" class="sim-artwork-img" src="assets/sim-coffee-workshop.jpg" alt="VitrinOS Canlı Simülasyon Çıktısı">
+                    <div class="sim-artwork-overlay">
+                      <span class="sim-format-tag" id="simFormatTag">Story 9:16</span>
+                      <span class="sim-watermark">VitrinOS Verified Output</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sim-result-footer">
+                  <div class="sim-quick-revise">
+                    <span class="revise-label">Tek Cümleyle Revizyon:</span>
+                    <span class="revise-example" id="simReviseExample">"Yazıyı biraz daha büyüt ve rengi derinleştir"</span>
+                  </div>
+                  <div class="result-actions">
+                    <span class="btn btn-primary sim-btn-dl">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                      </svg>
+                      <span>Görselleri İndir</span>
+                    </span>
+                    <span class="btn btn-secondary sim-btn-edit">
+                      <span>Revize İste</span>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

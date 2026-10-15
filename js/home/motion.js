@@ -23,14 +23,25 @@ export function initMotion() {
     revealElements.forEach(el => observer.observe(el));
   }
 
-  // 2. Header Scroll Durumu
+  // 2. Header Scroll Durumu & Canlı İlerleme Çubuğu
   const header = document.querySelector(".site-header");
-  if (header) {
+  const scrollBar = document.getElementById("headerScrollBar");
+
+  if (header || scrollBar) {
     const handleScroll = () => {
-      if (window.scrollY > 20) {
-        header.classList.add("is-scrolled");
-      } else {
-        header.classList.remove("is-scrolled");
+      const scrollY = window.scrollY || window.pageYOffset || 0;
+      if (header) {
+        if (scrollY > 20) {
+          header.classList.add("is-scrolled");
+        } else {
+          header.classList.remove("is-scrolled");
+        }
+      }
+
+      if (scrollBar) {
+        const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = totalHeight > 0 ? (scrollY / totalHeight) * 100 : 0;
+        scrollBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
       }
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
