@@ -295,21 +295,7 @@ h3 {
   gap: 14px;
 }
 
-.nav-toggle {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  flex-direction: column;
-  gap: 5px;
-}
-.nav-toggle .bar {
-  width: 22px;
-  height: 2px;
-  background: var(--text-main);
-  transition: all var(--duration-fast) var(--ease-out);
-}
+
 
 /* ==========================================================================
    Buton Tasarım Sistemi
@@ -1431,6 +1417,7 @@ h3 {
 .result-actions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
@@ -1965,8 +1952,10 @@ h3 {
 /* Scroll reveal is defined in @layer motion below */
 
 /* ==========================================================================
-   Responsive Uyarlamalar (320px, 375px, 768px, 1024px)
+   Full-Responsive Uyarlamalar (320px, 375px, 768px, 1024px)
    ========================================================================== */
+
+/* 1024px ve Altı Tablet / Küçük Laptop */
 @media (max-width: 1024px) {
   .hero-grid {
     grid-template-columns: 1fr;
@@ -1977,6 +1966,7 @@ h3 {
   }
   .flow-grid {
     grid-template-columns: 1fr;
+    gap: 48px;
   }
   .pricing-cards-grid {
     grid-template-columns: 1fr;
@@ -1995,45 +1985,268 @@ h3 {
   }
 }
 
+/* 768px ve Altı Mobil Cihazlar */
 @media (max-width: 768px) {
-  .nav-links {
-    display: none;
+  :root {
+    --container-pad: 20px;
+    --section-gap: 64px;
+  }
+
+  /* Header & Mobil Sadeleşme (Hamburger Menüsüz, Doğrudan Kaydırma) */
+  .site-header {
+    padding: 14px 0;
+  }
+  .nav-links,
+  .nav-drawer {
+    display: none !important;
   }
   .nav-toggle {
-    display: flex;
+    display: none !important;
   }
-  .stage-rules-bar {
+  /* Header'daki uzun WhatsApp butonu mobilde gizlenir; hero ve yüzen buton mevcuttur */
+  .nav-actions [data-auth-pilot] {
+    display: none !important;
+  }
+  .nav-actions {
+    gap: 10px;
+  }
+  .btn-nav-login {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+  .brand {
+    font-size: 20px;
+  }
+
+  /* Hero Bölümü */
+  .hero-section {
+    padding-top: 32px;
+    padding-bottom: 48px;
+  }
+  .hero-grid {
     grid-template-columns: 1fr;
+    gap: 32px;
+    min-width: 0;
+  }
+  .hero-statement,
+  .hero-stage-wrapper {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+  h1, .hero-statement h1 {
+    font-size: clamp(2rem, 7vw, 2.9rem);
+    line-height: 1.12;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    margin-bottom: 16px;
+  }
+  .hero-copy {
+    font-size: 1.02rem;
+    line-height: 1.55;
+    margin-bottom: 24px;
   }
   .hero-actions {
     flex-direction: column;
     width: 100%;
+    gap: 12px;
   }
   .hero-actions .btn {
     width: 100%;
+    justify-content: center;
+  }
+
+  /* Senaryo Seçici */
+  .scenario-selector {
+    margin-top: 24px;
+  }
+  .scenario-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+  }
+  .scenario-btn {
+    padding: 8px 12px;
+    font-size: 12.5px;
+    min-height: 40px;
+  }
+
+  /* Canlı Mockup Sahnesi (Aspect Ratio ve Genişlik Taşma Koruması) */
+  .stage-card {
+    padding: 18px;
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .stage-mockup-frame,
+  .stage-card[data-format-mode="landscape"] .stage-mockup-frame,
+  .stage-card[data-format-mode="portrait"] .stage-mockup-frame,
+  .stage-card[data-format-mode="post"] .stage-mockup-frame,
+  .stage-card[data-format-mode="banner"] .stage-mockup-frame {
+    min-height: unset;
+    height: auto;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .stage-card[data-format-mode="landscape"] .stage-mockup-frame {
+    aspect-ratio: 16 / 9;
+  }
+  .stage-card[data-format-mode="portrait"] .stage-mockup-frame {
+    aspect-ratio: 4 / 5; /* Mobilde aşırı uzun 9:14 yerine ergonomik 4:5 */
+  }
+  .stage-card[data-format-mode="post"] .stage-mockup-frame {
+    aspect-ratio: 1 / 1;
+  }
+  .stage-card[data-format-mode="banner"] .stage-mockup-frame {
+    aspect-ratio: 16 / 9;
+  }
+  .stage-mockup-frame {
+    padding: 16px;
+    min-height: 220px;
+  }
+  .mockup-headline {
+    font-size: 16px;
+    line-height: 1.3;
+  }
+  .mockup-subtext {
+    font-size: 12.5px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .mockup-footer {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .stage-rules-bar {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .rule-badge {
+    font-size: 11.5px;
+    padding: 6px 10px;
+  }
+
+  /* Kullanım Alanları / Mozaik Grid */
+  .mosaic-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .mosaic-card.card-story,
+  .mosaic-card.card-post,
+  .mosaic-card.card-hiring,
+  .mosaic-card.card-banner {
+    grid-column: span 1;
+    min-height: 320px;
+  }
+  .mosaic-media {
+    padding: 18px;
+  }
+
+  /* Nasıl Çalışır / Simülasyon Grid */
+  .flow-steps {
+    gap: 12px;
+  }
+  .flow-step-btn {
+    padding: 18px;
+  }
+  .sim-visual-viewport {
+    min-height: 260px;
+    padding: 16px;
+  }
+  .sim-metrics-bar {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* Karşılaştırma */
+  .comparison-grid {
+    gap: 16px;
+  }
+  .comp-card {
+    padding: 22px 18px;
+  }
+
+  /* Paketler */
+  .pricing-cards-grid {
+    max-width: 100%;
+    gap: 20px;
+  }
+  .price-card {
+    padding: 24px 20px;
+  }
+  .price-number {
+    font-size: 2.75rem;
+  }
+
+  /* Footer */
+  .footer-top {
+    margin-bottom: 36px;
+  }
+  .footer-brand {
+    font-size: clamp(2.5rem, 11vw, 3.8rem);
+  }
+  .footer-statement {
+    font-size: 1.05rem;
   }
   .footer-bottom {
     flex-direction: column;
     align-items: flex-start;
+    gap: 16px;
+    padding-top: 24px;
+  }
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    width: 100%;
   }
 }
 
+/* 480px ve 320px Ekstra Küçük Mobil Cihazlar */
 @media (max-width: 480px) {
   :root {
-    --container-pad: 18px;
+    --container-pad: 16px;
   }
   .stage-card {
-    padding: 16px;
+    padding: 14px;
   }
   .stage-mockup-frame {
-    padding: 16px;
-    min-height: 240px;
+    padding: 14px;
+    min-height: 200px;
+  }
+  .mockup-headline {
+    font-size: 15px;
   }
   .floating-whatsapp span {
     display: none;
   }
   .floating-whatsapp {
-    padding: 10px;
+    padding: 12px;
+    bottom: 18px;
+    right: 18px;
+    border-radius: 50%;
+  }
+  .whatsapp-icon-circle {
+    width: 24px;
+    height: 24px;
+  }
+  .sim-metrics-bar {
+    grid-template-columns: 1fr;
+  }
+  .price-figure {
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: 12px 18px;
+    font-size: 14px;
   }
 }
 }

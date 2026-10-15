@@ -24,7 +24,7 @@ test("ana sayfalar semantik yüzey sözleşmesini kullanır", async () => {
 
 test("form ve uygulama DOM hookları dönüşümden sonra korunur", async () => {
   const contracts = {
-    "index.html": ["navMenu", "navToggle", "navLinks", "navActions", "billingToggle"],
+    "index.html": ["navMenu", "navLinks", "navActions", "billingToggle"],
     "login.html": ["loginForm", "loginEmail", "loginPassword", "loginSubmitButton", "loginStatus"],
     "mfa-challenge.html": ["mfaChallengeForm", "mfaCode", "mfaStatus"],
     "mfa-setup.html": ["mfaSetupForm", "mfaCode", "mfaStatus", "mfaEnrollPanel"],
@@ -54,6 +54,7 @@ test("başvuru akışı WhatsApp üzerine taşınmıştır ve kişisel iletişim
   assert.match(html, /<svg[^>]+width=["']20["'][^>]+height=["']20["']/);
   assert.doesNotMatch(html, /id=["']leadForm["']/);
   assert.doesNotMatch(html, /id=["']basvuru["']/);
+  assert.doesNotMatch(html, /id=["']navToggle["']/);
 });
 
 test("optik atölye tasarım sistemi ve hareket güvenliği tanımlıdır", async () => {

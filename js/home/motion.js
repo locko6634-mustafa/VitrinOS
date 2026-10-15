@@ -10,7 +10,6 @@ export function initMotion() {
   initPreloader();
   initScrollReveal();
   initHeaderScroll();
-  initMobileMenu();
 }
 
 /**
@@ -122,19 +121,4 @@ function initHeaderScroll() {
 
   window.addEventListener("scroll", handleScroll, { passive: true });
   handleScroll();
-}
-
-/**
- * 4. Mobil Menü Toggle
- */
-function initMobileMenu() {
-  const navToggle = document.getElementById("navToggle");
-  const navLinks = document.getElementById("navLinks");
-  if (navToggle && navLinks) {
-    navToggle.addEventListener("click", () => {
-      const isExpanded = navToggle.getAttribute("aria-expanded") === "true";
-      navToggle.setAttribute("aria-expanded", !isExpanded);
-      navLinks.classList.toggle("is-open", !isExpanded);
-    });
-  }
 }
