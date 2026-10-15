@@ -277,8 +277,6 @@ body[data-surface="auth"]::before {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 22px;
-  font-size: 13px;
-  color: #8e95a8;
 }
 
 .remember-label {
@@ -287,14 +285,66 @@ body[data-surface="auth"]::before {
   gap: 8px;
   cursor: pointer;
   user-select: none;
+  font-size: 13px;
+  color: #9da6b9;
+  font-weight: 500;
+  transition: color 150ms ease;
+}
+
+.remember-label span {
+  color: inherit;
+}
+
+.remember-label:hover {
+  color: #ffffff;
 }
 
 .remember-checkbox {
-  accent-color: #ccff00;
-  width: 16px;
-  height: 16px;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  border: 1px solid #303746;
   border-radius: 4px;
+  background: #191c24;
   cursor: pointer;
+  display: inline-grid;
+  place-content: center;
+  vertical-align: middle;
+  flex-shrink: 0;
+  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.remember-checkbox:hover {
+  border-color: #4a546c;
+  background: #20242f;
+}
+
+.remember-checkbox::before {
+  content: "";
+  width: 7.5px;
+  height: 7.5px;
+  clip-path: polygon(14% 44%, 0 60%, 40% 100%, 100% 20%, 82% 4%, 38% 70%);
+  transform: scale(0);
+  transform-origin: center;
+  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
+  background-color: #0d0e12;
+}
+
+.remember-checkbox:checked {
+  background: #ccff00;
+  border-color: #ccff00;
+  box-shadow: 0 0 6px rgba(204, 255, 0, 0.35);
+}
+
+.remember-checkbox:checked::before {
+  transform: scale(1);
+}
+
+.remember-checkbox:focus-visible {
+  outline: 2px solid #ccff00;
+  outline-offset: 2px;
 }
 
 .auth-submit-btn {
