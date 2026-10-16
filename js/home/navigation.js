@@ -22,6 +22,7 @@ export function initMobileMenu() {
   function syncMenuState(open, returnFocus) {
     const shouldOpen = Boolean(open && mobileQuery.matches);
     navShell.classList.toggle("is-open", shouldOpen);
+    navMenu.classList.toggle("is-open", shouldOpen);
     navToggle.setAttribute("aria-expanded", String(shouldOpen));
     navToggle.setAttribute("aria-label", shouldOpen ? "Menüyü kapat" : "Menüyü aç");
     document.body.classList.toggle("menu-open", shouldOpen);
@@ -91,7 +92,7 @@ export function initAnchorNavigation() {
   function scrollToAnchor(target, updateUrl) {
     if (!target) return;
 
-    if (target.id === "top" || target.id === "main") {
+    if (target.id === "top" || target.id === "mainContent") {
       window.scrollTo({
         top: 0,
         behavior: reducedMotion.matches ? "auto" : "smooth"
@@ -103,15 +104,9 @@ export function initAnchorNavigation() {
     }
 
     const headerBottom = siteHeader?.getBoundingClientRect().bottom || 0;
-    const targetStyles = window.getComputedStyle(target);
-    const targetPaddingTop = parseFloat(targetStyles.paddingTop) || 0;
     const breathingRoom = 12;
     const targetTop =
-      window.scrollY +
-      target.getBoundingClientRect().top +
-      targetPaddingTop -
-      headerBottom -
-      breathingRoom;
+      window.scrollY + target.getBoundingClientRect().top - headerBottom - breathingRoom;
 
     window.scrollTo({
       top: Math.max(0, targetTop),
@@ -139,28 +134,34 @@ export function initAnchorNavigation() {
 export async function initAuthNavigation() {
   if (typeof document === "undefined") return;
 
-  const loginLink = document.querySelector("[data-auth-login]");
-  const pilotLink = document.querySelector("[data-auth-pilot]");
-  const dashboardLink = document.querySelector("[data-auth-dashboard]");
-  const adminLink = document.querySelector("[data-auth-admin]");
+  const guestNodes = Array.from(document.querySelectorAll("[data-guest-only], [data-auth-login], [data-auth-pilot]"));
+  const authNodes = Array.from(document.querySelectorAll("[data-auth-only], [data-auth-dashboard]"));
+  const adminNodes = Array.from(document.querySelectorAll("[data-admin-only], [data-auth-admin]"));
+  const logoutBtn = document.querySelector("[data-logout-trigger]");
 
-  if (!loginLink || !dashboardLink) return;
+  if (!guestNodes.length && !authNodes.length) return;
 
   try {
     const user = await authStore.fetchSession();
     if (!user) return;
 
-    loginLink.hidden = true;
-    if (pilotLink) pilotLink.hidden = true;
-    dashboardLink.hidden = false;
-    if (adminLink) adminLink.hidden = user.role !== "admin";
+    guestNodes.forEach((el) => {
+      el.hidden = true;
+    });
+    authNodes.forEach((el) => {
+      el.hidden = false;
+    });
+    adminNodes.forEach((el) => {
+      el.hidden = user.role !== "admin";
+    });
+    if (logoutBtn) {
+      logoutBtn.hidden = false;
+      logoutBtn.addEventListener("click", async () => {
+        await authStore.logout();
+        window.location.reload();
+      });
+    }
   } catch {
-    // Oturum yoksa devam et
+    // Oturum yoksa misafir görünümünü koru
   }
 }
-
-export default {
-  initMobileMenu,
-  initAnchorNavigation,
-  initAuthNavigation
-};

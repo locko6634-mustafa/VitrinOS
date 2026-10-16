@@ -73,12 +73,14 @@ test("optik atölye tasarım sistemi ve hareket güvenliği tanımlıdır", asyn
 
 test("landing anlatısı ve responsive görsel sözleşmesi uygulanır", async () => {
   const html = await read("index.html");
-  assert.match(html, /AI destekli kreatif operasyon sistemi/);
-  assert.match(html, /Brief girer\. Marka aklı çalışır\. Görsel şekillenir\./);
+  assert.match(html, /Ne paylaşacağınızı yazın\./);
+  assert.match(html, /14 gün boyunca ücretsiz/i);
   assert.match(html, /id=["']uretim-hatti["']/);
-  assert.match(html, /hero-operations-1600\.avif/);
-  assert.match(html, /format-gallery-1440\.avif/);
-  assert.doesNotMatch(html, /loading=["']eager["'][^>]+format-gallery/i);
+  assert.match(html, /assets\/ad-hr\.webp/);
+  assert.match(html, /assets\/ad-post-4x5\.webp/);
+  assert.match(html, /assets\/ad-story-9x16\.webp/);
+  assert.match(html, /assets\/ad-banner-rev\.webp/);
+  assert.doesNotMatch(html, /loading=["']eager["'][^>]+ad-post-4x5/i);
 });
 
 test("auth yüzeylerinde kurgu müşteri kanıtı bulunmaz", async () => {
@@ -126,10 +128,16 @@ test("mobil command desk dört üretim adımını da görünür tutar", async ()
 
 test("yerel fontlar ve responsive üretim varlıkları yayın bütçesi içindedir", async () => {
   const assets = [
-    ["assets/hero-operations-960.avif", 60_000],
-    ["assets/hero-operations-1600.avif", 90_000],
-    ["assets/format-gallery-768.avif", 50_000],
-    ["assets/format-gallery-1440.avif", 90_000],
+    ["assets/ad-hr.webp", 90_000],
+    ["assets/ad-hr-rev.webp", 90_000],
+    ["assets/ad-agency.webp", 90_000],
+    ["assets/ad-agency-rev.webp", 90_000],
+    ["assets/ad-social.webp", 90_000],
+    ["assets/ad-social-rev.webp", 90_000],
+    ["assets/ad-banner.webp", 90_000],
+    ["assets/ad-banner-rev.webp", 90_000],
+    ["assets/ad-post-4x5.webp", 90_000],
+    ["assets/ad-story-9x16.webp", 90_000],
     ["assets/fonts/instrument-sans-latin.woff2", 60_000],
     ["assets/fonts/ibm-plex-mono-500-latin.woff2", 35_000]
   ];
@@ -161,8 +169,7 @@ test("sayfa stilleri named cascade layer icinde izole edilir", async () => {
 
 test("responsive hero preload gorsel secimiyle ayni kaynak setini kullanir", async () => {
   const html = await read("index.html");
-  assert.match(html, /<link[^>]+rel=["']preload["'][^>]+imagesrcset=["'][^"']*hero-operations-960\.avif[^"']*hero-operations-1600\.avif/);
-  assert.match(html, /<link[^>]+rel=["']preload["'][^>]+imagesizes=/);
+  assert.match(html, /<link[^>]+rel=["']preload["'][^>]+as=["']image["'][^>]+href=["']assets\/ad-hr\.webp["']/);
 });
 
 test("tum ana yuzeyler yeni VitrinOS faviconunu tasir", async () => {
