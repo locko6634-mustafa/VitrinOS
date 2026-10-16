@@ -24,7 +24,7 @@ test("ana sayfalar semantik yüzey sözleşmesini kullanır", async () => {
 
 test("form ve uygulama DOM hookları dönüşümden sonra korunur", async () => {
   const contracts = {
-    "index.html": ["navMenu", "navLinks", "navActions", "billingToggle"],
+    "index.html": ["navMenu", "navToggle", "navLinks", "navActions", "billingToggle"],
     "login.html": ["loginForm", "loginEmail", "loginPassword", "loginSubmitButton", "loginStatus"],
     "mfa-challenge.html": ["mfaChallengeForm", "mfaCode", "mfaStatus"],
     "mfa-setup.html": ["mfaSetupForm", "mfaCode", "mfaStatus", "mfaEnrollPanel"],
@@ -54,7 +54,6 @@ test("başvuru akışı WhatsApp üzerine taşınmıştır ve kişisel iletişim
   assert.match(html, /<svg[^>]+width=["']20["'][^>]+height=["']20["']/);
   assert.doesNotMatch(html, /id=["']leadForm["']/);
   assert.doesNotMatch(html, /id=["']basvuru["']/);
-  assert.doesNotMatch(html, /id=["']navToggle["']/);
 });
 
 test("optik atölye tasarım sistemi ve hareket güvenliği tanımlıdır", async () => {
@@ -74,10 +73,12 @@ test("optik atölye tasarım sistemi ve hareket güvenliği tanımlıdır", asyn
 
 test("landing anlatısı ve responsive görsel sözleşmesi uygulanır", async () => {
   const html = await read("index.html");
-  assert.match(html, /Markanızın kurallarıyla çalışan akıllı tasarım atölyeniz/);
-  assert.match(html, /hero-tech-workspace\.jpg/);
-  assert.match(html, /showcase-coffee-story\.jpg/);
-  assert.doesNotMatch(html, /loading=["']eager["'][^>]+showcase-coffee-story/i);
+  assert.match(html, /AI destekli kreatif operasyon sistemi/);
+  assert.match(html, /Brief girer\. Marka aklı çalışır\. Görsel şekillenir\./);
+  assert.match(html, /id=["']uretim-hatti["']/);
+  assert.match(html, /hero-operations-1600\.avif/);
+  assert.match(html, /format-gallery-1440\.avif/);
+  assert.doesNotMatch(html, /loading=["']eager["'][^>]+format-gallery/i);
 });
 
 test("auth yüzeylerinde kurgu müşteri kanıtı bulunmaz", async () => {

@@ -370,7 +370,6 @@ export async function initDashboardApp() {
   }
 
   function renderResult() {
-    const resultStatusChip = document.querySelector("#resultStatusChip");
     const job = state.currentJob;
     if (!job) {
       if (activeJobTitle) activeJobTitle.textContent = "-";
@@ -379,7 +378,6 @@ export async function initDashboardApp() {
       resultBrand.textContent = "-";
       resultHeadline.textContent = "Brief Girişi Bekleniyor";
       resultMeta.textContent = "Kreatif alan boş";
-      if (resultStatusChip) resultStatusChip.textContent = "Hazır";
       resultCreative.replaceChildren();
       if (approveButton) approveButton.hidden = true;
       if (reviseButton) reviseButton.hidden = true;
@@ -393,7 +391,6 @@ export async function initDashboardApp() {
     resultBrand.textContent = job.brand;
     resultHeadline.textContent = `${job.format} önizleme`;
     resultMeta.textContent = `${job.format} · ${statusLabel(job.status)}`;
-    if (resultStatusChip) resultStatusChip.textContent = statusLabel(job.status);
     resultCreative.dataset.format = job.format.toLowerCase().replace(" ", "-");
     resultCreative.dataset.status = job.status;
     resultCreative.replaceChildren();
@@ -539,37 +536,6 @@ export async function initDashboardApp() {
     }
   });
 
-  const fileChosenPill = document.querySelector("#fileChosenPill");
-  const fileChosenName = document.querySelector("#fileChosenName");
-  const fileClearBtn = document.querySelector("#fileClearBtn");
-  const quickChips = Array.from(document.querySelectorAll(".quick-chip"));
-  const briefTextArea = document.querySelector("#briefText");
-
-  quickChips.forEach((chip) => {
-    chip.addEventListener("click", () => {
-      if (!briefTextArea) return;
-      briefTextArea.value = chip.dataset.quick || "";
-      briefTextArea.focus();
-    });
-  });
-
-  sourceImageInput?.addEventListener("change", () => {
-    const file = sourceImageInput.files?.[0];
-    if (file && fileChosenPill && fileChosenName) {
-      fileChosenName.textContent = file.name;
-      fileChosenPill.hidden = false;
-    } else if (fileChosenPill) {
-      fileChosenPill.hidden = true;
-    }
-  });
-
-  fileClearBtn?.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (sourceImageInput) sourceImageInput.value = "";
-    if (fileChosenPill) fileChosenPill.hidden = true;
-  });
-
   dashboardRetryButton?.addEventListener("click", async () => {
     await fetchData();
     renderAll();
@@ -618,7 +584,6 @@ export async function initDashboardApp() {
 
       await fetchData();
       if (sourceImageInput) sourceImageInput.value = "";
-      if (fileChosenPill) fileChosenPill.hidden = true;
       setLoading(false);
       setStatus(briefStatus, "Üretim akışı başladı. Canlı durum güncellenecektir.");
       renderAll();

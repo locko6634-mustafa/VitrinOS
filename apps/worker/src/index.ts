@@ -167,7 +167,7 @@ async function workLoop(): Promise<void> {
       } else if (outbox.type === 'email') {
         await processEmail(outbox);
       } else {
-        throw new Error(`Desteklenmeyen outbox iş tipi: ${outbox.type}`);
+        throw new Error(`Desteklenmeyen outbox iÅŸ tipi: ${outbox.type}`);
       }
     } catch (error) {
       await handleFailure(outbox, error);

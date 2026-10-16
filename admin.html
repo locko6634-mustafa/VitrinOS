@@ -3,11 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Yönetim Paneli | VitrinOS Command Desk</title>
-    <meta name="description" content="VitrinOS markalar, kullanıcılar ve yapay zeka üretim operasyonları yönetim komuta merkezi.">
+    <title>Yönetim paneli | VitrinOS</title>
+    <meta name="description" content="VitrinOS markalar, kullanıcılar ve yapay zeka promptları yönetim paneli.">
     <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#0d0e12">
-    <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" fill="%230d0e12"/%3E%3Cpath d="M11 15h11l10 30 10-30h11L38 53H26L11 15Z" fill="%23ffffff"/%3E%3Cpath d="M46 42h9v9h-9z" fill="%23f46b22"/%3E%3C/svg%3E'>
+    <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" fill="%23f8f4ec"/%3E%3Cpath d="M11 15h11l10 30 10-30h11L38 53H26L11 15Z" fill="%231d1e22"/%3E%3Cpath d="M46 42h9v9h-9z" fill="%23f46b22"/%3E%3C/svg%3E'>
     <link rel="stylesheet" href="css/shared/fonts.css">
     <link rel="stylesheet" href="css/shared/base.css">
     <link rel="stylesheet" href="css/admin/admin.css">
@@ -16,744 +15,259 @@
     <a class="skip-link" href="#admin-main">İçeriğe geç</a>
 
     <div class="admin-shell" id="appShell">
-      <!-- ===================================================================
-           Admin Topbar (Üst Komuta Çubuğu)
-           =================================================================== -->
       <header class="admin-topbar">
-        <div class="topbar-left">
-          <button class="admin-nav-toggle" id="appMenuToggle" type="button" aria-expanded="false" aria-controls="dashboardNav" aria-label="Operasyon menüsünü aç">
-            <span class="bar" aria-hidden="true"></span>
-            <span class="bar" aria-hidden="true"></span>
-            <span class="bar" aria-hidden="true"></span>
-          </button>
+        <button class="admin-nav-toggle" id="appMenuToggle" type="button" aria-expanded="false" aria-controls="dashboardNav" aria-label="Menüyü aç">
+          <span class="bar" aria-hidden="true"></span>
+          <span class="bar" aria-hidden="true"></span>
+          <span class="bar" aria-hidden="true"></span>
+        </button>
 
-          <a class="brand app-brand" href="index.html" aria-label="VitrinOS ana sayfa">
-            <span class="brand-word">Vitrin</span><span class="brand-os">OS</span><sup class="brand-reg" aria-hidden="true">®</sup>
-          </a>
+        <a class="brand app-brand" href="index.html" aria-label="VitrinOS ana sayfa">
+          <span class="brand-word">Vitrin</span><span class="brand-os">OS</span><sup class="brand-reg" aria-hidden="true">®</sup>
+        </a>
 
-          <div class="topbar-badge" aria-label="Sistem ve mod göstergesi">
-            <span class="pulse-indicator" aria-hidden="true"></span>
-            <span class="badge-text">ADMIN COMMAND DESK</span>
-          </div>
+        <div class="admin-context" aria-label="Yönetim alanı">
+          <span>Admin</span>
+          <strong>Operasyon kontrol merkezi</strong>
         </div>
-
-        <div class="admin-context" aria-label="Aktif yönetici oturumu">
-          <div class="context-role-pill">
-            <svg class="context-icon" viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
-              <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1z" clip-rule="evenodd" />
-            </svg>
-            <span class="role-badge">YÖNETİCİ</span>
-            <span class="context-admin-name" id="adminContextUser">Admin Masası</span>
-          </div>
-        </div>
-
         <div class="app-topbar-actions">
-          <a class="button user-panel-link" href="dashboard.html">
-            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
-              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
-            <span>Kullanıcı Paneli</span>
-          </a>
-          <button class="button logout-button" type="button" data-admin-logout>
-            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
-              <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
-            </svg>
-            <span>Çıkış Yap</span>
-          </button>
+          <a class="admin-link-button" href="dashboard.html">Kullanıcı paneli</a>
+          <button class="button secondary compact-button" type="button" data-admin-logout>Çıkış yap</button>
         </div>
       </header>
 
-      <!-- ===================================================================
-           Admin Navigation Sidebar (Sol Komuta Rayı)
-           =================================================================== -->
-      <aside class="admin-sidebar" id="dashboardNav" aria-label="Yönetim navigasyonu">
-        <div class="admin-rail-intro">
-          <span class="rail-kicker">Creative Command Desk</span>
-          <strong class="rail-title">Operasyon Merkezi</strong>
-        </div>
+        <nav class="admin-sidebar" id="dashboardNav" aria-label="Yönetim menüsü">
+          <div class="admin-rail-intro">
+            <span>Creative command desk</span>
+            <strong>Operasyon merkezi</strong>
+          </div>
+          <nav class="admin-nav" aria-label="Operasyon bölümleri" role="tablist" aria-orientation="vertical">
+            <button class="admin-nav-button is-active" id="admin-tab-overview" type="button" role="tab" aria-controls="admin-panel-overview" aria-selected="true" tabindex="0" data-admin-tab="overview"><span>01</span>Kontrol merkezi</button>
+            <button class="admin-nav-button" id="admin-tab-brands" type="button" role="tab" aria-controls="admin-panel-brands" aria-selected="false" tabindex="-1" data-admin-tab="brands"><span>02</span>Markalar</button>
+            <button class="admin-nav-button" id="admin-tab-users" type="button" role="tab" aria-controls="admin-panel-users" aria-selected="false" tabindex="-1" data-admin-tab="users"><span>03</span>Kullanıcılar</button>
+            <button class="admin-nav-button" id="admin-tab-jobs" type="button" role="tab" aria-controls="admin-panel-jobs" aria-selected="false" tabindex="-1" data-admin-tab="jobs"><span>04</span>Job izleme</button>
+          </nav>
 
-        <nav class="admin-nav" aria-label="Operasyon bölümleri" role="tablist" aria-orientation="vertical">
-          <button class="admin-nav-button is-active" id="admin-tab-overview" type="button" role="tab" aria-controls="admin-panel-overview" aria-selected="true" tabindex="0" data-admin-tab="overview">
-            <span class="nav-tab-num">01</span>
-            <span class="nav-tab-label">Kontrol Merkezi</span>
-            <svg class="nav-tab-icon" viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
-              <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-            </svg>
-          </button>
-
-          <button class="admin-nav-button" id="admin-tab-brands" type="button" role="tab" aria-controls="admin-panel-brands" aria-selected="false" tabindex="-1" data-admin-tab="brands">
-            <span class="nav-tab-num">02</span>
-            <span class="nav-tab-label">Markalar & Prompt</span>
-            <svg class="nav-tab-icon" viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
-              <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clip-rule="evenodd" />
-            </svg>
-          </button>
-
-          <button class="admin-nav-button" id="admin-tab-users" type="button" role="tab" aria-controls="admin-panel-users" aria-selected="false" tabindex="-1" data-admin-tab="users">
-            <span class="nav-tab-num">03</span>
-            <span class="nav-tab-label">Kullanıcılar</span>
-            <svg class="nav-tab-icon" viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
-              <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-            </svg>
-          </button>
-
-          <button class="admin-nav-button" id="admin-tab-jobs" type="button" role="tab" aria-controls="admin-panel-jobs" aria-selected="false" tabindex="-1" data-admin-tab="jobs">
-            <span class="nav-tab-num">04</span>
-            <span class="nav-tab-label">Job & Üretim Takibi</span>
-            <svg class="nav-tab-icon" viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-            </svg>
-          </button>
+          <div class="app-rail-footer admin-sidebar-actions">
+            <a class="admin-nav-button" href="dashboard.html">
+              <span class="nav-icon" aria-hidden="true">←</span>
+              <span class="nav-text">Çalışma alanına dön</span>
+            </a>
+            <button class="admin-nav-button" type="button" data-admin-logout>
+              <span class="nav-icon" aria-hidden="true">🚪</span>
+              <span class="nav-text">Çıkış yap</span>
+            </button>
+          </div>
+          <div class="admin-sidebar-note">
+            <span>Canlı sistem</span>
+            <p>VitrinOS Canlı Otomasyon Sistemi için marka, kullanıcı ve üretim operasyonlarını yönetin.</p>
+          </div>
         </nav>
 
-        <div class="admin-sidebar-actions">
-          <a class="admin-action-link" href="dashboard.html">
-            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-              <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-            </svg>
-            <span>Kullanıcı Alanına Dön</span>
-          </a>
-          <button class="admin-action-link admin-logout-link" type="button" data-admin-logout>
-            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-              <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
-            </svg>
-            <span>Oturumu Kapat</span>
-          </button>
-        </div>
-
-        <div class="admin-sidebar-status">
-          <div class="status-header">
-            <span class="status-dot is-live" aria-hidden="true"></span>
-            <strong>Sistem Hattı Aktif</strong>
-          </div>
-          <p>VitrinOS canlı otomasyon motoru; PostgreSQL, n8n webhook hattı ve MinIO storage senkron çalışıyor.</p>
-        </div>
-      </aside>
-
-      <!-- Mobil Menü Karartma Perdesi (Scrim) -->
-      <button class="admin-menu-scrim" id="appMenuScrim" type="button" tabindex="-1" aria-label="Menüyü kapat" hidden></button>
-
-      <!-- ===================================================================
-           Admin Main Canvas (Ana Yönetim Yüzeyi)
-           =================================================================== -->
-      <main class="admin-main" id="admin-main">
-        <!-- Sayfa Başlığı ve Canlı Metrik Şeridi -->
-        <header class="admin-page-head">
-          <div class="head-text-group">
-            <p class="kicker">OPERASYON KONTROL MASASI</p>
-            <h1>Marka hafızası, kullanıcılar ve AI üretim hattı tek ekranda.</h1>
-          </div>
-
-          <!-- Canlı Metrik Sayaç Şeridi -->
-          <div class="admin-stat-strip" aria-label="Sistem özet sayaçları">
-            <div class="stat-pill">
-              <span class="stat-label">Toplam Marka</span>
-              <strong class="stat-value" id="statBrandCount">-</strong>
+        <main class="admin-main" id="admin-main">
+          <header class="admin-page-head">
+            <div>
+              <p class="kicker">Canlı operasyon paneli</p>
+              <h1>Marka, kullanıcı<br>ve job akışı tek masada.</h1>
             </div>
-            <div class="stat-pill">
-              <span class="stat-label">Kayıtlı Kullanıcı</span>
-              <strong class="stat-value" id="statUserCount">-</strong>
+            <p class="admin-note">Marka ayarları, kullanıcı yönetimi ve job akışı tek merkezden izlenir.</p>
+          </header>
+          <section class="admin-panel is-active" id="admin-panel-overview" role="tabpanel" aria-labelledby="admin-tab-overview" data-admin-panel="overview">
+            <div class="admin-split-grid">
+              <article class="admin-card"><div class="admin-card-head"><span>Son joblar</span><strong>Üretim kuyruğu</strong></div><div class="admin-list" id="recentJobs"></div></article>
+              <article class="admin-card"><div class="admin-card-head"><span>Son kullanıcılar</span><strong>Kullanıcı akışı</strong></div><div class="admin-list" id="recentUsers"></div></article>
             </div>
-            <div class="stat-pill">
-              <span class="stat-label">İşlenen Job</span>
-              <strong class="stat-value" id="statJobCount">-</strong>
+          </section>
+          <section class="admin-panel" id="admin-panel-brands" role="tabpanel" aria-labelledby="admin-tab-brands" data-admin-panel="brands" hidden>
+            <div class="admin-toolbar">
+              <label class="admin-search">
+                <span>Marka ara</span>
+                <input id="brandSearch" type="search" placeholder="Marka adı veya kullanıcı">
+              </label>
+              <label>
+                <span>Tema</span>
+                <select id="brandThemeFilter">
+                  <option value="all">Tümü</option>
+                  <option value="koyu">Koyu</option>
+                  <option value="acik">Açık</option>
+                </select>
+              </label>
+              <button class="button secondary compact-button" type="button" id="newBrandButton">Yeni marka</button>
             </div>
-            <div class="stat-pill stat-health">
-              <span class="stat-label">Motor Sağlığı</span>
-              <div class="stat-health-val">
-                <span class="health-dot" aria-hidden="true"></span>
-                <strong>%99.9 Canlı</strong>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <!-- =================================================================
-             Panel 01: Kontrol Merkezi (Overview)
-             ================================================================= -->
-        <section class="admin-panel is-active" id="admin-panel-overview" role="tabpanel" aria-labelledby="admin-tab-overview" data-admin-panel="overview">
-          <div class="admin-overview-grid">
-            <!-- Son Joblar Kartı -->
-            <article class="admin-card">
-              <div class="admin-card-head">
-                <div>
-                  <span class="card-kicker">Üretim Kuyruğu</span>
-                  <h2 class="card-title">Son İşlenen Joblar</h2>
+            <div class="admin-grid-with-detail">
+              <article class="admin-card admin-table-card">
+                <div class="admin-card-head">
+                  <span>Marka listesi</span>
+                  <strong id="brandCount">0 marka</strong>
                 </div>
-                <button class="button secondary compact-button" type="button" id="overviewViewAllJobs">Tüm Joblar</button>
-              </div>
-              <div class="admin-list" id="recentJobs" aria-label="Son joblar listesi">
-                <p class="admin-loading">Job verileri yükleniyor…</p>
-              </div>
-            </article>
-
-            <!-- Son Kullanıcılar Kartı -->
-            <article class="admin-card">
-              <div class="admin-card-head">
-                <div>
-                  <span class="card-kicker">Kullanıcı Akışı</span>
-                  <h2 class="card-title">Son Kayıtlı Kullanıcılar</h2>
+                <div class="admin-table-wrap">
+                  <table class="admin-table">
+                    <thead>
+                      <tr>
+                        <th><button type="button" data-sort-brands="name">Marka</button></th>
+                        <th>Kullanıcı</th>
+                        <th>Tema</th>
+                        <th><button type="button" data-sort-brands="formatCount">Format</button></th>
+                        <th><button type="button" data-sort-brands="updatedAt">Güncelleme</button></th>
+                      </tr>
+                    </thead>
+                    <tbody id="brandRows"></tbody>
+                  </table>
                 </div>
-                <button class="button secondary compact-button" type="button" id="overviewAddUser">Kullanıcı Ekle</button>
-              </div>
-              <div class="admin-list" id="recentUsers" aria-label="Son kullanıcılar listesi">
-                <p class="admin-loading">Kullanıcı verileri yükleniyor…</p>
-              </div>
-            </article>
-          </div>
+              </article>
 
-          <!-- Sistem Altyapı Bilgi Kartı -->
-          <article class="admin-card admin-info-card">
-            <div class="admin-card-head">
-              <div>
-                <span class="card-kicker">Altyapı & Orkestrasyon</span>
-                <h2 class="card-title">VitrinOS Self-Hosted Operasyon Mimarisi</h2>
-              </div>
-              <span class="badge-status-online">SİSTEM CANLI</span>
-            </div>
-            <div class="infra-grid">
-              <div class="infra-item">
-                <div class="infra-dot" aria-hidden="true"></div>
-                <div>
-                  <strong>PostgreSQL Veritabanı</strong>
-                  <span>Kullanıcı, marka hafızası ve audit logları tek bir transactional yapıda korunur.</span>
+              <form class="admin-card admin-form-card" id="brandForm" novalidate>
+                <div class="admin-card-head">
+                  <span>Marka detayı</span>
+                  <strong id="brandFormTitle">Marka seç</strong>
                 </div>
-              </div>
-              <div class="infra-item">
-                <div class="infra-dot" aria-hidden="true"></div>
-                <div>
-                  <strong>n8n Kreatif Orkestrasyon</strong>
-                  <span>VitrinOS_BASE ana hattı briefleri analiz edip Post, Story ve Banner workflowlarına dağıtır.</span>
-                </div>
-              </div>
-              <div class="infra-item">
-                <div class="infra-dot" aria-hidden="true"></div>
-                <div>
-                  <strong>MinIO / S3 Depolama</strong>
-                  <span>Üretilen tüm kreatif çıktılar güvenli `generated-assets` bucket'ında saklanır.</span>
-                </div>
-              </div>
-            </div>
-          </article>
-        </section>
-
-        <!-- =================================================================
-             Panel 02: Markalar & Prompt Yönetimi (Brands)
-             ================================================================= -->
-        <section class="admin-panel" id="admin-panel-brands" role="tabpanel" aria-labelledby="admin-tab-brands" data-admin-panel="brands" hidden>
-          <div class="admin-toolbar">
-            <label class="admin-search-field">
-              <span class="field-label">Marka Ara</span>
-              <div class="input-with-icon">
-                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                </svg>
-                <input id="brandSearch" type="search" placeholder="Marka adı veya e-posta ile ara...">
-              </div>
-            </label>
-
-            <label class="admin-filter-field">
-              <span class="field-label">Tema Filtresi</span>
-              <select id="brandThemeFilter">
-                <option value="all">Tüm Temalar</option>
-                <option value="koyu">Koyu Tema</option>
-                <option value="acik">Açık Tema</option>
-              </select>
-            </label>
-
-            <button class="button primary-glow-button" type="button" id="newBrandButton">
-              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-              </svg>
-              <span>Yeni Marka Ekle</span>
-            </button>
-          </div>
-
-          <div class="admin-grid-with-detail">
-            <!-- Marka Tablosu -->
-            <article class="admin-card admin-table-card">
-              <div class="admin-card-head">
-                <div>
-                  <span class="card-kicker">Kayıtlı Portföy</span>
-                  <h2 class="card-title">Marka Listesi</h2>
-                </div>
-                <strong class="count-badge" id="brandCount">0 marka</strong>
-              </div>
-              <div class="admin-table-wrap">
-                <table class="admin-table">
-                  <thead>
-                    <tr>
-                      <th scope="col"><button type="button" class="table-sort-btn" data-sort-brands="name">Marka Adı</button></th>
-                      <th scope="col">Kullanıcı / Sahip</th>
-                      <th scope="col">Tema</th>
-                      <th scope="col"><button type="button" class="table-sort-btn" data-sort-brands="formatCount">Format</button></th>
-                      <th scope="col"><button type="button" class="table-sort-btn" data-sort-brands="updatedAt">Son Güncelleme</button></th>
-                    </tr>
-                  </thead>
-                  <tbody id="brandRows">
-                    <tr><td colspan="5" class="table-loading">Markalar yükleniyor…</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </article>
-
-            <!-- Marka Düzenleme & Prompt Formu -->
-            <form class="admin-card admin-form-card" id="brandForm" novalidate>
-              <div class="admin-card-head">
-                <div>
-                  <span class="card-kicker">Marka Kimliği & Prompt Şablonları</span>
-                  <h2 class="card-title" id="brandFormTitle">Yeni Marka Tanımı</h2>
-                </div>
-                <button type="button" class="button secondary compact-button" id="resetBrandFormBtn">Formu Temizle</button>
-              </div>
-
-              <input type="hidden" id="brandId">
-
-              <div class="admin-form-section">
-                <h3 class="section-heading">Temel Marka Bilgileri</h3>
+                <input type="hidden" id="brandId">
                 <div class="admin-form-grid">
-                  <label class="form-field">
-                    <span class="field-label">Marka Adı <span class="required-star">*</span></span>
-                    <input id="brandName" type="text" placeholder="Örn: Acme Studio" required>
-                  </label>
-
-                  <label class="form-field">
-                    <span class="field-label">Logo URL</span>
-                    <input id="brandLogo" type="url" placeholder="https://example.com/logo.svg">
-                  </label>
-
-                  <label class="form-field">
-                    <span class="field-label">Web Sitesi</span>
-                    <input id="brandWebsite" type="url" placeholder="https://example.com">
-                  </label>
-
-                  <label class="form-field">
-                    <span class="field-label">Marka Sahibi</span>
-                    <select id="brandOwner">
-                      <option value="">Atanmamış</option>
-                    </select>
-                  </label>
-
-                  <label class="form-field">
-                    <span class="field-label">Tema Tercihi</span>
-                    <select id="brandTheme">
-                      <option value="koyu">Koyu Tema</option>
-                      <option value="acik">Açık Tema</option>
-                    </select>
-                  </label>
-
-                  <div class="form-field-color-group">
-                    <label class="form-field">
-                      <span class="field-label">Birincil Renk</span>
-                      <div class="color-input-wrapper">
-                        <input id="brandPrimary" type="color" value="#d9962a">
-                        <span class="color-val-preview" id="brandPrimaryPreview">#d9962a</span>
-                      </div>
-                    </label>
-
-                    <label class="form-field">
-                      <span class="field-label">İkincil Renk</span>
-                      <div class="color-input-wrapper">
-                        <input id="brandSecondary" type="color" value="#7a4f12">
-                        <span class="color-val-preview" id="brandSecondaryPreview">#7a4f12</span>
-                      </div>
-                    </label>
-                  </div>
+                  <label>Marka adı<input id="brandName" required></label>
+                  <label>Logo URL<input id="brandLogo" type="url"></label>
+                  <label>Web sitesi<input id="brandWebsite" type="url"></label>
+                  <label>Marka sahibi<select id="brandOwner"><option value="">Atanmamış</option></select></label>
+                  <label>Tema<select id="brandTheme"><option value="koyu">Koyu</option><option value="acik">Açık</option></select></label>
+                  <label>Birincil renk<input id="brandPrimary" type="color"></label>
+                  <label>İkincil renk<input id="brandSecondary" type="color"></label>
                 </div>
-
-                <label class="form-field full-width">
-                  <span class="field-label">Marka Tonu ve Kuralları</span>
-                  <textarea id="brandTone" rows="3" placeholder="Örn: Minimal, lüks, cesur, sans-serif tipografi, dinamik neon ışıklar..."></textarea>
-                </label>
-
-                <label class="form-field full-width">
-                  <span class="field-label">Yasaklı Kelimeler ve Kısıtlar</span>
-                  <input id="brandBanned" type="text" placeholder="Virgülle ayırın. Örn: ucuz, kalitesiz, acele, kampanya">
-                </label>
-              </div>
-
-              <!-- Prompt Akordeon Grubu -->
-              <div class="admin-form-section">
-                <h3 class="section-heading">Yapay Zeka Prompt Şablonları</h3>
-                <p class="section-desc">Brief analiz ve format üreticilerinin LLM prompt direktiflerini düzenleyin.</p>
+                <label>Marka tonu ve kuralları<textarea id="brandTone" rows="3"></textarea></label>
+                <label>Yasaklı kelimeler<input id="brandBanned" placeholder="virgül ile ayır"></label>
 
                 <div class="admin-prompt-accordion">
-                  <!-- Base Prompt -->
-                  <details class="prompt-details" open>
-                    <summary>
-                      <span class="summary-left">
-                        <span class="prompt-badge">ORCHESTRATOR</span>
-                        <strong>Base Prompt (Brief Analiz Ajanı)</strong>
-                      </span>
-                      <svg class="summary-chevron" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                      </svg>
-                    </summary>
+                  <details class="prompt-details">
+                    <summary>Base Prompt (Brief Analiz Ajanı)</summary>
                     <div class="prompt-content">
-                      <div class="prompt-toolbar">
-                        <span>Brief ayrıştırma ve format yönlendirme promptu:</span>
-                        <button type="button" data-copy-template="base_prompt" class="admin-row-button compact">Şablonu Kopyala</button>
-                      </div>
-                      <textarea id="basePrompt" class="code-textarea" rows="4" placeholder="Brief analiz prompt şablonu..."></textarea>
+                      <label>Brief Analiz Prompt Şablonu
+                        <textarea id="basePrompt" rows="4"></textarea>
+                        <button type="button" data-copy-template="base_prompt" class="admin-row-button">Şablonu Kopyala</button>
+                      </label>
                     </div>
                   </details>
                   
-                  <!-- Story Prompt -->
                   <details class="prompt-details">
-                    <summary>
-                      <span class="summary-left">
-                        <span class="prompt-badge format-story">9:16</span>
-                        <strong>Story Prompts (Instagram / TikTok)</strong>
-                      </span>
-                      <svg class="summary-chevron" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                      </svg>
-                    </summary>
+                    <summary>Story (Dikey 9:16) Prompts</summary>
                     <div class="prompt-content">
-                      <div class="prompt-item">
-                        <div class="prompt-toolbar">
-                          <span>Story Metin Oluşturucu:</span>
-                          <button type="button" data-copy-template="story_text_prompt" class="admin-row-button compact">Şablonu Kopyala</button>
-                        </div>
-                        <textarea id="storyTextPrompt" class="code-textarea" rows="3" placeholder="Story metin promptu..."></textarea>
-                      </div>
-                      <div class="prompt-item">
-                        <div class="prompt-toolbar">
-                          <span>Story Arka Plan Oluşturucu:</span>
-                          <button type="button" data-copy-template="story_bg_prompt" class="admin-row-button compact">Şablonu Kopyala</button>
-                        </div>
-                        <textarea id="storyBgPrompt" class="code-textarea" rows="3" placeholder="Story arka plan promptu..."></textarea>
-                      </div>
-                      <div class="prompt-item">
-                        <div class="prompt-toolbar">
-                          <span>Story Görsel Entegrasyon:</span>
-                          <button type="button" data-copy-template="story_img_prompt" class="admin-row-button compact">Şablonu Kopyala</button>
-                        </div>
-                        <textarea id="storyImgPrompt" class="code-textarea" rows="3" placeholder="Story görsel entegrasyon promptu..."></textarea>
-                      </div>
+                      <label>Story Metin Oluşturucu<textarea id="storyTextPrompt" rows="3"></textarea><button type="button" data-copy-template="story_text_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                      <label>Story Arka Plan Oluşturucu<textarea id="storyBgPrompt" rows="3"></textarea><button type="button" data-copy-template="story_bg_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                      <label>Story Görsel Entegrasyon<textarea id="storyImgPrompt" rows="3"></textarea><button type="button" data-copy-template="story_img_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
                     </div>
                   </details>
                   
-                  <!-- Banner Prompt -->
                   <details class="prompt-details">
-                    <summary>
-                      <span class="summary-left">
-                        <span class="prompt-badge format-banner">YATAY</span>
-                        <strong>Banner Prompts (Web & E-Ticaret)</strong>
-                      </span>
-                      <svg class="summary-chevron" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                      </svg>
-                    </summary>
+                    <summary>Banner (Yatay) Prompts</summary>
                     <div class="prompt-content">
-                      <div class="prompt-item">
-                        <div class="prompt-toolbar">
-                          <span>Banner Metin Oluşturucu:</span>
-                          <button type="button" data-copy-template="banner_text_prompt" class="admin-row-button compact">Şablonu Kopyala</button>
-                        </div>
-                        <textarea id="bannerTextPrompt" class="code-textarea" rows="3" placeholder="Banner metin promptu..."></textarea>
-                      </div>
-                      <div class="prompt-item">
-                        <div class="prompt-toolbar">
-                          <span>Banner Arka Plan Oluşturucu:</span>
-                          <button type="button" data-copy-template="banner_bg_prompt" class="admin-row-button compact">Şablonu Kopyala</button>
-                        </div>
-                        <textarea id="bannerBgPrompt" class="code-textarea" rows="3" placeholder="Banner arka plan promptu..."></textarea>
-                      </div>
-                      <div class="prompt-item">
-                        <div class="prompt-toolbar">
-                          <span>Banner Görsel Entegrasyon:</span>
-                          <button type="button" data-copy-template="banner_img_prompt" class="admin-row-button compact">Şablonu Kopyala</button>
-                        </div>
-                        <textarea id="bannerImgPrompt" class="code-textarea" rows="3" placeholder="Banner görsel promptu..."></textarea>
-                      </div>
+                      <label>Banner Metin Oluşturucu<textarea id="bannerTextPrompt" rows="3"></textarea><button type="button" data-copy-template="banner_text_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                      <label>Banner Arka Plan Oluşturucu<textarea id="bannerBgPrompt" rows="3"></textarea><button type="button" data-copy-template="banner_bg_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                      <label>Banner Görsel Entegrasyon<textarea id="bannerImgPrompt" rows="3"></textarea><button type="button" data-copy-template="banner_img_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
                     </div>
                   </details>
 
-                  <!-- Meta Post Prompt -->
                   <details class="prompt-details">
-                    <summary>
-                      <span class="summary-left">
-                        <span class="prompt-badge format-meta">1:1 / 4:5</span>
-                        <strong>Meta Post Prompts (Instagram / Facebook)</strong>
-                      </span>
-                      <svg class="summary-chevron" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                      </svg>
-                    </summary>
+                    <summary>Meta Post (Kare/Dikey) Prompts</summary>
                     <div class="prompt-content">
-                      <div class="prompt-item">
-                        <div class="prompt-toolbar">
-                          <span>Meta Post Metin Oluşturucu:</span>
-                          <button type="button" data-copy-template="meta_post_text_prompt" class="admin-row-button compact">Şablonu Kopyala</button>
-                        </div>
-                        <textarea id="metaPostTextPrompt" class="code-textarea" rows="3" placeholder="Meta post metin promptu..."></textarea>
-                      </div>
-                      <div class="prompt-item">
-                        <div class="prompt-toolbar">
-                          <span>Meta Post Arka Plan Oluşturucu:</span>
-                          <button type="button" data-copy-template="meta_post_bg_prompt" class="admin-row-button compact">Şablonu Kopyala</button>
-                        </div>
-                        <textarea id="metaPostBgPrompt" class="code-textarea" rows="3" placeholder="Meta post arka plan promptu..."></textarea>
-                      </div>
-                      <div class="prompt-item">
-                        <div class="prompt-toolbar">
-                          <span>Meta Post Görsel Entegrasyon:</span>
-                          <button type="button" data-copy-template="meta_post_img_prompt" class="admin-row-button compact">Şablonu Kopyala</button>
-                        </div>
-                        <textarea id="metaPostImgPrompt" class="code-textarea" rows="3" placeholder="Meta post görsel promptu..."></textarea>
-                      </div>
+                      <label>Meta Post Metin Oluşturucu<textarea id="metaPostTextPrompt" rows="3"></textarea><button type="button" data-copy-template="meta_post_text_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                      <label>Meta Post Arka Plan Oluşturucu<textarea id="metaPostBgPrompt" rows="3"></textarea><button type="button" data-copy-template="meta_post_bg_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
+                      <label>Meta Post Görsel Entegrasyon<textarea id="metaPostImgPrompt" rows="3"></textarea><button type="button" data-copy-template="meta_post_img_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
                     </div>
                   </details>
 
-                  <!-- Revize Prompt -->
                   <details class="prompt-details">
-                    <summary>
-                      <span class="summary-left">
-                        <span class="prompt-badge format-revize">REVISION</span>
-                        <strong>Revizyon Ajanı (Görsel Düzenleme)</strong>
-                      </span>
-                      <svg class="summary-chevron" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                      </svg>
-                    </summary>
+                    <summary>Revizyon (Görsel Düzenleme) Prompt</summary>
                     <div class="prompt-content">
-                      <div class="prompt-toolbar">
-                        <span>Görsel Revize Ajan Direktifleri:</span>
-                        <button type="button" data-copy-template="revize_prompt" class="admin-row-button compact">Şablonu Kopyala</button>
-                      </div>
-                      <textarea id="revizePrompt" class="code-textarea" rows="4" placeholder="Revizyon ajanı prompt direktifleri..."></textarea>
+                      <label>Görsel Revize Ajanı<textarea id="revizePrompt" rows="4"></textarea><button type="button" data-copy-template="revize_prompt" class="admin-row-button">Şablonu Kopyala</button></label>
                     </div>
                   </details>
                 </div>
-              </div>
-
-              <div class="form-actions-bar">
-                <button class="button primary primary-action-btn" type="submit">
-                  <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                  </svg>
-                  <span>Marka ve Prompt Ayarlarını Kaydet</span>
-                </button>
+                <button class="button primary" type="submit">Marka ayarlarını güncelle</button>
                 <p class="form-status" id="brandStatus" role="status" aria-live="polite"></p>
-              </div>
-            </form>
-          </div>
-        </section>
-
-        <!-- =================================================================
-             Panel 03: Kullanıcılar (Users)
-             ================================================================= -->
-        <section class="admin-panel" id="admin-panel-users" role="tabpanel" aria-labelledby="admin-tab-users" data-admin-panel="users" hidden>
-          <div class="admin-toolbar">
-            <label class="admin-search-field">
-              <span class="field-label">Kullanıcı Ara</span>
-              <div class="input-with-icon">
-                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                </svg>
-                <input id="userSearch" type="search" placeholder="E-posta veya kullanıcı adı ile ara...">
-              </div>
-            </label>
-
-            <label class="admin-filter-field">
-              <span class="field-label">Durum Filtresi</span>
-              <select id="userStatusFilter">
-                <option value="all">Tüm Durumlar</option>
-                <option value="active">Aktif Kullanıcılar</option>
-                <option value="suspended">Askıya Alınanlar</option>
-              </select>
-            </label>
-
-            <button class="button primary-glow-button" type="button" id="addUserButton">
-              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-              </svg>
-              <span>Yeni Kullanıcı Ekle</span>
-            </button>
-          </div>
-
-          <article class="admin-card admin-table-card">
-            <div class="admin-card-head">
-              <div>
-                <span class="card-kicker">Erişim & Yetkilendirme</span>
-                <h2 class="card-title">Kullanıcı Yönetim Tablosu</h2>
-              </div>
-              <strong class="count-badge" id="userCount">0 kullanıcı</strong>
+              </form>
             </div>
+          </section>
 
-            <div class="admin-table-wrap">
-              <table class="admin-table">
-                <thead>
-                  <tr>
-                    <th scope="col">E-posta</th>
-                    <th scope="col">Bağlı Markalar</th>
-                    <th scope="col">Üretilen Job</th>
-                    <th scope="col">Son Giriş</th>
-                    <th scope="col">Durum</th>
-                    <th scope="col" class="th-actions">Aksiyonlar</th>
-                  </tr>
-                </thead>
-                <tbody id="userRows">
-                  <tr><td colspan="6" class="table-loading">Kullanıcılar yükleniyor…</td></tr>
-                </tbody>
-              </table>
+          <section class="admin-panel" id="admin-panel-users" role="tabpanel" aria-labelledby="admin-tab-users" data-admin-panel="users" hidden>
+            <div class="admin-toolbar">
+              <label class="admin-search"><span>Kullanıcı ara</span><input id="userSearch" type="search" placeholder="e-posta veya marka"></label>
+              <label><span>Durum</span><select id="userStatusFilter"><option value="all">Tümü</option><option value="active">Aktif</option><option value="suspended">Askıda</option></select></label>
+              <button class="button secondary compact-button" type="button" id="addUserButton">Kullanıcı ekle</button>
             </div>
-          </article>
-        </section>
-
-        <!-- =================================================================
-             Panel 04: Job İzleme (Jobs)
-             ================================================================= -->
-        <section class="admin-panel" id="admin-panel-jobs" role="tabpanel" aria-labelledby="admin-tab-jobs" data-admin-panel="jobs" hidden>
-          <div class="admin-toolbar">
-            <label class="admin-filter-field">
-              <span class="field-label">Marka Filtresi</span>
-              <select id="jobBrandFilter">
-                <option value="all">Tüm Markalar</option>
-              </select>
-            </label>
-
-            <label class="admin-filter-field">
-              <span class="field-label">Format Filtresi</span>
-              <select id="jobFormatFilter">
-                <option value="all">Tüm Formatlar</option>
-                <option value="Banner">Banner (Yatay)</option>
-                <option value="Meta Post">Meta Post (Kare/Dikey)</option>
-                <option value="Story">Story (9:16)</option>
-              </select>
-            </label>
-
-            <label class="admin-filter-field">
-              <span class="field-label">Durum Filtresi</span>
-              <select id="jobStatusFilter">
-                <option value="all">Tüm Durumlar</option>
-                <option value="queued">Sırada (Queued)</option>
-                <option value="dispatching">Gönderiliyor (Dispatching)</option>
-                <option value="processing">Üretiliyor (Processing)</option>
-                <option value="succeeded">Tamamlandı (Succeeded)</option>
-                <option value="approved">Onaylandı (Approved)</option>
-                <option value="failed_retryable">Yeniden Denenecek</option>
-                <option value="failed_terminal">Başarısız (Terminal)</option>
-                <option value="cancelled">İptal Edildi</option>
-              </select>
-            </label>
-          </div>
-
-          <div class="admin-grid-with-detail">
-            <!-- Job Listesi -->
             <article class="admin-card admin-table-card">
-              <div class="admin-card-head">
-                <div>
-                  <span class="card-kicker">Üretim Hattı Denetimi</span>
-                  <h2 class="card-title">Canlı Job Kuyruğu</h2>
-                </div>
-                <strong class="count-badge" id="jobCount">0 job</strong>
-              </div>
+              <div class="admin-card-head"><span>Kullanıcı yönetimi</span><strong id="userCount">0 kullanıcı</strong></div>
               <div class="admin-table-wrap">
                 <table class="admin-table">
-                  <thead>
-                    <tr>
-                      <th scope="col"><button type="button" class="table-sort-btn" data-sort-jobs="id">Job ID</button></th>
-                      <th scope="col">Marka</th>
-                      <th scope="col">Format</th>
-                      <th scope="col"><button type="button" class="table-sort-btn" data-sort-jobs="status">Durum</button></th>
-                      <th scope="col">Revizyon</th>
-                      <th scope="col"><button type="button" class="table-sort-btn" data-sort-jobs="createdAt">Oluşturma Tarihi</button></th>
-                    </tr>
-                  </thead>
-                  <tbody id="jobRows">
-                    <tr><td colspan="6" class="table-loading">Job kuyruğu yükleniyor…</td></tr>
-                  </tbody>
+                  <thead><tr><th>E-posta</th><th>Marka</th><th>Job</th><th>Son giriş</th><th>Durum</th><th>Aksiyon</th></tr></thead>
+                  <tbody id="userRows"></tbody>
                 </table>
               </div>
             </article>
+          </section>
 
-            <!-- Job Detay Bölümü -->
-            <aside class="admin-card admin-detail" id="jobDetail" tabindex="-1" aria-live="polite">
-              <div class="admin-card-head">
-                <div>
-                  <span class="card-kicker">Seçili Job Detayı</span>
-                  <h2 class="card-title">Job İnceleme</h2>
+          <section class="admin-panel" id="admin-panel-jobs" role="tabpanel" aria-labelledby="admin-tab-jobs" data-admin-panel="jobs" hidden>
+            <div class="admin-toolbar">
+              <label><span>Marka</span><select id="jobBrandFilter"><option value="all">Tümü</option></select></label>
+              <label><span>Format</span><select id="jobFormatFilter"><option value="all">Tümü</option><option value="Banner">Banner</option><option value="Meta Post">Meta Post</option><option value="Story">Story</option></select></label>
+              <label><span>Durum</span><select id="jobStatusFilter"><option value="all">Tümü</option><option value="queued">Sırada</option><option value="dispatching">Gönderiliyor</option><option value="processing">Üretiliyor</option><option value="succeeded">Tamamlandı</option><option value="approved">Onaylandı</option><option value="failed_retryable">Yeniden denenecek</option><option value="failed_terminal">Başarısız</option><option value="cancelled">İptal edildi</option></select></label>
+            </div>
+            <div class="admin-grid-with-detail">
+              <article class="admin-card admin-table-card">
+                <div class="admin-card-head"><span>Job izleme</span><strong id="jobCount">0 job</strong></div>
+                <div class="admin-table-wrap">
+                  <table class="admin-table">
+                    <thead>
+                      <tr>
+                        <th><button type="button" data-sort-jobs="id">Job ID</button></th>
+                        <th>Marka</th>
+                        <th>Format</th>
+                        <th><button type="button" data-sort-jobs="status">Durum</button></th>
+                        <th>Revizyon</th>
+                        <th><button type="button" data-sort-jobs="createdAt">Tarih</button></th>
+                      </tr>
+                    </thead>
+                    <tbody id="jobRows"></tbody>
+                  </table>
                 </div>
-              </div>
-              <div class="job-detail-placeholder">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="36" height="36" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                </svg>
-                <p>İncelemek istediğiniz job'ın detaylarını görüntülemek için soldaki tablodan bir satıra tıklayın.</p>
-              </div>
-            </aside>
-          </div>
-        </section>
-      </main>
+              </article>
+              <aside class="admin-card admin-detail" id="jobDetail" tabindex="-1" aria-live="polite">
+                <div class="admin-card-head"><span>Job detayı</span><strong>Seçim bekliyor</strong></div>
+                <p class="admin-empty">Tablodan bir job seç.</p>
+              </aside>
+            </div>
+          </section>
+        </main>
     </div>
 
-    <!-- ===================================================================
-         Diyaloglar (Dialog & Modal Windows)
-         =================================================================== -->
-    <!-- Operasyon Onay Diyaloğu -->
     <dialog class="admin-dialog" id="adminConfirmDialog" aria-labelledby="adminConfirmTitle" aria-describedby="adminConfirmMessage">
-      <form method="dialog" class="dialog-card">
-        <div class="dialog-icon-badge danger" aria-hidden="true">
-          <svg viewBox="0 0 20 20" fill="currentColor" width="22" height="22">
-            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-          </svg>
-        </div>
-        <div class="dialog-head">
-          <p class="kicker">OPERASYONEL ONAY</p>
-          <h2 id="adminConfirmTitle">İşlemi Onaylayın</h2>
-          <p id="adminConfirmMessage" class="dialog-desc"></p>
-        </div>
+      <form method="dialog">
+        <p class="kicker">Operasyon onayı</p>
+        <h2 id="adminConfirmTitle">İşlemi onayla</h2>
+        <p id="adminConfirmMessage"></p>
         <div class="admin-dialog-actions">
           <button class="button secondary" type="submit" value="cancel">Vazgeç</button>
-          <button class="button danger-button" id="adminConfirmButton" type="submit" value="confirm">Evet, Onayla</button>
+          <button class="button primary" id="adminConfirmButton" type="submit" value="confirm">Onayla</button>
         </div>
       </form>
     </dialog>
 
-    <!-- Yeni Kullanıcı Ekleme Diyaloğu -->
     <dialog class="admin-dialog" id="adminUserDialog" aria-labelledby="adminUserTitle">
-      <form method="dialog" id="adminUserForm" class="dialog-card">
-        <div class="dialog-head">
-          <p class="kicker">KULLANICI ERİŞİMİ</p>
-          <h2 id="adminUserTitle">Yeni Kullanıcı Hesabı Ekle</h2>
-          <p class="dialog-desc">Sisteme yeni bir standart kullanıcı veya operasyon yöneticisi tanımlayın.</p>
-        </div>
-
-        <div class="dialog-body-fields">
-          <label class="form-field">
-            <span class="field-label">Ad Soyad <span class="required-star">*</span></span>
-            <input id="adminUserName" type="text" autocomplete="name" placeholder="Örn: Ahmet Yılmaz" required>
-          </label>
-
-          <label class="form-field">
-            <span class="field-label">E-posta Adresi <span class="required-star">*</span></span>
-            <input id="adminUserEmail" type="email" autocomplete="email" placeholder="kullanici@marka.com" required>
-          </label>
-
-          <label class="form-field">
-            <span class="field-label">Başlangıç Parolası <span class="required-star">*</span></span>
-            <input id="adminUserPassword" type="password" autocomplete="new-password" placeholder="En az 6 karakter" minlength="6" required>
-          </label>
-
-          <label class="form-field">
-            <span class="field-label">Kullanıcı Rolü</span>
-            <select id="adminUserRole">
-              <option value="user" selected>Standart Kullanıcı (Müşteri Workspace)</option>
-              <option value="admin">Sistem Yöneticisi (Admin Access)</option>
-            </select>
-          </label>
-        </div>
-
+      <form method="dialog" id="adminUserForm">
+        <p class="kicker">Kullanıcı yönetimi</p>
+        <h2 id="adminUserTitle">Yeni kullanıcı ekle</h2>
+        <label>Ad Soyad<input id="adminUserName" autocomplete="name" placeholder="Örn: Ahmet Yılmaz" required></label>
+        <label>E-posta adresi<input id="adminUserEmail" type="email" autocomplete="email" placeholder="kullanici@ornek.com" required></label>
+        <label>Parola<input id="adminUserPassword" type="password" autocomplete="new-password" placeholder="En az 6 karakter" minlength="6" required></label>
+        <label>Rol
+          <select id="adminUserRole">
+            <option value="user" selected>Kullanıcı (Standart)</option>
+            <option value="admin">Yönetici (Admin)</option>
+          </select>
+        </label>
         <div class="admin-dialog-actions">
           <button class="button secondary" type="submit" value="cancel" formnovalidate>Vazgeç</button>
-          <button class="button primary" type="submit" value="confirm">Kullanıcıyı Kaydet</button>
+          <button class="button primary" type="submit" value="confirm">Kullanıcıyı kaydet</button>
         </div>
       </form>
     </dialog>
 
-    <!-- Bildirim Bölgesi (Toast Region) -->
     <div class="toast-region" id="adminToastRegion" role="status" aria-live="polite" aria-atomic="false"></div>
 
     <script type="module" src="js/shared/observability.js"></script>

@@ -3,11 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>VitrinOS Command Desk | Kreatif Stüdyo & Operasyon</title>
-    <meta name="description" content="VitrinOS kreatif operasyon masası; brief, yapay zeka üretim takibi, görsel onayı, revizyon ve marka hafızasını tek stüdyo yüzeyinde toplar.">
+    <title>VitrinOS Command Desk | Kreatif operasyon</title>
+    <meta name="description" content="VitrinOS kreatif operasyon masası; brief, üretim takibi, görsel onayı, revizyon ve operasyon geçmişini tek yüzeyde toplar.">
     <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#0d0e12">
-    <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" fill="%230d0e12"/%3E%3Cpath d="M11 15h11l10 30 10-30h11L38 53H26L11 15Z" fill="%23ffffff"/%3E%3Cpath d="M46 42h9v9h-9z" fill="%23f46b22"/%3E%3C/svg%3E'>
+    <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" fill="%23f8f4ec"/%3E%3Cpath d="M11 15h11l10 30 10-30h11L38 53H26L11 15Z" fill="%231d1e22"/%3E%3Cpath d="M46 42h9v9h-9z" fill="%23f46b22"/%3E%3C/svg%3E'>
     <link rel="stylesheet" href="css/shared/fonts.css">
     <link rel="stylesheet" href="css/shared/base.css">
     <link rel="stylesheet" href="css/dashboard/dashboard.css">
@@ -16,620 +15,244 @@
     <a class="skip-link" href="#app-main">İçeriğe geç</a>
 
     <div class="app-shell" id="appShell">
-      <!-- ===================================================================
-           Studio Topbar (Üst Bar)
-           =================================================================== -->
       <header class="app-topbar">
-        <div class="topbar-left">
-          <a class="brand" href="index.html" aria-label="VitrinOS ana sayfa">
-            <span class="brand-word">Vitrin</span><span class="brand-os">OS</span><sup aria-hidden="true">®</sup>
-          </a>
-          <div class="topbar-badge" aria-label="Stüdyo sürüm ve mod">
-            <span class="pulse-indicator" aria-hidden="true"></span>
-            <span class="badge-text">STUDIO DESK</span>
-          </div>
+        <a class="brand" href="index.html" aria-label="VitrinOS ana sayfa">
+          <span class="brand-word">Vitrin</span><span class="brand-os">OS</span><sup aria-hidden="true">®</sup>
+        </a>
+        <div class="app-context">
+          <span id="appContextBrand">-</span>
+          <strong id="appContextUser">-</strong>
         </div>
-
-        <div class="app-context" aria-label="Aktif marka ve kullanıcı oturumu">
-          <div class="context-brand-pill">
-            <svg class="context-icon" viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
-              <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1z" clip-rule="evenodd" />
-            </svg>
-            <span class="context-label">Marka:</span>
-            <strong id="appContextBrand">-</strong>
-          </div>
-          <div class="context-user-pill">
-            <svg class="context-icon" viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
-              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-            </svg>
-            <span id="appContextUser">-</span>
-          </div>
-        </div>
-
         <div class="app-actions">
-          <a class="button admin-panel-link" id="adminPanelLink" href="admin.html" hidden>
-            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
-              <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
-            </svg>
-            <span>Admin Paneli</span>
-          </a>
-          <button class="button logout-button" id="logoutButton" type="button" data-dashboard-logout>
-            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
-              <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
-            </svg>
-            <span>Çıkış</span>
-          </button>
+          <a class="button secondary compact-button admin-panel-link" id="adminPanelLink" href="admin.html" hidden>Admin paneli</a>
+          <button class="button secondary compact-button" id="logoutButton" type="button" data-dashboard-logout>Çıkış</button>
         </div>
-
         <button class="app-menu-toggle" id="appMenuToggle" type="button" aria-label="Çalışma alanı menüsünü aç" aria-controls="dashboardNav" aria-expanded="false">
-          <span class="toggle-bar"></span>
-          <span class="toggle-bar"></span>
-          <span class="toggle-bar"></span>
+          <span></span>
+          <span></span>
+          <span></span>
         </button>
       </header>
 
-      <!-- ===================================================================
-           Studio Workspace Layout (Sidebar Rail + Main Content)
-           =================================================================== -->
       <div class="app-workspace" id="appMain">
-        <!-- Sidebar Navigation Rail -->
         <aside class="app-rail" id="dashboardNav" aria-label="Creative Command Desk navigasyonu">
           <div class="rail-intro">
-            <span class="rail-intro-kicker">Kreatif Komuta Masası</span>
-            <strong class="rail-intro-title">Üretim Stüdyosu</strong>
+            <span>Creative command desk</span>
+            <strong>Üretim merkezi</strong>
           </div>
-
           <nav class="app-tabs" id="appTabs" role="tablist" aria-label="Çalışma alanı bölümleri" aria-orientation="vertical">
-            <button class="tab-button is-active" id="tab-brief" type="button" role="tab" tabindex="0" aria-selected="true" aria-controls="panel-brief" data-tab="brief">
-              <span class="tab-index">01</span>
-              <span class="tab-label">Brief Masası</span>
-              <svg class="tab-indicator-icon" viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
-                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-              </svg>
-            </button>
-            <button class="tab-button" id="tab-overview" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-overview" data-tab="overview">
-              <span class="tab-index">02</span>
-              <span class="tab-label">Operasyon</span>
-              <svg class="tab-indicator-icon" viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
-                <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-              </svg>
-            </button>
-            <button class="tab-button" id="tab-assets" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-assets" data-tab="assets">
-              <span class="tab-index">03</span>
-              <span class="tab-label">Görseller</span>
-              <svg class="tab-indicator-icon" viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
-                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
-              </svg>
-            </button>
-            <button class="tab-button" id="tab-history" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-history" data-tab="history">
-              <span class="tab-index">04</span>
-              <span class="tab-label">Geçmiş</span>
-              <svg class="tab-indicator-icon" viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-              </svg>
-            </button>
-            <button class="tab-button" id="tab-settings" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-settings" data-tab="settings">
-              <span class="tab-index">05</span>
-              <span class="tab-label">Marka Hafızası</span>
-              <svg class="tab-indicator-icon" viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-              </svg>
-            </button>
+            <button class="tab-button is-active" id="tab-brief" type="button" role="tab" tabindex="0" aria-selected="true" aria-controls="panel-brief" data-tab="brief"><span>01</span>Brief masası</button>
+            <button class="tab-button" id="tab-overview" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-overview" data-tab="overview"><span>02</span>Operasyon</button>
+            <button class="tab-button" id="tab-assets" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-assets" data-tab="assets"><span>03</span>Görseller</button>
+            <button class="tab-button" id="tab-history" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-history" data-tab="history"><span>04</span>Geçmiş</button>
+            <button class="tab-button" id="tab-settings" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="panel-settings" data-tab="settings"><span>05</span>Marka hafızası</button>
           </nav>
-
           <div class="rail-account-actions">
-            <a class="rail-admin-link" id="mobileAdminPanelLink" href="admin.html" hidden>
-              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
-              </svg>
-              <span>Admin paneline geç</span>
-            </a>
-            <button type="button" class="rail-logout-btn" id="mobileLogoutButton" data-dashboard-logout>
-              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
-              </svg>
-              <span>Oturumu kapat</span>
-            </button>
+            <a class="rail-admin-link" id="mobileAdminPanelLink" href="admin.html" hidden>Admin paneline geç</a>
+            <button type="button" id="mobileLogoutButton" data-dashboard-logout>Oturumu kapat</button>
           </div>
-
           <div class="rail-foot">
-            <div class="foot-status">
-              <span class="status-dot is-live" aria-hidden="true"></span>
-              <div>
-                <strong>Operasyon Hattı Canlı</strong>
-                <small>SSE senkronizasyonu aktif</small>
-              </div>
-            </div>
+            <span class="status-dot" aria-hidden="true"></span>
+            <div><strong>Operasyon hattı</strong><small>Durumlar canlı veriden okunur</small></div>
           </div>
         </aside>
 
-        <!-- Mobil Menü Arka Plan Perdesi (Scrim) -->
         <button class="app-menu-scrim" id="appMenuScrim" type="button" tabindex="-1" aria-label="Menüyü kapat" hidden></button>
 
-        <!-- Ana Çalışma Yüzeyi (Main Canvas) -->
         <main class="app-main" id="app-main">
-          <!-- Command Bar (Karşılama ve Canlı Akış Sinyali) -->
           <section class="app-command-bar" aria-labelledby="appTitle">
-            <div class="command-bar-content">
-              <div class="command-kicker">
-                <span class="kicker-tag">VİTRİNOS CREATIVE DESK</span>
-                <span class="kicker-sub">YAPAY ZEKA ATÖLYESİ</span>
-              </div>
-              <h1 id="appTitle">Brief Gir. Hattı İzle. Çıktıyı Yönet.</h1>
-              <p>Yeni görsel talebinizi tanımlayın, yapay zeka render sürecini canlı takip edin ve sonucu aynı masada onaylayın.</p>
+            <div>
+              <p class="kicker">Kreatif operasyon / çalışma alanı</p>
+              <h1 id="appTitle">Brief gir. Hattı izle. Çıktıyı yönet.</h1>
+              <p>Yeni üretim emrini kur, aktif işi izle ve görsel hazır olduğunda aynı masada onayla ya da revize et.</p>
             </div>
             <div class="workspace-signal" aria-label="Operasyon akışı: brief, marka aklı, üretim ve onay">
-              <div class="signal-step is-active" data-step-id="1">
-                <span class="step-num">01</span>
-                <span class="step-label">Brief</span>
-              </div>
-              <div class="signal-step" data-step-id="2">
-                <span class="step-num">02</span>
-                <span class="step-label">Marka Aklı</span>
-              </div>
-              <div class="signal-step" data-step-id="3">
-                <span class="step-num">03</span>
-                <span class="step-label">Üretim</span>
-              </div>
-              <div class="signal-step" data-step-id="4">
-                <span class="step-num">04</span>
-                <span class="step-label">Onay</span>
-              </div>
+              <span><b>01</b>Brief</span>
+              <span><b>02</b>Marka aklı</span>
+              <span><b>03</b>Üretim</span>
+              <span><b>04</b>Onay</span>
             </div>
           </section>
 
-          <!-- Hata ve Geri Bildirim Bildirimi -->
           <div class="dashboard-feedback" id="dashboardFeedback" role="alert" hidden>
-            <div class="feedback-icon" aria-hidden="true">
-              <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-              </svg>
-            </div>
-            <div class="feedback-text-wrap">
+            <div>
               <strong id="dashboardFeedbackTitle">Çalışma alanı verileri yenilenemedi.</strong>
               <span id="dashboardFeedbackText">Bağlantıyı kontrol edip yeniden deneyin.</span>
             </div>
-            <button class="button retry-btn" id="dashboardRetryButton" type="button">Yeniden dene</button>
+            <button class="button secondary compact-button" id="dashboardRetryButton" type="button">Yeniden dene</button>
           </div>
 
-          <!-- =================================================================
-               SEKME 01: Brief Masası (Varsayılan Açık Sekme)
-               ================================================================= -->
-          <section class="tab-panel is-active" id="panel-brief" role="tabpanel" aria-labelledby="tab-brief" tabindex="0">
-            <div class="section-heading brief-section-heading">
-              <div class="heading-title-group">
-                <span class="mini-label">CANLI ÇALIŞMA MASASI</span>
-                <h2>Yeni Brief & Kreatif Önizleme</h2>
+        <section class="tab-panel" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" tabindex="0" hidden>
+          <div class="section-heading">
+            <div><span class="mini-label">Yüklenen operasyon penceresi</span><h2>Üretim durumu</h2></div>
+            <p>Metrikler en son yüklenen iş grubunu gösterir; tüm zamanlar toplamı değildir.</p>
+          </div>
+          <div class="metric-grid">
+            <article class="metric-card">
+              <span>Yüklenen grupta bugün</span>
+              <strong id="metricJobs">-</strong>
+              <p>En yeni işler içinde</p>
+            </article>
+            <article class="metric-card">
+              <span>Yüklenen grupta aksiyon</span>
+              <strong id="metricApprovals">-</strong>
+              <p>Onay ve işlem kuyruğu</p>
+            </article>
+            <article class="metric-card">
+              <span>Tamamlananlarda süre</span>
+              <strong id="metricDuration">-</strong>
+              <p>Yüklenen grupta brief → çıktı</p>
+            </article>
+            <article class="metric-card">
+              <span>Sonuçlananlarda başarı</span>
+              <strong id="metricMatch">-</strong>
+              <p>Yüklenen veri kapsamında</p>
+            </article>
+          </div>
+
+          <div class="overview-grid">
+            <article class="work-panel" id="activeJobPanel">
+              <div class="panel-heading">
+                <span class="mini-label">Aktif üretim</span>
+                <strong id="activeJobTitle">-</strong>
               </div>
-              <p>Talebinizi soldaki stüdyo formunda oluşturun; AI çıktısı ve revizyon kontrolleri sağda anlık güncellensin.</p>
-            </div>
+              <div class="pipeline-list" id="pipelineList" aria-label="Üretim adımları">
+                <span data-step="parsed">Brief ayrıştırıldı</span>
+                <span data-step="format">Format seçildi</span>
+                <span data-step="current" id="pipelineCurrent">Brief bekliyor</span>
+                <span data-step="approval">Onay bekliyor</span>
+              </div>
+            </article>
+            <article class="work-panel">
+              <div class="panel-heading">
+                <span class="mini-label">Kanal dağılımı</span>
+                <strong>Format kuyruğu</strong>
+              </div>
+              <div class="format-bars" id="formatBars" aria-label="Format dağılımı">
+                <div><span>Banner</span><strong id="barBanner" style="--bar: 0%"></strong></div>
+                <div><span>Meta post</span><strong id="barMetaPost" style="--bar: 0%"></strong></div>
+                <div><span>Story</span><strong id="barStory" style="--bar: 0%"></strong></div>
+              </div>
+            </article>
+          </div>
+        </section>
 
-            <div class="brief-layout">
-              <!-- Sol Sütun: Brief Formu -->
-              <form class="brief-composer" id="briefForm" novalidate>
-                <div class="panel-heading">
-                  <div class="heading-lead">
-                    <span class="mini-label">YENİ ÜRETİM EMRİ</span>
-                    <strong>Görsel Önizlemesi Üret</strong>
-                  </div>
-                  <span class="studio-badge">v2.4 AI Engine</span>
-                </div>
-
-                <!-- Hızlı Şablon Etiketleri -->
-                <div class="quick-templates" aria-label="Hızlı brief şablonları">
-                  <span class="quick-title">Hızlı Öneri:</span>
-                  <button type="button" class="quick-chip" data-quick="Yaz sezonu indirimi için yüksek dönüşümlü 1600x600 web banner'ı hazırla. Modern tipografi ve canlı renkler kullan.">İndirim Banner</button>
-                  <button type="button" class="quick-chip" data-quick="Yeni premium kahve çekirdekleri lansmanı için dikkat çekici 1080x1350 Instagram post görseli tasarla.">Lansman Post</button>
-                  <button type="button" class="quick-chip" data-quick="Flash Sale kampanyası için aciliyet hissi yaratan 1080x1920 dikey Instagram Story görseli üret.">Flaş Kampanya Story</button>
-                </div>
-
-                <!-- Brief Metni -->
+        <section class="tab-panel is-active" id="panel-brief" role="tabpanel" aria-labelledby="tab-brief" tabindex="0">
+          <div class="section-heading brief-section-heading">
+            <div><span class="mini-label">Aktif çalışma masası</span><h2>Yeni brief ve canlı çıktı</h2></div>
+            <p>Üretim talebini solda kur; iş durumu ve kreatif sonucu sağda takip et.</p>
+          </div>
+          <div class="brief-layout">
+            <form class="brief-composer" id="briefForm" novalidate>
+              <div class="panel-heading">
+                <span class="mini-label">Yeni brief</span>
+                <strong>Görsel önizlemesi üret</strong>
+              </div>
+              <div class="form-row">
+                <label for="briefText">Brief</label>
+                <textarea id="briefText" name="brief" rows="7" placeholder="Kampanya hedefinizi ve görsel gereksinimlerinizi buraya yazın (Örn: Elektronik kategorisi için 1600x600 banner hazırla...)" required></textarea>
+              </div>
+              <div class="form-row">
+                <label for="sourceImage">Ürün görseli <span class="field-hint">(İsteğe bağlı, PNG/JPEG/WebP, en fazla 10 MB)</span></label>
+                <input id="sourceImage" name="sourceImage" type="file" accept="image/png,image/jpeg,image/webp" />
+              </div>
+              <div class="brief-fields">
                 <div class="form-row">
-                  <div class="label-row">
-                    <label for="briefText">Brief Açıklaması</label>
-                    <span class="char-hint">En az 12 karakter</span>
-                  </div>
-                  <div class="textarea-wrapper">
-                    <textarea id="briefText" name="brief" rows="6" placeholder="Kampanya hedefinizi, görsel atmosferi ve öne çıkarılacak mesajı buraya yazın (Örn: 'Kahve severler için %25 indirimli yeni hasat tanıtım görseli...')" required></textarea>
-                  </div>
+                  <label for="briefFormat">Format</label>
+                  <select id="briefFormat" name="format">
+                    <option value="auto">Otomatik seç</option>
+                    <option value="Banner">Banner</option>
+                    <option value="Meta Post">Meta post</option>
+                    <option value="Story">Story</option>
+                  </select>
                 </div>
-
-                <!-- Ürün Görseli Yükleme (Dropzone Stili) -->
                 <div class="form-row">
-                  <label for="sourceImage">
-                    Referans Ürün Görseli
-                    <span class="field-hint">(İsteğe bağlı, PNG/JPEG/WebP, en fazla 10 MB)</span>
-                  </label>
-                  <div class="dropzone-box" id="dropzoneBox">
-                    <input id="sourceImage" name="sourceImage" type="file" accept="image/png,image/jpeg,image/webp" />
-                    <div class="dropzone-visual">
-                      <div class="dropzone-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24" aria-hidden="true">
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                          <polyline points="17 8 12 3 7 8" />
-                          <line x1="12" y1="3" x2="12" y2="15" />
-                        </svg>
-                      </div>
-                      <div class="dropzone-text">
-                        <strong class="dropzone-prompt">Görsel seçin veya buraya sürükleyin</strong>
-                        <span class="dropzone-sub">Ürün dekupe edilecek veya referans alınacaktır</span>
-                      </div>
-                    </div>
-                    <div class="file-chosen-pill" id="fileChosenPill" hidden>
-                      <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
-                        <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
-                      </svg>
-                      <span class="file-chosen-name" id="fileChosenName"></span>
-                      <button type="button" class="file-clear-btn" id="fileClearBtn" aria-label="Görseli kaldır">✕</button>
-                    </div>
-                  </div>
+                  <label for="briefBrand">Marka</label>
+                  <select id="briefBrand" name="brand" required>
+                    <option value="" disabled selected>Markalar yükleniyor...</option>
+                  </select>
                 </div>
-
-                <!-- Format ve Marka Seçimi -->
-                <div class="brief-fields">
-                  <div class="form-row">
-                    <label for="briefFormat">Çıktı Formatı</label>
-                    <div class="select-wrapper">
-                      <select id="briefFormat" name="format">
-                        <option value="auto">⚡ Otomatik Tespit Et</option>
-                        <option value="Banner">Web Banner (1600x600)</option>
-                        <option value="Meta Post">Meta Post (1080x1350)</option>
-                        <option value="Story">Story / Reels (1080x1920)</option>
-                      </select>
-                      <span class="select-arrow" aria-hidden="true">▾</span>
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <label for="briefBrand">Uygulanacak Marka</label>
-                    <div class="select-wrapper">
-                      <select id="briefBrand" name="brand" required>
-                        <option value="" disabled selected>Markalar yükleniyor...</option>
-                      </select>
-                      <span class="select-arrow" aria-hidden="true">▾</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Gönderim Butonu ve Canlı Durum -->
-                <div class="form-footer">
-                  <button class="button primary-action-btn" id="briefSubmit" type="submit">
-                    <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18" aria-hidden="true">
-                      <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
-                    </svg>
-                    <span>Üretimi Başlat</span>
-                  </button>
-                  <p class="form-status" id="briefStatus" role="status" aria-live="polite"></p>
-                </div>
-              </form>
-
-              <!-- Sağ Sütun: Canlı Çıktı & Onay Masası -->
-              <article class="brief-result" id="briefResult" aria-live="polite">
-                <div class="panel-heading">
-                  <div class="heading-lead">
-                    <span class="mini-label">CANLI KREATİF ÇIKTI</span>
-                    <strong id="resultTitle">-</strong>
-                  </div>
-                  <div class="studio-status-chip" id="resultStatusChip">Hazır</div>
-                </div>
-
-                <!-- Kreatif Önizleme Çerçevesi -->
-                <div class="result-viewport-wrapper">
-                  <div class="result-creative" id="resultCreative">
-                    <div class="creative-empty-state">
-                      <div class="empty-radar" aria-hidden="true">
-                        <div class="radar-sweep"></div>
-                        <div class="radar-dot dot-1"></div>
-                        <div class="radar-dot dot-2"></div>
-                      </div>
-                      <span class="empty-brand" id="resultBrand">-</span>
-                      <strong class="empty-title" id="resultHeadline">Brief bekleniyor</strong>
-                      <small class="empty-sub" id="resultMeta">Kreatif alan boş</small>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Onay ve Revizyon Eylemleri -->
-                <div class="result-actions">
-                  <button class="button approve-action-btn" id="approveButton" type="button" hidden>
-                    <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                    <span>Kreatifi Onayla</span>
-                  </button>
-                  <button class="button revise-action-btn" id="reviseButton" type="button" hidden>
-                    <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                    </svg>
-                    <span>Revizyon İste</span>
-                  </button>
-                </div>
-
-                <!-- Revizyon Formu Kutusu -->
-                <div class="revision-box" id="revisionBox" hidden>
-                  <div class="revision-header">
-                    <label for="revisionText">Revizyon Notu</label>
-                    <span class="revision-badge">Yapay Zeka Prompt Düzenleme</span>
-                  </div>
-                  <textarea id="revisionText" rows="3" placeholder="Örn: Fiyat etiketini sağ alta al, arka planı daha kontrast yap, başlığı 2 satırda topla..."></textarea>
-                  <button class="button send-revision-btn" id="sendRevisionButton" type="button">
-                    <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
-                      <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-                    </svg>
-                    <span>Revizyonu Çalıştır</span>
-                  </button>
-                </div>
-
-                <div class="creative-details-box" id="creativeDetailsBox" hidden></div>
-              </article>
-            </div>
-          </section>
-
-          <!-- =================================================================
-               SEKME 02: Operasyon & Metrikler
-               ================================================================= -->
-          <section class="tab-panel" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" tabindex="0" hidden>
-            <div class="section-heading">
-              <div class="heading-title-group">
-                <span class="mini-label">OPERASYONEL METRİKLER</span>
-                <h2>Stüdyo Üretim Durumu</h2>
               </div>
-              <p>Metrikler en son yüklenen iş grubunu gösterir; gerçek zamanlı üretim kuyruğunu yansıtır.</p>
-            </div>
+              <button class="button primary" id="briefSubmit" type="submit">Üretimi başlat</button>
+              <p class="form-status" id="briefStatus" role="status" aria-live="polite"></p>
+            </form>
 
-            <!-- Metrik Kartları -->
-            <div class="metric-grid">
-              <article class="metric-card">
-                <div class="metric-header">
-                  <span class="metric-tag">BUGÜN</span>
-                  <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M10 2a1 1 0 00-1 1v1a1 1 0 002 0V3a1 1 0 00-1-1zM4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
-                  </svg>
-                </div>
-                <span>Yüklenen Grupta Bugün</span>
-                <strong id="metricJobs">-</strong>
-                <p>En yeni işler içinde</p>
-              </article>
-
-              <article class="metric-card">
-                <div class="metric-header">
-                  <span class="metric-tag">AKSİYON</span>
-                  <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                  </svg>
-                </div>
-                <span>Yüklenen Grupta Aksiyon</span>
-                <strong id="metricApprovals">-</strong>
-                <p>Onay ve işlem kuyruğu</p>
-              </article>
-
-              <article class="metric-card">
-                <div class="metric-header">
-                  <span class="metric-tag">HIZ</span>
-                  <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-                  </svg>
-                </div>
-                <span>Tamamlananlarda Süre</span>
-                <strong id="metricDuration">-</strong>
-                <p>Yüklenen grupta brief → çıktı</p>
-              </article>
-
-              <article class="metric-card">
-                <div class="metric-header">
-                  <span class="metric-tag">UYUM</span>
-                  <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                  </svg>
-                </div>
-                <span>Sonuçlananlarda Başarı</span>
-                <strong id="metricMatch">-</strong>
-                <p>Marka yönergelerine uyum</p>
-              </article>
-            </div>
-
-            <!-- Operasyon Panelleri -->
-            <div class="overview-grid">
-              <article class="work-panel" id="activeJobPanel">
-                <div class="panel-heading">
-                  <div class="heading-lead">
-                    <span class="mini-label">AKTİF ÜRETİM HATTI</span>
-                    <strong id="activeJobTitle">-</strong>
-                  </div>
-                  <span class="live-tag">CANLI İZLEME</span>
-                </div>
-                <div class="pipeline-list" id="pipelineList" aria-label="Üretim adımları">
-                  <div class="pipeline-node" data-step="parsed">
-                    <div class="node-bullet"></div>
-                    <div class="node-meta">
-                      <strong class="node-title">Brief Ayrıştırıldı</strong>
-                      <span class="node-desc">Hedef kitle, format ve tema işlendi</span>
-                    </div>
-                  </div>
-                  <div class="pipeline-node" data-step="format">
-                    <div class="node-bullet"></div>
-                    <div class="node-meta">
-                      <strong class="node-title">Format Seçildi</strong>
-                      <span class="node-desc">Çözünürlük ve en-boy oranı belirlendi</span>
-                    </div>
-                  </div>
-                  <div class="pipeline-node is-current" data-step="current">
-                    <div class="node-bullet"></div>
-                    <div class="node-meta">
-                      <strong class="node-title" id="pipelineCurrent">Brief bekliyor</strong>
-                      <span class="node-desc">Görsel üretim motoru hazırlanıyor</span>
-                    </div>
-                  </div>
-                  <div class="pipeline-node" data-step="approval">
-                    <div class="node-bullet"></div>
-                    <div class="node-meta">
-                      <strong class="node-title">Onay Bekliyor</strong>
-                      <span class="node-desc">Kullanıcı inceleme ve onay adımı</span>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
-              <article class="work-panel">
-                <div class="panel-heading">
-                  <div class="heading-lead">
-                    <span class="mini-label">KANAL DAĞILIMI</span>
-                    <strong>Format Dağılım Kuyruğu</strong>
-                  </div>
-                  <span class="channel-tag">3 KANAL</span>
-                </div>
-                <div class="format-bars" id="formatBars" aria-label="Format dağılımı">
-                  <div class="format-bar-row">
-                    <div class="format-label">
-                      <span>Banner</span>
-                      <small>1600x600 px</small>
-                    </div>
-                    <div class="format-track">
-                      <strong id="barBanner" style="--bar: 0%"></strong>
-                    </div>
-                  </div>
-                  <div class="format-bar-row">
-                    <div class="format-label">
-                      <span>Meta Post</span>
-                      <small>1080x1350 px</small>
-                    </div>
-                    <div class="format-track">
-                      <strong id="barMetaPost" style="--bar: 0%"></strong>
-                    </div>
-                  </div>
-                  <div class="format-bar-row">
-                    <div class="format-label">
-                      <span>Story</span>
-                      <small>1080x1920 px</small>
-                    </div>
-                    <div class="format-track">
-                      <strong id="barStory" style="--bar: 0%"></strong>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            </div>
-          </section>
-
-          <!-- =================================================================
-               SEKME 03: Görseller (Arşiv)
-               ================================================================= -->
-          <section class="tab-panel" id="panel-assets" role="tabpanel" aria-labelledby="tab-assets" tabindex="0" hidden>
-            <div class="section-heading">
-              <div class="heading-title-group">
-                <span class="mini-label">KREATİF ARŞİVİ</span>
-                <h2>Onay ve İnceleme Çıktıları</h2>
+            <article class="brief-result" id="briefResult" aria-live="polite">
+              <div class="panel-heading">
+                <span class="mini-label">Çıktı önizleme</span>
+                <strong id="resultTitle">-</strong>
               </div>
-              <p>Tamamlanmış ve onaylanmış yüksek çözünürlüklü pazarlama görselleriniz.</p>
-            </div>
-            <div class="asset-grid" id="assetGrid" aria-live="polite"></div>
-          </section>
-
-          <!-- =================================================================
-               SEKME 04: Geçmiş Briefler
-               ================================================================= -->
-          <section class="tab-panel" id="panel-history" role="tabpanel" aria-labelledby="tab-history" tabindex="0" hidden>
-            <div class="section-heading">
-              <div class="heading-title-group">
-                <span class="mini-label">ÜRETİM GÜNLÜĞÜ</span>
-                <h2>İzlenebilir Operasyon Kaydı</h2>
+              <div class="result-creative" id="resultCreative">
+                <span id="resultBrand">-</span>
+                <strong id="resultHeadline">Brief bekleniyor</strong>
+                <small id="resultMeta">Kreatif alan boş</small>
               </div>
-              <p>Tüm geçmiş brief talepleri, üretim zaman damgaları ve sonuç durumları.</p>
-            </div>
-            <div class="history-list" id="historyList" aria-live="polite"></div>
-          </section>
-
-          <!-- =================================================================
-               SEKME 05: Marka Hafızası (Ayarlar & Entegrasyonlar)
-               ================================================================= -->
-          <section class="tab-panel" id="panel-settings" role="tabpanel" aria-labelledby="tab-settings" tabindex="0" hidden>
-            <div class="section-heading">
-              <div class="heading-title-group">
-                <span class="mini-label">MARKA KURALLARI & SİSTEM HAZIRLIĞI</span>
-                <h2>Marka Hafızası & Entegrasyon Sağlığı</h2>
+              <div class="result-actions">
+                <button class="button primary compact-button" id="approveButton" type="button" hidden>Onayla</button>
+                <button class="button secondary compact-button" id="reviseButton" type="button" hidden>Revize et</button>
               </div>
-              <p>Bu görünüm brief formunda seçili marka üzerinden dinamik güncellenir.</p>
-            </div>
+              <div class="revision-box" id="revisionBox" hidden>
+                <label for="revisionText">Revizyon notu</label>
+                <textarea id="revisionText" rows="3" placeholder="Fiyat alanını büyüt, ürünü sağa al, başlığı kısalt."></textarea>
+                <button class="button secondary compact-button" id="sendRevisionButton" type="button">Revizyonu çalıştır</button>
+              </div>
+              <div class="creative-details-box" id="creativeDetailsBox" hidden></div>
+            </article>
+          </div>
+        </section>
 
-            <div class="settings-grid">
-              <article class="work-panel">
-                <div class="panel-heading">
-                  <div class="heading-lead">
-                    <span class="mini-label">MARKA KURALLARI</span>
-                    <strong id="settingsBrandTitle">Seçili marka kuralları</strong>
-                  </div>
-                  <span class="memory-tag">AI GUARDRAILS</span>
-                </div>
-                <div class="readiness-list">
-                  <div class="readiness-item">
-                    <span class="readiness-icon check">✓</span>
-                    <div class="readiness-text">
-                      <strong>Marka Tonu ve Üslup</strong>
-                      <span id="settingsToneRule">Marka dili seçili marka kaydından alınır</span>
-                    </div>
-                  </div>
-                  <div class="readiness-item">
-                    <span class="readiness-icon check">✓</span>
-                    <div class="readiness-text">
-                      <strong>Yasaklı Kelimeler ve Filtreler</strong>
-                      <span id="settingsBannedWords">Yasaklı dil seçili marka kaydından uygulanır</span>
-                    </div>
-                  </div>
-                  <div class="readiness-item">
-                    <span class="readiness-icon check">✓</span>
-                    <div class="readiness-text">
-                      <strong>Audit ve Revizyon Hafızası</strong>
-                      <span>Onay ve revizyon kaydı veritabanında saklanır</span>
-                    </div>
-                  </div>
-                </div>
-              </article>
+        <section class="tab-panel" id="panel-assets" role="tabpanel" aria-labelledby="tab-assets" tabindex="0" hidden>
+          <div class="section-heading">
+            <div><span class="mini-label">Görsel arşivi</span><h2>Onay ve inceleme çıktıları</h2></div>
+            <p>Sayfalama yalnızca görsel arşivini değiştirir.</p>
+          </div>
+          <div class="asset-grid" id="assetGrid" aria-live="polite"></div>
+        </section>
 
-              <article class="work-panel">
-                <div class="panel-heading">
-                  <div class="heading-lead">
-                    <span class="mini-label">SİSTEM SAĞLIĞI</span>
-                    <strong>Canlı Üretim Altyapısı</strong>
-                  </div>
-                  <span class="ready-tag">ONLINE</span>
-                </div>
-                <div class="readiness-list">
-                  <div class="readiness-item">
-                    <span class="readiness-icon pulse">●</span>
-                    <div class="readiness-text">
-                      <strong>Fastify REST API</strong>
-                      <small>Uçtan uca kimlik doğrulama ve yetki kontrolü</small>
-                    </div>
-                  </div>
-                  <div class="readiness-item">
-                    <span class="readiness-icon pulse">●</span>
-                    <div class="readiness-text">
-                      <strong>MinIO / S3 Storage</strong>
-                      <small>Sertifikalı depolama ve CDN dağıtımı</small>
-                    </div>
-                  </div>
-                  <div class="readiness-item">
-                    <span class="readiness-icon pulse">●</span>
-                    <div class="readiness-text">
-                      <strong>n8n Orchestration Webhook</strong>
-                      <small>Model router ve çoklu görsel üretici workflow</small>
-                    </div>
-                  </div>
-                  <div class="readiness-item">
-                    <span class="readiness-icon pulse">●</span>
-                    <div class="readiness-text">
-                      <strong>PostgreSQL Job Kuyruğu</strong>
-                      <small>ACID uyumlu transactional kuyruk yönetimi</small>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            </div>
-          </section>
+        <section class="tab-panel" id="panel-history" role="tabpanel" aria-labelledby="tab-history" tabindex="0" hidden>
+          <div class="section-heading">
+            <div><span class="mini-label">Geçmiş briefler</span><h2>İzlenebilir operasyon kaydı</h2></div>
+            <p>Sayfalama yalnızca geçmiş kayıtlarını değiştirir.</p>
+          </div>
+          <div class="history-list" id="historyList" aria-live="polite"></div>
+        </section>
+
+        <section class="tab-panel" id="panel-settings" role="tabpanel" aria-labelledby="tab-settings" tabindex="0" hidden>
+          <div class="section-heading">
+            <div><span class="mini-label">Seçili marka bağlamı</span><h2>Marka hafızası ve sistem hazırlığı</h2></div>
+            <p>Bu görünüm brief formunda seçili marka üzerinden güncellenir.</p>
+          </div>
+          <div class="settings-grid">
+            <article class="work-panel">
+              <div class="panel-heading">
+                <span class="mini-label">Marka hafızası</span>
+                <strong id="settingsBrandTitle">Seçili marka kuralları</strong>
+              </div>
+              <div class="readiness-list">
+                <span id="settingsToneRule">Marka dili seçili marka kaydından alınır</span>
+                <span id="settingsBannedWords">Yasaklı dil seçili marka kaydından uygulanır</span>
+                <span>Onay ve revizyon kaydı job akışında tutulur</span>
+              </div>
+            </article>
+            </article>
+            <article class="work-panel">
+              <div class="panel-heading">
+                <span class="mini-label">Canlı hazırlık</span>
+                <strong>Canlı üretim akışı için hazır</strong>
+              </div>
+              <div class="readiness-list">
+                <span>Fastify API</span>
+                <span>MinIO / S3 Storage</span>
+                <span>n8n webhook tetikleme</span>
+                <span>PostgreSQL job kuyruğu</span>
+              </div>
+            </article>
+          </div>
+        </section>
         </main>
       </div>
     </div>
 
-    <!-- Script Yüklemeleri -->
     <script src="/api/runtime-config.js"></script>
     <script type="module" src="js/shared/observability.js"></script>
     <script type="module" src="js/dashboard/app.js"></script>
