@@ -540,41 +540,9 @@ body[data-surface="admin"] :focus-visible {
   transform: translateX(2px);
 }
 
-/* Sidebar Alt Aksiyonlar */
+/* Sidebar Alt Aksiyonlar (Header'a taşındığı için gizlendi) */
 .admin-sidebar-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border-subtle);
-}
-
-.admin-action-link {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  border-radius: var(--radius-sm);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink-secondary);
-  text-decoration: none;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border);
-  cursor: pointer;
-  transition: all 160ms ease;
-}
-
-.admin-action-link:hover {
-  background: var(--surface-elevated);
-  border-color: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-}
-
-.admin-logout-link:hover {
-  background: var(--danger-soft);
-  border-color: rgba(244, 63, 94, 0.3);
-  color: #ff6b85;
+  display: none !important;
 }
 
 /* Canlı Sistem Durumu Kutusu */
@@ -809,47 +777,61 @@ body[data-surface="admin"] :focus-visible {
 }
 
 /* Form Kontrolleri (Input, Select, Textarea) */
-input[type="text"],
-input[type="search"],
-input[type="url"],
-input[type="email"],
-input[type="password"],
-select,
-textarea {
+body[data-surface="admin"] input:not([type="color"]):not([type="checkbox"]):not([type="radio"]),
+body[data-surface="admin"] select,
+body[data-surface="admin"] textarea,
+.admin-body input:not([type="color"]):not([type="checkbox"]):not([type="radio"]),
+.admin-body select,
+.admin-body textarea {
   width: 100%;
   box-sizing: border-box;
-  background: var(--bg-deep);
-  border: 1px solid var(--border);
+  background-color: var(--bg-deep) !important;
+  background: var(--bg-deep) !important;
+  border: 1px solid var(--border) !important;
   border-radius: var(--radius-sm);
-  color: var(--ink);
+  color: var(--ink) !important;
   font-family: var(--font-sans);
   font-size: 13px;
   padding: 10px 14px;
   transition: all 160ms ease;
 }
 
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: var(--accent);
-  background: #0f1118;
-  box-shadow: 0 0 0 3px rgba(204, 255, 0, 0.14);
-  outline: none;
+body[data-surface="admin"] input:focus,
+body[data-surface="admin"] select:focus,
+body[data-surface="admin"] textarea:focus,
+.admin-body input:focus,
+.admin-body select:focus,
+.admin-body textarea:focus {
+  border-color: var(--accent) !important;
+  background-color: #0f1118 !important;
+  background: #0f1118 !important;
+  box-shadow: 0 0 0 3px rgba(204, 255, 0, 0.14) !important;
+  outline: none !important;
+  color: #ffffff !important;
 }
 
-input::placeholder,
-textarea::placeholder {
-  color: var(--ink-muted);
+body[data-surface="admin"] input::placeholder,
+body[data-surface="admin"] textarea::placeholder,
+.admin-body input::placeholder,
+.admin-body textarea::placeholder {
+  color: var(--ink-muted) !important;
 }
 
-select {
+body[data-surface="admin"] select,
+.admin-body select {
   cursor: pointer;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%239ba3b8'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 16px;
-  padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%239ba3b8'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 12px center !important;
+  background-size: 16px !important;
+  padding-right: 36px !important;
+}
+
+body[data-surface="admin"] select option,
+.admin-body select option {
+  background-color: #13151b !important;
+  color: var(--ink) !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -1469,11 +1451,13 @@ select {
 /* --------------------------------------------------------------------------
    13. Dialog & Modal Stilleri
    -------------------------------------------------------------------------- */
+body[data-surface="admin"] dialog,
 .admin-dialog {
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--ink);
-  border-radius: var(--radius-xl);
+  border: 1px solid var(--border) !important;
+  background-color: var(--surface) !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border-radius: var(--radius-xl) !important;
   padding: 0;
   max-width: 480px;
   width: 90%;

@@ -118,27 +118,32 @@ export async function initAdminApp() {
     }, 4000);
   }
 
+  const isMobile = () => window.matchMedia("(max-width: 991px)").matches;
+
   function switchTab(name) {
     nodes.tabs.forEach((tab) => {
       const active = tab.dataset.adminTab === name;
       tab.classList.toggle("is-active", active);
       tab.setAttribute("aria-selected", String(active));
+      tab.tabIndex = active ? 0 : -1;
     });
     nodes.panels.forEach((panel) => {
       const active = panel.dataset.adminPanel === name;
       panel.hidden = !active;
       panel.classList.toggle("is-active", active);
     });
-    closeMobileMenu();
+    if (isMobile()) {
+      closeMobileMenu();
+    }
   }
 
   function closeMobileMenu() {
     nodes.rail?.classList.remove("is-open");
-    const sidebar = nodes.rail;
-    if (sidebar) sidebar.inert = true;
     document.body.classList.remove("admin-sidebar-open");
     nodes.menu?.setAttribute("aria-expanded", "false");
     if (nodes.scrim) nodes.scrim.hidden = true;
+    const sidebar = nodes.rail;
+    if (sidebar) sidebar.inert = isMobile();
   }
 
   function openMobileMenu() {
@@ -568,13 +573,30 @@ export async function initAdminApp() {
   nodes.menu?.addEventListener("click", () => {
     const open = nodes.rail?.classList.toggle("is-open");
     const sidebar = nodes.rail;
-    if (sidebar) sidebar.inert = !open;
+    if (sidebar) sidebar.inert = isMobile() ? !open : false;
     document.body.classList.toggle("admin-sidebar-open", open);
     nodes.menu.setAttribute("aria-expanded", String(open));
     if (nodes.scrim) nodes.scrim.hidden = !open;
   });
 
   nodes.scrim?.addEventListener("click", closeMobileMenu);
+
+  function syncSidebar() {
+    const sidebar = nodes.rail;
+    if (!sidebar) return;
+    if (!isMobile()) {
+      sidebar.inert = false;
+      sidebar.classList.remove("is-open");
+      document.body.classList.remove("admin-sidebar-open");
+      if (nodes.scrim) nodes.scrim.hidden = true;
+      nodes.menu?.setAttribute("aria-expanded", "false");
+    } else {
+      sidebar.inert = !sidebar.classList.contains("is-open");
+    }
+  }
+
+  window.addEventListener("resize", syncSidebar);
+  syncSidebar();
 
   window.addEventListener("keydown", (event) => {
     if (event.key === "Tab" && document.body.classList.contains("admin-sidebar-open")) nodes.rail?.focus();
