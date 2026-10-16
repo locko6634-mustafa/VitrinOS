@@ -86,11 +86,17 @@
     </header>
 
     <main id="mainContent">
-      <!-- BÖLÜM 1: HERO & CANLI 4-SEKTÖR DÖNÜŞTÜRÜCÜ (#F4F4F0 Stone) -->
+      <!-- BÖLÜM 1: HERO & CANLI 4-SEKTÖR DÖNÜŞTÜRÜCÜ -->
       <section class="chapter chapter-stone hero-section" id="top">
         <div class="container hero-layout">
           <div class="hero-copy">
+            <div class="hero-status-pill" data-ui data-reveal="up">
+              <span class="status-dot" aria-hidden="true"></span>
+              <span>Size özel kurulum sonrası <strong>14 gün ücretsiz deneme</strong></span>
+            </div>
+
             <h1 data-reveal="up">Ne paylaşacağınızı yazın.<br />Tasarımınız hazır.</h1>
+
             <p class="hero-lead" data-reveal="up" data-delay="1">
               Sosyal medya hesapları, iş ilanları, ajanslar ve işletmeler için kendi marka
               kurallarınızla çalışan düzenli görsel üretim sistemi. Ekibimiz size özel kurulumu
@@ -110,15 +116,15 @@
             </div>
 
             <dl class="hero-facts" data-reveal="up" data-delay="3">
-              <div>
+              <div class="hero-fact-card">
                 <dt>14 Gün Deneme</dt>
                 <dd>Kurulum tesliminden sonra ücret ödemeden test edin</dd>
               </div>
-              <div>
+              <div class="hero-fact-card">
                 <dt>Fotoğraf İsteğe Bağlı</dt>
                 <dd>Kendi fotoğrafınızla veya tek cümleyle sıfırdan üretim</dd>
               </div>
-              <div>
+              <div class="hero-fact-card">
                 <dt>Her Ekrana Uygun</dt>
                 <dd>Post, hikaye, 16:9 ve yatay afiş formatında hazır teslim</dd>
               </div>
@@ -127,6 +133,16 @@
 
           <div class="hero-stage" data-reveal="scale" data-delay="1">
             <div class="studio-converter" id="heroConverter" data-ui>
+              <div class="studio-window-bar">
+                <div class="window-dots" aria-hidden="true">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <span class="window-title">VitrinOS Marka Stüdyosu · Canlı Örnekler</span>
+                <span class="window-live-pill">Marka Kuralları Aktif</span>
+              </div>
+
               <div class="converter-tabs" role="tablist" aria-label="Sektör örnekleri">
                 <button
                   type="button"
@@ -179,7 +195,9 @@
                   />
                 </div>
                 <div class="converter-caption">
-                  <span id="converterStatusLabel">İlk Üretim · 16:9 · 1600 × 900</span>
+                  <span class="converter-status-pill" id="converterStatusLabel"
+                    >İlk Üretim · 16:9 · 1600 × 900</span
+                  >
                   <span id="converterBrandRule"
                     >KuzeyTek logosu, lacivert-kobalt palet ve ikon dizilimi korundu</span
                   >
@@ -227,7 +245,7 @@
         </div>
       </section>
 
-      <!-- BÖLÜM 2: NASIL ÇALIŞIR (#EAEAE3 Surface Step) -->
+      <!-- BÖLÜM 2: NASIL ÇALIŞIR -->
       <section class="chapter chapter-surface process-section" id="uretim-hatti">
         <div class="container process-layout">
           <div class="process-lead" data-reveal="up">
@@ -250,7 +268,10 @@
           <div class="process-stages">
             <article class="process-stage" data-reveal="up" data-delay="1">
               <div class="stage-header">
-                <h3>Size özel kurulum ve<br />14 gün ücretsiz deneme</h3>
+                <div class="stage-title-group">
+                  <span class="stage-num" aria-hidden="true">Adım 1</span>
+                  <h3>Size özel kurulum ve 14 gün ücretsiz deneme</h3>
+                </div>
                 <span class="stage-timing">24 Saat – 14 Gün Kurulum</span>
               </div>
               <p>
@@ -260,11 +281,20 @@
                 <strong>14 gün boyunca hiçbir ücret ödemeden</strong> kendi görsellerinizi üreterek
                 sistemi denersiniz.
               </p>
+              <div class="stage-chips">
+                <span>Marka Logosu</span>
+                <span>Kurumsal Renk Paleti</span>
+                <span>Türkçe Font Ailesi</span>
+                <span class="stage-chip-accent">14 Gün Ücretsiz Deneme</span>
+              </div>
             </article>
 
             <article class="process-stage" data-reveal="up" data-delay="2">
               <div class="stage-header">
-                <h3>Fotoğraflı veya fotoğrafsız<br />tek cümle istek</h3>
+                <div class="stage-title-group">
+                  <span class="stage-num" aria-hidden="true">Adım 2</span>
+                  <h3>Fotoğraflı veya fotoğrafsız tek cümle istek</h3>
+                </div>
                 <span class="stage-timing">Fotoğraf Zorunluluğu Yok</span>
               </div>
               <p>
@@ -273,11 +303,19 @@
                 cümleyle yazın. Hedef ekran boyutunu kendiniz seçebilir veya seçimi sisteme
                 bırakabilirsiniz.
               </p>
+              <div class="stage-chips">
+                <span>Kendi Fotoğrafınızla</span>
+                <span>Fotoğrafsız Sıfırdan Üretim</span>
+                <span>Günlük Türkçe İstek</span>
+              </div>
             </article>
 
             <article class="process-stage" data-reveal="up" data-delay="3">
               <div class="stage-header">
-                <h3>Anında teslim ve<br />tek cümleyle düzeltme</h3>
+                <div class="stage-title-group">
+                  <span class="stage-num" aria-hidden="true">Adım 3</span>
+                  <h3>Anında teslim ve tek cümleyle düzeltme</h3>
+                </div>
                 <span class="stage-timing">Paylaşıma Hazır Çıktı</span>
               </div>
               <p>
@@ -286,6 +324,12 @@
                 istediğiniz bir detay olursa aynı ekran üzerinden tek bir cümle yazarak anında
                 düzeltir ve indirirsiniz.
               </p>
+              <div class="stage-chips">
+                <span>16:9 Geniş Ekran</span>
+                <span>4:5 Sosyal Medya Postu</span>
+                <span>9:16 Hikaye &amp; Reels</span>
+                <span>1600×600 Yatay Banner</span>
+              </div>
             </article>
           </div>
         </div>
@@ -304,8 +348,12 @@
           </div>
 
           <div class="formats-specs">
-            <article class="format-spec" data-reveal="up" data-delay="1">
-              <div class="format-slot-box">
+            <article class="format-spec format-spec-post" data-reveal="up" data-delay="1">
+              <div class="format-card-top">
+                <span class="format-spec-ratio">1080 × 1350 · 4:5 Post</span>
+                <span class="format-brand-pill">VegaAjans</span>
+              </div>
+              <div class="format-slot-box format-slot-4x5">
                 <img
                   src="assets/ad-post-4x5.webp"
                   alt="Sosyal medya akışı için 4:5 oranında üretilmiş VegaAjans reklam görseli"
@@ -315,35 +363,59 @@
                   decoding="async"
                 />
               </div>
-              <div class="format-spec-ratio">1080 × 1350 · 4:5 Post</div>
-              <h3>Sosyal Medya Postu</h3>
-              <p>
-                Instagram ve LinkedIn akışında maksimum ekran alanı kaplayan dikey dört-beş oranı.
-                Başlık, ikon maddeleri ve istatistik kartı akışta ilk bakışta okunur.
-              </p>
-            </article>
-
-            <article class="format-spec" data-reveal="up" data-delay="2">
-              <div class="format-slot-box">
-                <img
-                  src="assets/ad-story-9x16.webp"
-                  alt="Dikey hikaye ve Reels için 9:16 oranında üretilmiş KuzeyTek iş ilanı görseli"
-                  width="1080"
-                  height="1920"
-                  loading="lazy"
-                  decoding="async"
-                />
+              <div class="format-card-body">
+                <h3>Sosyal Medya Postu</h3>
+                <p>
+                  Instagram ve LinkedIn akışında maksimum ekran alanı kaplayan dikey dört-beş oranı.
+                  Başlık, ikon maddeleri ve istatistik kartı akışta ilk bakışta okunur.
+                </p>
               </div>
-              <div class="format-spec-ratio">1080 × 1920 · 9:16 Hikaye</div>
-              <h3>Dikey Hikaye ve Reels</h3>
-              <p>
-                Telefon ekranını tam dolduran dikey format. Üstte profil simgesi ve altta mesaj
-                çubuğuyla çakışmayan güvenli okuma alanları otomatik olarak korunur.
-              </p>
             </article>
 
-            <article class="format-spec" data-reveal="up" data-delay="3">
-              <div class="format-slot-box">
+            <article class="format-spec format-spec-story" data-reveal="up" data-delay="2">
+              <div class="format-card-top">
+                <span class="format-spec-ratio">1080 × 1920 · 9:16 Hikaye</span>
+                <span class="format-brand-pill">KuzeyTek</span>
+              </div>
+              <div class="format-story-stage">
+                <div class="format-slot-box format-slot-9x16">
+                  <img
+                    src="assets/ad-story-9x16.webp"
+                    alt="Dikey hikaye ve Reels için 9:16 oranında üretilmiş KuzeyTek iş ilanı görseli"
+                    width="1080"
+                    height="1920"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <div class="format-story-notes">
+                  <h3>Dikey Hikaye ve Reels</h3>
+                  <p>
+                    Telefon ekranını tam dolduran dikey format. Üstte profil simgesi ve altta mesaj
+                    çubuğuyla çakışmayan güvenli okuma alanları otomatik olarak korunur.
+                  </p>
+                  <ul class="format-check-list">
+                    <li>Üst ve alt güvenli hikaye boşluğu</li>
+                    <li>Mobil ekranda okunaklı büyük Türkçe manşet</li>
+                    <li>Dikey akışa göre yeniden dizilen ikon ve CTA</li>
+                  </ul>
+                </div>
+              </div>
+            </article>
+
+            <article class="format-spec format-spec-banner" data-reveal="up" data-delay="3">
+              <div class="format-banner-copy">
+                <div class="format-card-top">
+                  <span class="format-spec-ratio">1600 × 600 · Yatay Banner</span>
+                  <span class="format-brand-pill">PeraAkademi</span>
+                </div>
+                <h3>Yatay Duyuru ve İlan Afişi</h3>
+                <p>
+                  Web sitesi manşetleri, kariyer portalları ve etkinlik duyuruları için sol başlık,
+                  tarih rozeti ve aksiyon butonunu sağ görsel sahneyle dengeleyen panoramik kurgu.
+                </p>
+              </div>
+              <div class="format-slot-box format-slot-banner">
                 <img
                   src="assets/ad-banner-rev.webp"
                   alt="Web sitesi ve etkinlik duyurusu için 1600x600 yatay banner görseli"
@@ -353,18 +425,12 @@
                   decoding="async"
                 />
               </div>
-              <div class="format-spec-ratio">1600 × 600 · Yatay Banner</div>
-              <h3>Yatay Duyuru ve İlan Afişi</h3>
-              <p>
-                Web sitesi manşetleri, kariyer portalları ve kampanya duyuruları için sol başlık ve
-                aksiyon butonunu sağ görsel sahneyle dengeleyen geniş kurgu.
-              </p>
             </article>
           </div>
         </div>
       </section>
 
-      <!-- BÖLÜM 4: TEK CÜMLEYLE REVİZYON DENEYİMİ (#F4F4F0 Stone) -->
+      <!-- BÖLÜM 4: TEK CÜMLEYLE REVİZYON DENEYİMİ -->
       <section class="chapter chapter-stone revision-section" id="revizyon">
         <div class="container">
           <div class="section-intro-split" data-reveal="up">
@@ -376,8 +442,8 @@
             </p>
           </div>
 
-          <div class="revision-showcase" data-ui data-reveal="scale" data-delay="1">
-            <div class="revision-command-bar">
+          <div class="revision-showcase" data-reveal="scale" data-delay="1">
+            <div class="revision-command-bar" data-ui>
               <div class="revision-command-input">
                 <span class="revision-command-tag">Yazılan Düzeltme İsteği</span>
                 <p id="revisionPromptDisplay">
@@ -580,7 +646,10 @@
 
             <article class="pricing-tier pricing-tier-featured" data-reveal="up" data-delay="2">
               <div class="tier-head">
-                <h3>Growth</h3>
+                <div class="tier-title-row">
+                  <h3>Growth</h3>
+                  <span class="tier-popular-pill">En Çok Tercih Edilen</span>
+                </div>
                 <p class="tier-summary">
                   Birden fazla marka, hesap veya yoğun kampanya takvimi yöneten büyüyen ekipler ve
                   ajanslar için.

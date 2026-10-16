@@ -3,8 +3,8 @@ export function initHeroMotion() {
   if (typeof window === "undefined" || typeof document === "undefined") return;
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const hero = document.querySelector(".hero");
-  const visual = document.querySelector(".hero-visual");
+  const hero = document.querySelector(".hero-section") || document.querySelector(".hero");
+  const visual = document.getElementById("heroConverter") || document.querySelector(".hero-visual");
 
   if (!hero || reducedMotion.matches) return;
 
@@ -24,6 +24,7 @@ export function initHeroMotion() {
   }
 
   function updatePointer(event) {
+    if (!visual) return;
     const rect = visual.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / Math.max(1, rect.width) - 0.5) * 2;
     const y = ((event.clientY - rect.top) / Math.max(1, rect.height) - 0.5) * 2;
@@ -32,6 +33,7 @@ export function initHeroMotion() {
   }
 
   function resetPointer() {
+    if (!visual) return;
     visual.style.setProperty("--pointer-x", "0");
     visual.style.setProperty("--pointer-y", "0");
   }

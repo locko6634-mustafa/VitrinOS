@@ -30,12 +30,19 @@ export function initReveal() {
       });
     },
     {
-      rootMargin: "0px 0px -9% 0px",
-      threshold: 0.12
+      rootMargin: "120px 0px 120px 0px",
+      threshold: 0.01
     }
   );
 
-  revealItems.forEach((item) => observer.observe(item));
+  revealItems.forEach((item) => {
+    const rect = item.getBoundingClientRect();
+    if (rect.top < window.innerHeight + 120) {
+      item.classList.add("is-visible");
+    } else {
+      observer.observe(item);
+    }
+  });
   document.documentElement.classList.add("reveal-ready");
 }
 

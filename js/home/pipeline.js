@@ -142,6 +142,9 @@ function initHeroConverter() {
 
     if (frameEl) {
       frameEl.dataset.aspect = data.defaultAspect;
+      frameEl.classList.remove("is-switching");
+      void frameEl.offsetWidth;
+      frameEl.classList.add("is-switching");
     }
 
     if (imageEl) {
@@ -152,6 +155,7 @@ function initHeroConverter() {
       statusLabelEl.textContent = isRevised
         ? `Revizyon Uygulandı · ${data.ratioLabel}`
         : `İlk Üretim · ${data.ratioLabel}`;
+      statusLabelEl.classList.toggle("is-revised", isRevised);
     }
 
     if (brandRuleEl) {
@@ -183,6 +187,7 @@ function initRevisionShowcase() {
   const summaryEl = document.getElementById("revAfterSummary");
   const beforeImg = document.getElementById("revBeforeImg");
   const afterImg = document.getElementById("revAfterImg");
+  const compareGrid = document.querySelector(".revision-compare-grid");
 
   if (!buttons.length) return;
 
@@ -192,6 +197,11 @@ function initRevisionShowcase() {
       const sample = REVISION_SAMPLES[key] || REVISION_SAMPLES.social;
 
       buttons.forEach((b) => b.classList.toggle("is-active", b === btn));
+      if (compareGrid) {
+        compareGrid.classList.remove("is-switching");
+        void compareGrid.offsetWidth;
+        compareGrid.classList.add("is-switching");
+      }
       if (promptEl) promptEl.textContent = sample.prompt;
       if (summaryEl) summaryEl.textContent = sample.summary;
       if (beforeImg) beforeImg.src = sample.beforeImg;
