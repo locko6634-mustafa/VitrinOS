@@ -371,18 +371,16 @@ body[data-surface="workspace"] .brand sup {
   grid-template-columns: var(--rail-width) minmax(0, 1fr);
   flex: 1;
   width: 100%;
-  max-width: 1680px;
-  margin: 0 auto;
 }
 
 /* Sol Yan Navigasyon (Rail) */
 .app-rail {
   background: #0f1117;
   border-right: 1px solid var(--border);
-  padding: 24px 16px;
+  padding: 18px 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   position: sticky;
   top: var(--topbar-height);
   height: calc(100vh - var(--topbar-height));
@@ -390,28 +388,30 @@ body[data-surface="workspace"] .brand sup {
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
+  box-sizing: border-box;
 }
 
 .rail-intro {
-  padding: 0 8px;
+  padding: 0 6px;
+  flex-shrink: 0;
 }
 
 .rail-intro-kicker,
 .rail-intro span {
   display: block;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--accent);
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .rail-intro-title,
 .rail-intro strong {
   display: block;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: #ffffff;
   letter-spacing: -0.02em;
@@ -421,27 +421,28 @@ body[data-surface="workspace"] .brand sup {
 .app-tabs {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
 .tab-button {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
-  padding: 12px 14px;
+  padding: 9px 12px;
   background: transparent;
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   color: var(--ink-secondary);
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 600;
   text-align: left;
   cursor: pointer;
   transition: all 180ms ease;
   position: relative;
-  min-height: 44px;
+  min-height: 38px;
 }
 
 .tab-button:hover {
@@ -527,18 +528,19 @@ body[data-surface="workspace"] .brand sup {
 /* Rail Alt Bilgisi (Foot) */
 .rail-foot {
   margin-top: auto;
-  padding-top: 20px;
+  padding-top: 14px;
   border-top: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
 .foot-status,
 .rail-foot > div {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   background: #141720;
   border: 1px solid var(--border);
-  padding: 12px 14px;
+  padding: 10px 12px;
   border-radius: var(--radius-sm);
 }
 
@@ -560,7 +562,7 @@ body[data-surface="workspace"] .brand sup {
 .foot-status strong,
 .rail-foot strong {
   display: block;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: #ffffff;
 }
@@ -568,7 +570,7 @@ body[data-surface="workspace"] .brand sup {
 .foot-status small,
 .rail-foot small {
   display: block;
-  font-size: 11px;
+  font-size: 10.5px;
   color: var(--ink-secondary);
   font-family: var(--font-mono);
 }
