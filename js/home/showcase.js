@@ -130,42 +130,51 @@ export function initShowcase() {
     // Format modu ile dinamik boyutlandırma (Dikey görsel dikey görünsün)
     stageMockup.dataset.formatMode = data.formatMode;
 
-    // Sahne içerik güncellemesi
-    if (brandBadge) {
-      brandBadge.textContent = data.badgeLetter;
-      brandBadge.style.backgroundColor = data.paletteColor;
-      brandBadge.style.color = data.id === "agency" || data.id === "cafe" ? "#0d0e12" : "#ffffff";
-    }
-    if (brandName) brandName.textContent = data.brandName;
-    if (brandType) brandType.textContent = data.brandType;
+    // Sektör rengine göre dinamik kart spotlight ve parlama rengi
+    stageMockup.style.setProperty("--spotlight-border", data.paletteColor);
+    stageMockup.style.setProperty("--spotlight-color", data.tagBg);
 
-    if (mockupTag) {
-      mockupTag.textContent = data.tag;
-      mockupTag.style.backgroundColor = data.tagBg;
-      mockupTag.style.color = data.tagColor;
-    }
-    if (mockupHeadline) mockupHeadline.textContent = data.headline;
-    if (mockupSubtext) mockupSubtext.textContent = data.subtext;
+    // Sinematik geçiş efekti
+    stageMockup.classList.add("is-switching");
 
-    if (mockupCta) {
-      mockupCta.textContent = data.ctaText;
-      mockupCta.style.backgroundColor = data.ctaBg;
-      mockupCta.style.color = data.ctaColor;
-    }
-    if (mockupFormat) mockupFormat.textContent = data.format;
+    setTimeout(() => {
+      // Sahne içerik güncellemesi
+      if (brandBadge) {
+        brandBadge.textContent = data.badgeLetter;
+        brandBadge.style.backgroundColor = data.paletteColor;
+        brandBadge.style.color = data.id === "agency" || data.id === "cafe" ? "#0d0e12" : "#ffffff";
+      }
+      if (brandName) brandName.textContent = data.brandName;
+      if (brandType) brandType.textContent = data.brandType;
 
-    if (ruleTone) ruleTone.textContent = data.rules.tone;
-    if (ruleColor) ruleColor.textContent = data.rules.colorCode;
-    if (ruleSafe) ruleSafe.textContent = data.rules.safeZone;
-    if (paletteDot) paletteDot.style.backgroundColor = data.paletteColor;
+      if (mockupTag) {
+        mockupTag.textContent = data.tag;
+        mockupTag.style.backgroundColor = data.tagBg;
+        mockupTag.style.color = data.tagColor;
+      }
+      if (mockupHeadline) mockupHeadline.textContent = data.headline;
+      if (mockupSubtext) mockupSubtext.textContent = data.subtext;
 
-    if (mockupArtwork) {
-      mockupArtwork.style.opacity = "0.7";
-      setTimeout(() => {
+      if (mockupCta) {
+        mockupCta.textContent = data.ctaText;
+        mockupCta.style.backgroundColor = data.ctaBg;
+        mockupCta.style.color = data.ctaColor;
+      }
+      if (mockupFormat) mockupFormat.textContent = data.format;
+
+      if (ruleTone) ruleTone.textContent = data.rules.tone;
+      if (ruleColor) ruleColor.textContent = data.rules.colorCode;
+      if (ruleSafe) ruleSafe.textContent = data.rules.safeZone;
+      if (paletteDot) paletteDot.style.backgroundColor = data.paletteColor;
+
+      if (mockupArtwork) {
         mockupArtwork.src = data.artworkUrl;
-        mockupArtwork.style.opacity = "1";
-      }, 100);
-    }
+      }
+
+      setTimeout(() => {
+        stageMockup.classList.remove("is-switching");
+      }, 80);
+    }, 180);
   }
 
   // Tıklama dinleyicileri

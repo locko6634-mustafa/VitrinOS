@@ -79,6 +79,11 @@ body[data-surface="marketing"] {
   margin: 0;
   padding: 0;
   background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(circle at 18% 12%, rgba(204, 255, 0, 0.055) 0%, transparent 42%),
+    radial-gradient(circle at 82% 18%, rgba(43, 102, 255, 0.075) 0%, transparent 48%),
+    radial-gradient(circle at 50% 68%, rgba(204, 255, 0, 0.035) 0%, transparent 55%);
+  background-attachment: fixed;
   color: var(--text-main);
   font-family: var(--font-family);
   font-size: 16px;
@@ -89,6 +94,27 @@ body[data-surface="marketing"] {
   overflow-x: hidden;
   selection-background-color: var(--accent-lime);
   selection-color: var(--text-inverse);
+  position: relative;
+}
+
+/* Atmosferik Işık & Parçacık Zemin Katmanı */
+#ambientCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.85;
+}
+
+/* Tüm ana içerik katmanlarının zemin canvas'ı üstünde kalması */
+.site-header,
+main,
+.site-footer,
+.whatsapp-float {
+  position: relative;
+  z-index: 1;
 }
 
 ::selection {
@@ -298,7 +324,7 @@ h3 {
 
 
 /* ==========================================================================
-   Buton Tasarım Sistemi
+   Buton Tasarım Sistemi — Awwwards Seviyesi Manyetik & Parlak Işık (Sheen)
    ========================================================================== */
 .btn {
   display: inline-flex;
@@ -312,43 +338,99 @@ h3 {
   border-radius: var(--radius-md);
   text-decoration: none;
   cursor: pointer;
-  transition: all var(--duration-fast) var(--ease-out);
   border: 1px solid transparent;
   min-height: 46px;
   white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.22s var(--ease-out),
+    background 0.22s var(--ease-out),
+    border-color 0.22s var(--ease-out),
+    box-shadow 0.22s var(--ease-out),
+    color 0.22s var(--ease-out);
+  will-change: transform;
+}
+
+/* Buton İçeriği Manyetik Bağımsız Katman */
+.btn > * {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+  transition: transform 0.18s var(--ease-out);
+}
+
+/* Parlak Işık Süpürme (Sheen / Shimmer) */
+.btn::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: -70%;
+  width: 50%;
+  height: 220%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  transform: rotate(26deg);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 2;
+  transition: opacity 0.3s ease;
+}
+
+.btn:hover::after {
+  opacity: 1;
+  animation: btn-sheen-sweep 1.25s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@keyframes btn-sheen-sweep {
+  0% { transform: rotate(26deg) translateX(-180%); }
+  100% { transform: rotate(26deg) translateX(460%); }
 }
 
 .btn:active {
-  transform: scale(0.975);
+  transform: scale(0.965);
 }
 
 .btn-primary {
   background: var(--accent-lime);
   color: var(--text-inverse);
-  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(204, 255, 0, 0.75);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4), 0 0 20px rgba(204, 255, 0, 0.22);
 }
 .btn-primary:hover {
   background: var(--accent-lime-hover);
-  box-shadow: var(--shadow-lime);
-  transform: translateY(-1px);
+  box-shadow: 0 8px 30px rgba(204, 255, 0, 0.46), 0 0 45px rgba(204, 255, 0, 0.3);
+  border-color: #ffffff;
 }
 
 .btn-secondary {
-  background: var(--bg-tertiary);
+  background: rgba(25, 28, 36, 0.7);
   color: var(--text-main);
-  border-color: var(--border-subtle);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 .btn-secondary:hover {
-  background: var(--bg-surface);
-  border-color: var(--border-hover);
+  background: rgba(35, 40, 52, 0.85);
+  border-color: rgba(204, 255, 0, 0.4);
   color: #ffffff;
-  transform: translateY(-1px);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.5), 0 0 20px rgba(204, 255, 0, 0.12);
 }
 
 .btn-icon {
   width: 18px;
   height: 18px;
   flex-shrink: 0;
+  transition: transform 0.24s var(--ease-out);
+}
+
+.btn:hover .btn-icon {
+  transform: translateX(3px);
 }
 
 /* ==========================================================================
@@ -409,7 +491,7 @@ h3 {
 }
 
 .scenario-btn {
-  background: var(--bg-secondary);
+  background: rgba(19, 21, 27, 0.75);
   border: 1px solid var(--border-subtle);
   color: var(--text-muted);
   padding: 8px 14px;
@@ -417,49 +499,149 @@ h3 {
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: all var(--duration-fast) var(--ease-out);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.22s var(--ease-out),
+    background 0.22s var(--ease-out),
+    border-color 0.22s var(--ease-out),
+    color 0.22s var(--ease-out),
+    box-shadow 0.22s var(--ease-out);
+  will-change: transform;
 }
 
 .scenario-btn:hover {
-  background: var(--bg-tertiary);
-  color: var(--text-main);
-  border-color: var(--border-hover);
+  background: rgba(30, 34, 45, 0.9);
+  color: #ffffff;
+  border-color: rgba(204, 255, 0, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  transform: translateY(-1px);
 }
 
 .scenario-btn.is-active {
-  background: var(--accent-lime-dim);
-  color: var(--accent-lime);
+  background: rgba(204, 255, 0, 0.12);
+  color: #ffffff;
   border-color: var(--accent-lime);
   font-weight: 600;
+  box-shadow: 0 0 18px rgba(204, 255, 0, 0.25);
 }
 
 .scenario-btn .dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: currentColor;
+  transition: transform 0.2s ease;
+}
+
+.scenario-btn.is-active .dot {
+  background: var(--accent-lime);
+  box-shadow: 0 0 8px var(--accent-lime);
+  animation: pulse-dot 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  50% { transform: scale(1.4); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.8; }
 }
 
 /* Sağ Taraf: Canlı Sahne Vitrini */
 .hero-stage-wrapper {
   position: relative;
+  perspective: 1200px;
+}
+
+/* ==========================================================================
+   Awwwards Seviyesi Dinamik Kart Mimarisi (3D Tilt & Mouse Spotlight)
+   ========================================================================== */
+.stage-card,
+.mosaic-card,
+.flow-visual-card,
+.comparison-box,
+.price-card {
+  --spotlight-color: rgba(204, 255, 0, 0.08);
+  --spotlight-border: rgba(204, 255, 0, 0.45);
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  --spotlight-opacity: 0;
+  position: relative;
+  background:
+    radial-gradient(
+      550px circle at var(--mouse-x) var(--mouse-y),
+      var(--spotlight-color),
+      transparent 60%
+    ),
+    linear-gradient(145deg, rgba(22, 25, 33, 0.85) 0%, rgba(13, 15, 20, 0.95) 100%);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow:
+    0 16px 40px -12px rgba(0, 0, 0, 0.7),
+    0 1px 1px 0 rgba(255, 255, 255, 0.08) inset;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Kart Kenarlık Spotlight Işıltısı (Lazer Border Glow) */
+.stage-card::before,
+.mosaic-card::before,
+.flow-visual-card::before,
+.comparison-box::before,
+.price-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    380px circle at var(--mouse-x) var(--mouse-y),
+    var(--spotlight-border),
+    transparent 65%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: var(--spotlight-opacity);
+  transition: opacity 0.3s ease;
+  z-index: 5;
 }
 
 .stage-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
   padding: 24px;
-  box-shadow: var(--shadow-lg);
-  position: relative;
   overflow: hidden;
-  transition: all 450ms var(--ease-out), border-color var(--duration-normal) var(--ease-out);
+  transition: border-color var(--duration-normal) var(--ease-out), box-shadow var(--duration-normal) var(--ease-out);
 }
 .stage-card:hover {
-  border-color: var(--border-hover);
+  border-color: rgba(204, 255, 0, 0.3);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8), 0 0 30px rgba(204, 255, 0, 0.12);
+}
+
+.stage-card > * {
+  transform-style: preserve-3d;
+}
+.stage-header {
+  transform: translateZ(16px);
+}
+.stage-mockup-frame {
+  transform: translateZ(26px);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6);
+  transition: transform 0.35s var(--ease-out), filter 0.35s var(--ease-out), opacity 0.35s var(--ease-out);
+}
+.stage-card.is-switching .stage-mockup-frame {
+  transform: translateZ(26px) scale(0.97);
+  filter: blur(5px) brightness(1.2);
+  opacity: 0.65;
+}
+.stage-specs-strip {
+  transform: translateZ(16px);
 }
 
 .stage-header {
@@ -701,21 +883,17 @@ h3 {
 }
 
 .mosaic-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
   overflow: hidden;
   position: relative;
-  transition: all var(--duration-normal) var(--ease-out);
-  box-shadow: var(--shadow-sm);
+  transition: border-color var(--duration-normal) var(--ease-out), box-shadow var(--duration-normal) var(--ease-out);
   display: flex;
   flex-direction: column;
 }
 
 .mosaic-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--border-hover);
-  box-shadow: var(--shadow-md);
+  border-color: rgba(204, 255, 0, 0.35);
+  box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(204, 255, 0, 0.12);
 }
 
 /* Asimetrik Yerleşim */
@@ -748,6 +926,7 @@ h3 {
   display: flex;
   align-items: flex-end;
   padding: 24px;
+  transform-style: preserve-3d;
 }
 
 .mosaic-media img {
@@ -757,11 +936,11 @@ h3 {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform var(--duration-slow) var(--ease-out);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s var(--ease-out);
 }
 
 .mosaic-card:hover .mosaic-media img {
-  transform: scale(1.04);
+  transform: scale(1.07);
 }
 
 .mosaic-scrim {
@@ -778,6 +957,8 @@ h3 {
   position: relative;
   z-index: 2;
   width: 100%;
+  transform: translateZ(24px);
+  transition: transform 0.3s var(--ease-out);
 }
 
 .mosaic-badge {
@@ -787,6 +968,15 @@ h3 {
   font-size: 11px;
   font-weight: 700;
   margin-bottom: 8px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mosaic-card:hover .mosaic-badge {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .mosaic-title {
@@ -808,7 +998,9 @@ h3 {
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px;
-  background: var(--bg-tertiary);
+  background: rgba(19, 21, 27, 0.85);
+  transform: translateZ(16px);
+  border-top: 1px solid var(--border-subtle);
   border-top: 1px solid var(--border-subtle);
   font-size: 12px;
 }
@@ -947,21 +1139,48 @@ h3 {
    Sağ Taraf: Canlı Stüdyo Penceresi (Studio Simulator Window)
    ========================================================================== */
 .flow-visual-card {
-  background: #0f1117;
-  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
   padding: 0;
-  box-shadow: var(--shadow-lg);
   position: relative;
   min-height: 480px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: border-color var(--duration-normal) var(--ease-out);
+  transition: border-color var(--duration-normal) var(--ease-out), box-shadow var(--duration-normal) var(--ease-out);
 }
 
 .flow-visual-card:hover {
-  border-color: var(--border-hover);
+  border-color: rgba(204, 255, 0, 0.35);
+  box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(204, 255, 0, 0.12);
+}
+
+/* Siber Tarama Çizgisi (Cyber Scanline Beam) */
+.flow-visual-card::after {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 80%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(204, 255, 0, 0.08) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
+}
+
+.flow-visual-card.is-scanning::after {
+  opacity: 1;
+  animation: scanline-pass 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scanline-pass {
+  0% { top: -100%; }
+  100% { top: 150%; }
 }
 
 /* macOS Stüdyo Başlık Çubuğu */
@@ -1451,25 +1670,32 @@ h3 {
 }
 
 .comparison-box {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
   padding: 32px;
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: border-color var(--duration-normal) var(--ease-out), box-shadow var(--duration-normal) var(--ease-out);
 }
 
 .comparison-box.is-generic {
-  border-color: rgba(255, 71, 87, 0.3);
+  --spotlight-color: rgba(255, 71, 87, 0.08);
+  --spotlight-border: rgba(255, 71, 87, 0.45);
+  border-color: rgba(255, 71, 87, 0.25);
 }
 
 .comparison-box.is-vitrinos {
-  border-color: rgba(204, 255, 0, 0.4);
-  background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(204, 255, 0, 0.03) 100%);
+  --spotlight-color: rgba(204, 255, 0, 0.12);
+  --spotlight-border: rgba(204, 255, 0, 0.65);
+  border-color: rgba(204, 255, 0, 0.45);
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.7), 0 0 35px rgba(204, 255, 0, 0.1);
+}
+
+.comparison-box.is-vitrinos:hover {
+  border-color: var(--accent-lime);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8), 0 0 45px rgba(204, 255, 0, 0.22);
 }
 
 .comparison-header {
@@ -1620,26 +1846,59 @@ h3 {
 }
 
 .price-card {
-  background: var(--bg-primary);
-  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
   padding: 32px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: relative;
-  transition: all var(--duration-normal) var(--ease-out);
+  transition: border-color var(--duration-normal) var(--ease-out), box-shadow var(--duration-normal) var(--ease-out);
 }
 
 .price-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--border-hover);
-  box-shadow: var(--shadow-md);
+  border-color: rgba(204, 255, 0, 0.35);
+  box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(204, 255, 0, 0.12);
+}
+
+@property --conic-border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
 }
 
 .price-card.is-featured {
-  border-color: var(--accent-lime);
-  box-shadow: 0 12px 40px rgba(204, 255, 0, 0.12);
+  border-color: rgba(204, 255, 0, 0.6);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.7), 0 0 35px rgba(204, 255, 0, 0.18);
+  position: relative;
+}
+
+/* Lüks Döner Işık Hüzmesi (Animated Border Beam) */
+.price-card.is-featured::after {
+  content: "";
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--conic-border-angle, 0deg),
+    transparent 20%,
+    rgba(204, 255, 0, 0.15) 35%,
+    rgba(204, 255, 0, 0.95) 50%,
+    rgba(204, 255, 0, 0.15) 65%,
+    transparent 80%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: rotate-conic-beam 5s linear infinite;
+  z-index: 6;
+}
+
+@keyframes rotate-conic-beam {
+  to {
+    --conic-border-angle: 360deg;
+  }
 }
 
 .featured-ribbon {
@@ -1654,6 +1913,14 @@ h3 {
   padding: 4px 12px;
   border-radius: var(--radius-pill);
   text-transform: uppercase;
+  box-shadow: 0 0 16px rgba(204, 255, 0, 0.5);
+  animation: pulse-ribbon 2.5s infinite;
+  z-index: 7;
+}
+
+@keyframes pulse-ribbon {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 12px rgba(204, 255, 0, 0.4); }
+  50% { transform: scale(1.04); box-shadow: 0 0 22px rgba(204, 255, 0, 0.7); }
 }
 
 .price-header h3 {
@@ -1808,24 +2075,49 @@ h3 {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-strong);
+  background: rgba(22, 26, 36, 0.88);
+  border: 1px solid rgba(204, 255, 0, 0.35);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   color: var(--text-main);
   padding: 10px 18px 10px 12px;
   border-radius: var(--radius-pill);
   text-decoration: none;
   font-size: 13.5px;
   font-weight: 600;
-  box-shadow: var(--shadow-md);
-  transition: all var(--duration-fast) var(--ease-out);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(204, 255, 0, 0.15);
+  transition: all 0.25s var(--ease-out);
+  will-change: transform;
+}
+
+/* Radar Dalgaları (Radar Pulse Rings) */
+.whatsapp-float::before,
+.whatsapp-float::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--accent-lime);
+  opacity: 0;
+  pointer-events: none;
+  animation: whatsapp-radar 2.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.whatsapp-float::after {
+  animation-delay: 1.4s;
+}
+
+@keyframes whatsapp-radar {
+  0% { transform: scale(0.96); opacity: 0.8; }
+  100% { transform: scale(1.28, 1.55); opacity: 0; }
 }
 
 .floating-whatsapp:hover,
 .whatsapp-float:hover {
-  background: var(--bg-tertiary);
+  background: rgba(30, 36, 50, 0.95);
   border-color: var(--accent-lime);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lime);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.7), 0 0 35px rgba(204, 255, 0, 0.35);
   color: #ffffff;
 }
 
@@ -1839,6 +2131,12 @@ h3 {
   justify-content: center;
   color: var(--text-inverse);
   flex-shrink: 0;
+  box-shadow: 0 0 10px rgba(204, 255, 0, 0.6);
+  transition: transform 0.25s ease;
+}
+
+.whatsapp-float:hover .whatsapp-icon-circle {
+  transform: scale(1.1) rotate(6deg);
 }
 
 /* ==========================================================================
@@ -2253,38 +2551,86 @@ h3 {
 
 @layer motion {
   /* ==========================================================================
-     VitrinOS — Modern Scroll Reveal Motion System (En Yüksek Öncelikli Katman)
+     VitrinOS — Modern Scroll Reveal Motion System (Awwwards Standardı)
      ========================================================================== */
   [data-reveal] {
     opacity: 0 !important;
-    transform: translateY(48px) !important;
-    transition: opacity 800ms cubic-bezier(0.16, 1, 0.3, 1), transform 800ms cubic-bezier(0.16, 1, 0.3, 1) !important;
-    will-change: transform, opacity;
+    transform: perspective(1000px) translateY(38px) scale(0.97) rotateX(4deg) !important;
+    filter: blur(8px) !important;
+    transition:
+      opacity 900ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 900ms cubic-bezier(0.16, 1, 0.3, 1),
+      filter 900ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+    will-change: transform, opacity, filter;
   }
 
   [data-reveal="right"] {
     opacity: 0 !important;
-    transform: translateX(48px) !important;
+    transform: perspective(1000px) translateX(38px) scale(0.97) !important;
+    filter: blur(8px) !important;
+  }
+
+  [data-reveal="left"] {
+    opacity: 0 !important;
+    transform: perspective(1000px) translateX(-38px) scale(0.97) !important;
+    filter: blur(8px) !important;
   }
 
   [data-reveal].is-visible {
     opacity: 1 !important;
-    transform: translateY(0) translateX(0) !important;
+    transform: perspective(1000px) translateY(0) translateX(0) scale(1) rotateX(0deg) !important;
+    filter: blur(0) !important;
   }
 
   /* Kademeli Giriş Gecikmeleri (Stagger Delays) */
+  [data-reveal-delay="50"]  { transition-delay: 50ms !important; }
   [data-reveal-delay="100"] { transition-delay: 100ms !important; }
   [data-reveal-delay="150"] { transition-delay: 150ms !important; }
   [data-reveal-delay="200"] { transition-delay: 200ms !important; }
   [data-reveal-delay="250"] { transition-delay: 250ms !important; }
   [data-reveal-delay="300"] { transition-delay: 300ms !important; }
+  [data-reveal-delay="350"] { transition-delay: 350ms !important; }
   [data-reveal-delay="400"] { transition-delay: 400ms !important; }
+  [data-reveal-delay="500"] { transition-delay: 500ms !important; }
+
+  /* Kart alt elemanlarının kademeli uyanışı */
+  [data-reveal].is-visible > * {
+    animation: fade-sub-in 600ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+
+  @keyframes fade-sub-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Dokunmatik & Mobil Uyum Güvencesi */
+  @media (hover: none) and (pointer: coarse) {
+    [data-reveal] {
+      transform: translateY(24px) !important;
+      filter: none !important;
+    }
+    [data-reveal].is-visible {
+      transform: translateY(0) !important;
+    }
+  }
 
   @media (prefers-reduced-motion: reduce) {
-    [data-reveal] {
+    [data-reveal],
+    [data-reveal="right"],
+    [data-reveal="left"] {
       opacity: 1 !important;
       transform: none !important;
+      filter: none !important;
       transition: none !important;
+    }
+    [data-reveal].is-visible > * {
+      animation: none !important;
     }
   }
 }

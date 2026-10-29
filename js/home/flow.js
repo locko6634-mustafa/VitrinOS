@@ -170,6 +170,14 @@ export function initFlow() {
       stepTimeout = null;
     }
 
+    // Siber Tarama Çizgisi Işıltısı (Scanline Pass)
+    const flowVisualCard = document.querySelector(".flow-visual-card");
+    if (flowVisualCard) {
+      flowVisualCard.classList.remove("is-scanning");
+      void flowVisualCard.offsetWidth; // Reflow tetikle
+      flowVisualCard.classList.add("is-scanning");
+    }
+
     // Buton ve panel durumları
     stepButtons.forEach((btn, idx) => {
       const isActive = idx === stepIndex;
