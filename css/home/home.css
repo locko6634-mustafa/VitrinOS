@@ -80,10 +80,9 @@ body[data-surface="marketing"] {
   padding: 0;
   background-color: var(--bg-primary);
   background-image:
-    radial-gradient(circle at 18% 12%, rgba(204, 255, 0, 0.055) 0%, transparent 42%),
-    radial-gradient(circle at 82% 18%, rgba(43, 102, 255, 0.075) 0%, transparent 48%),
-    radial-gradient(circle at 50% 68%, rgba(204, 255, 0, 0.035) 0%, transparent 55%);
-  background-attachment: fixed;
+    radial-gradient(circle at 18% 12%, rgba(204, 255, 0, 0.045) 0%, transparent 42%),
+    radial-gradient(circle at 82% 18%, rgba(43, 102, 255, 0.055) 0%, transparent 48%),
+    radial-gradient(circle at 50% 68%, rgba(204, 255, 0, 0.025) 0%, transparent 55%);
   color: var(--text-main);
   font-family: var(--font-family);
   font-size: 16px;
@@ -577,14 +576,19 @@ h3 {
       var(--spotlight-color),
       transparent 60%
     ),
-    linear-gradient(145deg, rgba(22, 25, 33, 0.85) 0%, rgba(13, 15, 20, 0.95) 100%);
-  backdrop-filter: blur(24px) saturate(190%);
-  -webkit-backdrop-filter: blur(24px) saturate(190%);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+    linear-gradient(145deg, rgba(22, 25, 33, 0.92) 0%, rgba(13, 15, 20, 0.97) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
     0 16px 40px -12px rgba(0, 0, 0, 0.7),
     0 1px 1px 0 rgba(255, 255, 255, 0.08) inset;
   transform-style: preserve-3d;
+}
+
+.stage-card:hover,
+.mosaic-card:hover,
+.flow-visual-card:hover,
+.comparison-box:hover,
+.price-card:hover {
   will-change: transform;
 }
 
@@ -2555,31 +2559,26 @@ h3 {
      ========================================================================== */
   [data-reveal] {
     opacity: 0 !important;
-    transform: perspective(1000px) translateY(38px) scale(0.97) rotateX(4deg) !important;
-    filter: blur(8px) !important;
+    transform: perspective(1000px) translateY(32px) scale(0.98) !important;
     transition:
-      opacity 900ms cubic-bezier(0.16, 1, 0.3, 1),
-      transform 900ms cubic-bezier(0.16, 1, 0.3, 1),
-      filter 900ms cubic-bezier(0.16, 1, 0.3, 1) !important;
-    will-change: transform, opacity, filter;
+      opacity 750ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 750ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+    will-change: transform, opacity;
   }
 
   [data-reveal="right"] {
     opacity: 0 !important;
-    transform: perspective(1000px) translateX(38px) scale(0.97) !important;
-    filter: blur(8px) !important;
+    transform: perspective(1000px) translateX(32px) scale(0.98) !important;
   }
 
   [data-reveal="left"] {
     opacity: 0 !important;
-    transform: perspective(1000px) translateX(-38px) scale(0.97) !important;
-    filter: blur(8px) !important;
+    transform: perspective(1000px) translateX(-32px) scale(0.98) !important;
   }
 
   [data-reveal].is-visible {
     opacity: 1 !important;
-    transform: perspective(1000px) translateY(0) translateX(0) scale(1) rotateX(0deg) !important;
-    filter: blur(0) !important;
+    transform: perspective(1000px) translateY(0) translateX(0) scale(1) !important;
   }
 
   /* Kademeli Giriş Gecikmeleri (Stagger Delays) */
