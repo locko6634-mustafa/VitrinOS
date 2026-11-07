@@ -1,7 +1,7 @@
 /**
  * VitrinOS — Modern Living Studio Simulator (Flow Controller)
- * 3 Sektör Senaryosu, Daktilo Efekti, Story Tarzı Progress Bar ve
- * Kesintisiz Otomatik Döngülü Canlı Önizleme Simülatörü.
+ * 3 Sektör Senaryosu, Daktilo Efekti, Story Tarzı Progress Bar,
+ * Manuel Sektör Seçici ve Canlı Revizyon Mikro-Simülasyonu.
  */
 
 const SCENARIOS = [
@@ -73,22 +73,21 @@ const SCENARIOS = [
   }
 ];
 
-const STEP_DURATION = 4000; // 4 saniye
+const STEP_DURATION = 4200;
 
 export function initFlow() {
   const stepButtons = document.querySelectorAll("[data-flow-step]");
   const scenePanels = document.querySelectorAll("[data-flow-scene]");
   const progressFills = document.querySelectorAll(".step-progress-fill");
+  const presetBtns = document.querySelectorAll("[data-sim-preset]");
 
   if (!stepButtons.length || !scenePanels.length) return;
 
-  // Rastgele bir senaryo seç
-  let currentScenarioIndex = Math.floor(Math.random() * SCENARIOS.length);
+  let currentScenarioIndex = 0;
   let currentStep = 0;
   let typingTimer = null;
   let stepTimeout = null;
 
-  // DOM Referansları
   const simSectorTag = document.getElementById("simSectorTag");
   const simPromptText = document.getElementById("simPromptText");
   const simMetaSector = document.getElementById("simMetaSector");
@@ -103,10 +102,19 @@ export function initFlow() {
   const simRuleLogo = document.getElementById("simRuleLogo");
   const simRuleVisual = document.getElementById("simRuleVisual");
 
+  const simReadyBadge = document.getElementById("simReadyBadge");
   const simArtworkFrame = document.getElementById("simArtworkFrame");
   const simArtworkImg = document.getElementById("simArtworkImg");
   const simFormatTag = document.getElementById("simFormatTag");
   const simReviseExample = document.getElementById("simReviseExample");
+  const reviseBtn = document.querySelector(".sim-btn-edit");
+  const dlBtn = document.querySelector(".sim-btn-dl");
+
+  function syncPresetButtons() {
+    presetBtns.forEach((btn, idx) => {
+      btn.classList.toggle("is-active", idx === currentScenarioIndex);
+    });
+  }
 
   function applyScenarioData(scenario) {
     if (simSectorTag) simSectorTag.textContent = scenario.sector;
@@ -122,12 +130,16 @@ export function initFlow() {
     if (simRuleVisual) simRuleVisual.textContent = scenario.visualTone;
 
     if (simPaletteSwatches) {
-      simPaletteSwatches.innerHTML = scenario.palette.map(p => `
+      simPaletteSwatches.innerHTML = scenario.palette
+        .map(
+          (p) => `
         <div class="swatch-item">
           <span class="swatch-color" style="background: ${p.hex}"></span>
           <span class="swatch-meta">${p.name} (<code>${p.hex}</code>)</span>
         </div>
-      `).join("");
+      `
+        )
+        .join("");
     }
 
     if (simArtworkImg) {
@@ -136,9 +148,14 @@ export function initFlow() {
     }
     if (simArtworkFrame) {
       simArtworkFrame.style.aspectRatio = scenario.aspectRatio;
+      simArtworkFrame.classList.remove("is-revised");
+    }
+    if (simReadyBadge) {
+      simReadyBadge.textContent = "✓ 3 Formatında Tasarımlar Hazır!";
     }
     if (simFormatTag) simFormatTag.textContent = scenario.formatBadge;
     if (simReviseExample) simReviseExample.textContent = `"${scenario.reviseExample}"`;
+    syncPresetButtons();
   }
 
   function startTypewriter(fullText) {
@@ -147,7 +164,7 @@ export function initFlow() {
 
     simPromptText.textContent = "";
     let charIdx = 0;
-    const speed = 20;
+    const speed = 18;
 
     typingTimer = setInterval(() => {
       if (charIdx < fullText.length) {
@@ -164,21 +181,18 @@ export function initFlow() {
     currentStep = stepIndex;
     const currentScenario = SCENARIOS[currentScenarioIndex];
 
-    // Önceki zamanlayıcıları temizle
     if (stepTimeout) {
       clearTimeout(stepTimeout);
       stepTimeout = null;
     }
 
-    // Siber Tarama Çizgisi Işıltısı (Scanline Pass)
     const flowVisualCard = document.querySelector(".flow-visual-card");
     if (flowVisualCard) {
       flowVisualCard.classList.remove("is-scanning");
-      void flowVisualCard.offsetWidth; // Reflow tetikle
+      void flowVisualCard.offsetWidth;
       flowVisualCard.classList.add("is-scanning");
     }
 
-    // Buton ve panel durumları
     stepButtons.forEach((btn, idx) => {
       const isActive = idx === stepIndex;
       btn.classList.toggle("is-active", isActive);
@@ -189,7 +203,6 @@ export function initFlow() {
       panel.classList.toggle("is-active", idx === stepIndex);
     });
 
-    // İlerleme çubukları (Story style CSS transition)
     progressFills.forEach((fill, idx) => {
       fill.style.transition = "none";
       if (idx < stepIndex) {
@@ -198,7 +211,6 @@ export function initFlow() {
         fill.style.width = "0%";
       } else {
         fill.style.width = "0%";
-        // Kısa bir frame gecikmesi ile akıcı transition başlat
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             fill.style.transition = `width ${STEP_DURATION}ms linear`;
@@ -210,12 +222,10 @@ export function initFlow() {
 
     applyScenarioData(currentScenario);
 
-    // Adım 1 ise daktilo animasyonunu başlat
     if (stepIndex === 0) {
       startTypewriter(currentScenario.prompt);
     }
 
-    // Garantili zamanlayıcı ile bir sonraki adıma otomatik geçiş
     stepTimeout = setTimeout(() => {
       nextStep();
     }, STEP_DURATION);
@@ -225,19 +235,42 @@ export function initFlow() {
     if (currentStep < 2) {
       activateStep(currentStep + 1);
     } else {
-      // 3. Adım tamamlandığında diğer rastgele senaryoya geç!
       currentScenarioIndex = (currentScenarioIndex + 1) % SCENARIOS.length;
       activateStep(0);
     }
   }
 
-  // Kullanıcı herhangi bir adıma tıklarsa anında o adıma geç ve döngüyü oradan sürdür
   stepButtons.forEach((btn, index) => {
     btn.addEventListener("click", () => {
       activateStep(index);
     });
   });
 
-  // İlk adımı başlat
+  presetBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const idx = parseInt(btn.dataset.simPreset, 10);
+      if (!Number.isNaN(idx) && SCENARIOS[idx]) {
+        currentScenarioIndex = idx;
+        activateStep(0);
+      }
+    });
+  });
+
+  if (reviseBtn && simArtworkFrame && simReadyBadge) {
+    reviseBtn.addEventListener("click", () => {
+      simArtworkFrame.classList.toggle("is-revised");
+      const isRevised = simArtworkFrame.classList.contains("is-revised");
+      simReadyBadge.textContent = isRevised
+        ? "✓ Revizyon 1.4 sn İçinde Uygulandı!"
+        : "✓ 3 Formatında Tasarımlar Hazır!";
+    });
+  }
+
+  if (dlBtn && simReadyBadge) {
+    dlBtn.addEventListener("click", () => {
+      simReadyBadge.textContent = "✓ PNG & WebP Paketleri Hazırlandı!";
+    });
+  }
+
   activateStep(0);
 }

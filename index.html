@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>VitrinOS | Markanızın Kurallarıyla Çalışan Akıllı Tasarım Atölyeniz</title>
     <meta name="description" content="Sosyal medya gönderisinden iş ilanına, kampanyadan tanıtım banner'ına kadar tüm görselleriniz kendi renkleriniz, logonuz ve tarzınızla anında hazır.">
-    <meta name="theme-color" content="#0d0e12">
+    <meta name="theme-color" content="#07080c">
     <meta property="og:title" content="VitrinOS | Akıllı Tasarım Atölyeniz">
     <meta property="og:description" content="Tasarımcı beklemeden, markanızın kurallarına sadık kalarak sosyal medya ve reklam görselleri üretin.">
     <meta property="og:type" content="website">
@@ -18,13 +18,15 @@
     <link rel="stylesheet" href="css/shared/base.css">
     <link rel="stylesheet" href="css/home/home.css">
   </head>
-  <body data-surface="marketing">
+  <body data-surface="marketing" data-active-theme="tech">
     <!-- =====================================================================
-         Site Yükleme Ekranı (Preloader — FOUT & Sıçrama Önleyici)
+         Sinematik Yükleme Ekranı (Preloader — FOUT & Layout Shift Önleyici)
          ===================================================================== -->
     <div class="site-preloader" id="sitePreloader" aria-hidden="true">
       <div class="preloader-backdrop"></div>
+      <div class="preloader-grid-lines"></div>
       <div class="preloader-content">
+        <div class="preloader-telemetry">SYS.VO // SPATIAL STUDIO ENGINE</div>
         <div class="preloader-brand">
           <span class="brand-vitrin">Vitrin</span><span class="brand-os">OS</span><sup>®</sup>
         </div>
@@ -37,22 +39,53 @@
 
     <a class="skip-link" href="#main">İçeriğe geç</a>
 
+    <!-- Atmosferik Arka Plan Işık Koniği ve Mimari Kılavuz Katmanı -->
+    <div class="spatial-ambient-rig" aria-hidden="true">
+      <img
+        class="ambient-preload-texture"
+        src="assets/hero-operations-960.avif"
+        srcset="assets/hero-operations-960.avif 960w, assets/hero-operations-1600.avif 1600w"
+        sizes="(max-width: 960px) calc(100vw - 28px), min(52vw, 760px)"
+        alt=""
+        aria-hidden="true"
+      >
+      <div class="ambient-aurora ambient-aurora-primary"></div>
+      <div class="ambient-aurora ambient-aurora-secondary"></div>
+      <div class="ambient-grid-mesh"></div>
+      <div class="ambient-noise-film"></div>
+    </div>
+
     <!-- =====================================================================
-         Site Üst Menüsü (Header)
+         Yüzen Orbital Komut Kapsülü (Header)
          ===================================================================== -->
     <header class="site-header">
-      <div class="container">
+      <div class="container header-capsule-wrap">
         <nav class="nav-shell" aria-label="Ana menü">
           <a class="brand" href="#top" aria-label="VitrinOS ana sayfa">
+            <span class="brand-mark-cube" aria-hidden="true">
+              <span class="cube-core"></span>
+            </span>
             <span class="brand-vitrin">Vitrin</span><span class="brand-os">OS</span><sup aria-hidden="true">®</sup>
           </a>
 
           <div class="nav-drawer" id="navMenu">
             <div class="nav-links" id="navLinks">
-              <a class="nav-link" href="#vitrin">Kullanım Alanları</a>
-              <a class="nav-link" href="#nasil-calisir">Nasıl Çalışır?</a>
-              <a class="nav-link" href="#neden-vitrinos">Neden VitrinOS?</a>
-              <a class="nav-link" href="#paketler">Paketler</a>
+              <a class="nav-link" href="#vitrin" data-nav-section="vitrin">
+                <span class="nav-link-index">01</span>
+                <span>Kullanım Alanları</span>
+              </a>
+              <a class="nav-link" href="#nasil-calisir" data-nav-section="nasil-calisir">
+                <span class="nav-link-index">02</span>
+                <span>Nasıl Çalışır?</span>
+              </a>
+              <a class="nav-link" href="#neden-vitrinos" data-nav-section="neden-vitrinos">
+                <span class="nav-link-index">03</span>
+                <span>Neden VitrinOS?</span>
+              </a>
+              <a class="nav-link" href="#paketler" data-nav-section="paketler">
+                <span class="nav-link-index">04</span>
+                <span>Paketler</span>
+              </a>
             </div>
           </div>
 
@@ -64,7 +97,7 @@
               </svg>
               <span>Giriş Yap</span>
             </a>
-            <a class="btn btn-primary" href="https://wa.me/905510653051?text=Merhaba%2C%20VitrinOS%20hakk%C4%B1nda%20bilgi%20almak%20ve%20markam%20i%C3%A7in%20denemek%20istiyorum." target="_blank" rel="noopener noreferrer" data-auth-pilot>
+            <a class="btn btn-primary btn-header-cta" href="https://wa.me/905510653051?text=Merhaba%2C%20VitrinOS%20hakk%C4%B1nda%20bilgi%20almak%20ve%20markam%20i%C3%A7in%20denemek%20istiyorum." target="_blank" rel="noopener noreferrer" data-auth-pilot>
               <span>WhatsApp ile Tanışın</span>
               <svg class="btn-icon" aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
@@ -82,125 +115,239 @@
 
     <main id="main">
       <!-- ===================================================================
-           Bölüm 1: Hero & Canlı Marka Seçici Sahnesi (Live Thing)
+           Bölüm 1: Spatial Hero & Holografik Marka Sahnesi (Multi-Plane Rig)
            =================================================================== -->
       <section class="hero-section" id="top" aria-labelledby="hero-title">
-        <div class="container hero-grid">
-          <div class="hero-statement" data-reveal>
-            <h1 id="hero-title">Markanızın kurallarıyla çalışan akıllı tasarım atölyeniz.</h1>
-            <p class="hero-copy">
-              Sosyal medya gönderisinden iş ilanına, kampanyadan tanıtım banner'ına kadar tüm görselleriniz kendi renkleriniz, logonuz ve tarzınızla anında hazır.
-            </p>
-
-            <div class="hero-actions">
-              <a class="btn btn-primary" href="https://wa.me/905510653051?text=Merhaba%2C%20VitrinOS%20hakk%C4%B1nda%20bilgi%20almak%20ve%20markam%20i%C3%A7in%20denemek%20istiyorum." target="_blank" rel="noopener noreferrer">
-                <span>WhatsApp ile Hemen Başlayın</span>
-                <svg class="btn-icon" aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                </svg>
-              </a>
-              <a class="btn btn-secondary" href="#vitrin">Kullanım Alanlarını Görün</a>
+        <div class="container hero-spatial-deck">
+          <!-- Üst Mimari Telemetri Şeridi -->
+          <div class="hero-telemetry-ribbon" data-reveal>
+            <div class="telemetry-pill">
+              <span class="telemetry-pulse" aria-hidden="true"></span>
+              <span class="telemetry-code">VITRINOS CORE // BRAND-LOCKED AI</span>
             </div>
-
-            <!-- İnteraktif Senaryo Seçici Butonları -->
-            <div class="scenario-selector">
-              <span class="scenario-label">Canlı senaryoyu değiştirip deneyin:</span>
-              <div class="scenario-pills" role="tablist" aria-label="Sektör senaryoları">
-                <button class="scenario-btn is-active" type="button" data-scenario-btn="tech" role="tab" aria-selected="true">
-                  <span class="dot" aria-hidden="true"></span>
-                  <span>Yazılım / İş İlanı</span>
-                </button>
-                <button class="scenario-btn" type="button" data-scenario-btn="cafe" role="tab" aria-selected="false">
-                  <span class="dot" aria-hidden="true"></span>
-                  <span>Butik Kafe / Story</span>
-                </button>
-                <button class="scenario-btn" type="button" data-scenario-btn="agency" role="tab" aria-selected="false">
-                  <span class="dot" aria-hidden="true"></span>
-                  <span>Kreatif Ajans / Post</span>
-                </button>
-                <button class="scenario-btn" type="button" data-scenario-btn="fashion" role="tab" aria-selected="false">
-                  <span class="dot" aria-hidden="true"></span>
-                  <span>Moda / Web Banner</span>
-                </button>
-              </div>
+            <div class="telemetry-coords" aria-hidden="true">
+              <span>RENK TUTARLILIĞI: <strong>%100</strong></span>
+              <span class="telemetry-sep">/</span>
+              <span>FORMAT MOTORU: <strong>9:16 · 4:5 · 16:9 · 16:6</strong></span>
             </div>
           </div>
 
-          <!-- Sağ Taraf: Canlı Sahne Vitrini -->
-          <div class="hero-stage-wrapper" data-reveal>
-            <div class="stage-card" data-stage-mockup>
-              <div class="stage-header">
-                <div class="stage-brand-pill">
-                  <div class="brand-badge" data-brand-badge>S</div>
-                  <div class="brand-meta">
-                    <h4 data-brand-name>Stratos Cloud Systems</h4>
-                    <span data-brand-type>Yazılım & B2B SaaS</span>
+          <div class="hero-grid">
+            <!-- Sol Sütun: Manifesto, Komut Aksiyonları ve Stüdyo Switchboard -->
+            <div class="hero-statement" data-reveal data-parallax-layer="statement">
+              <div class="hero-eyebrow">
+                <span class="eyebrow-tag">AKILLI TASARIM STÜDYOSU</span>
+                <span class="eyebrow-line" aria-hidden="true"></span>
+              </div>
+
+              <h1 id="hero-title">Markanızın kurallarıyla çalışan akıllı tasarım atölyeniz.</h1>
+
+              <p class="hero-copy">
+                Sosyal medya gönderisinden iş ilanına, kampanyadan tanıtım banner'ına kadar tüm görselleriniz kendi renkleriniz, logonuz ve tarzınızla anında hazır.
+              </p>
+
+              <div class="hero-actions">
+                <a class="btn btn-primary btn-lg" href="https://wa.me/905510653051?text=Merhaba%2C%20VitrinOS%20hakk%C4%B1nda%20bilgi%20almak%20ve%20markam%20i%C3%A7in%20denemek%20istiyorum." target="_blank" rel="noopener noreferrer">
+                  <span>WhatsApp ile Hemen Başlayın</span>
+                  <svg class="btn-icon" aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                  </svg>
+                </a>
+                <a class="btn btn-secondary btn-lg" href="#vitrin">
+                  <span>Kullanım Alanlarını Görün</span>
+                </a>
+              </div>
+
+              <!-- İnteraktif Senaryo Seçici Switchboard -->
+              <div class="scenario-selector">
+                <div class="scenario-header-row">
+                  <span class="scenario-label">Canlı senaryoyu değiştirip deneyin:</span>
+                  <span class="scenario-live-hint" aria-hidden="true">4 AKTİF REÇETE</span>
+                </div>
+                <div class="scenario-pills" role="tablist" aria-label="Sektör senaryoları">
+                  <button class="scenario-btn is-active" type="button" data-scenario-btn="tech" role="tab" aria-selected="true">
+                    <span class="scenario-btn-top">
+                      <span class="dot" style="--dot-color: #2b66ff;" aria-hidden="true"></span>
+                      <span class="scenario-ratio-tag" aria-hidden="true">16:9</span>
+                    </span>
+                    <span class="scenario-btn-text">Yazılım / İş İlanı</span>
+                  </button>
+                  <button class="scenario-btn" type="button" data-scenario-btn="cafe" role="tab" aria-selected="false">
+                    <span class="scenario-btn-top">
+                      <span class="dot" style="--dot-color: #d49b6a;" aria-hidden="true"></span>
+                      <span class="scenario-ratio-tag" aria-hidden="true">9:16</span>
+                    </span>
+                    <span class="scenario-btn-text">Butik Kafe / Story</span>
+                  </button>
+                  <button class="scenario-btn" type="button" data-scenario-btn="agency" role="tab" aria-selected="false">
+                    <span class="scenario-btn-top">
+                      <span class="dot" style="--dot-color: #ccff00;" aria-hidden="true"></span>
+                      <span class="scenario-ratio-tag" aria-hidden="true">4:5</span>
+                    </span>
+                    <span class="scenario-btn-text">Kreatif Ajans / Post</span>
+                  </button>
+                  <button class="scenario-btn" type="button" data-scenario-btn="fashion" role="tab" aria-selected="false">
+                    <span class="scenario-btn-top">
+                      <span class="dot" style="--dot-color: #e5e5e5;" aria-hidden="true"></span>
+                      <span class="scenario-ratio-tag" aria-hidden="true">16:6</span>
+                    </span>
+                    <span class="scenario-btn-text">Moda / Web Banner</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sağ Sütun: Çok Katmanlı 3D Holografik Sahne Vitrini -->
+            <div class="hero-stage-wrapper" data-reveal data-parallax-layer="stage">
+              <!-- Arka Plan Optik Halka & Derinlik Katmanı -->
+              <div class="stage-orbital-halo" aria-hidden="true">
+                <div class="orbital-ring ring-outer"></div>
+                <div class="orbital-ring ring-inner"></div>
+              </div>
+
+              <div class="stage-card" data-stage-mockup data-tilt-card>
+                <!-- Işıltılı Konik Kenarlık -->
+                <div class="card-glow-border" aria-hidden="true"></div>
+
+                <!-- Üst Stüdyo HUD Çubuğu -->
+                <div class="stage-header">
+                  <div class="stage-brand-pill">
+                    <div class="brand-badge" data-brand-badge>S</div>
+                    <div class="brand-meta">
+                      <h4 data-brand-name>Stratos Cloud Systems</h4>
+                      <span data-brand-type>Yazılım & B2B SaaS</span>
+                    </div>
+                  </div>
+                  <div class="stage-status">
+                    <span class="status-beacon" aria-hidden="true"></span>
+                    <span>Marka Kuralları Bağlı</span>
                   </div>
                 </div>
-                <div class="stage-status">
-                  <span class="status-beacon" aria-hidden="true"></span>
-                  <span>Marka Kuralları Bağlı</span>
+
+                <!-- Canlı Mockup Önizleme Çerçevesi + Optik Cetvel Kılavuzları -->
+                <div class="stage-mockup-frame">
+                  <div class="viewport-rulers" aria-hidden="true">
+                    <span class="ruler-corner tl"></span>
+                    <span class="ruler-corner tr"></span>
+                    <span class="ruler-corner bl"></span>
+                    <span class="ruler-corner br"></span>
+                    <span class="ruler-coord">SAFE-ZONE // LOCKED</span>
+                  </div>
+
+                  <img class="mockup-artwork" data-mockup-artwork src="assets/hero-tech-workspace.jpg" alt="Canlı tasarım çıktısı önizlemesi" width="960" height="600">
+                  <div class="mockup-gradient-scrim" aria-hidden="true"></div>
+
+                  <div class="mockup-content">
+                    <span class="mockup-tag" data-mockup-tag>İŞ İLANI</span>
+                    <div class="mockup-headline" data-mockup-headline>Kıdemli Frontend Mühendisi Aranıyor</div>
+                    <p class="mockup-subtext" data-mockup-subtext>Tam zamanlı uzaktan çalışma, modern web teknolojileri ve global projeler.</p>
+
+                    <div class="mockup-footer">
+                      <span class="mockup-cta-btn" data-mockup-cta>Pozisyona Başvur</span>
+                      <span class="mockup-format-pill" data-mockup-format>16:9 LinkedIn / Kariyer İlanı</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              <!-- Canlı Mockup Önizleme Çerçevesi -->
-              <div class="stage-mockup-frame">
-                <img class="mockup-artwork" data-mockup-artwork src="assets/hero-tech-workspace.jpg" alt="Canlı tasarım çıktısı önizlemesi">
-                <div class="mockup-gradient-scrim" aria-hidden="true"></div>
-
-                <div class="mockup-content">
-                  <span class="mockup-tag" data-mockup-tag>İŞ İLANI</span>
-                  <div class="mockup-headline" data-mockup-headline>Kıdemli Frontend Mühendisi Aranıyor</div>
-                  <p class="mockup-subtext" data-mockup-subtext>Tam zamanlı uzaktan çalışma, modern web teknolojileri ve global projeler.</p>
-
-                  <div class="mockup-footer">
-                    <span class="mockup-cta-btn" data-mockup-cta>Pozisyona Başvur</span>
-                    <span class="mockup-format-pill" data-mockup-format>16:9 LinkedIn / Kariyer İlanı</span>
+                <!-- Sahne Altı: Yüzen Marka DNA Telemetri Modülleri -->
+                <div class="stage-rules-bar" data-parallax-layer="hud">
+                  <div class="rule-chip">
+                    <span class="rule-chip-label">Marka Dili & Tonu</span>
+                    <span class="rule-chip-value" data-rule-tone>Profesyonel & Doğrudan</span>
+                  </div>
+                  <div class="rule-chip">
+                    <span class="rule-chip-label">Kurumsal Renk</span>
+                    <span class="rule-chip-value">
+                      <i class="palette-dot" data-palette-dot style="background-color: #2b66ff;" aria-hidden="true"></i>
+                      <span data-rule-color>#2b66ff Kobalt</span>
+                    </span>
+                  </div>
+                  <div class="rule-chip">
+                    <span class="rule-chip-label">Güvenli Alan</span>
+                    <span class="rule-chip-value" data-rule-safe>Kurumsal Logo Kilitli</span>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
 
-              <!-- Sahne Altı: Marka Kuralları Rozetleri -->
-              <div class="stage-rules-bar">
-                <div class="rule-chip">
-                  <span class="rule-chip-label">Marka Dili & Tonu</span>
-                  <span class="rule-chip-value" data-rule-tone>Profesyonel & Doğrudan</span>
-                </div>
-                <div class="rule-chip">
-                  <span class="rule-chip-label">Kurumsal Renk</span>
-                  <span class="rule-chip-value">
-                    <i class="palette-dot" data-palette-dot style="background-color: #2b66ff;" aria-hidden="true"></i>
-                    <span data-rule-color>#2b66ff Kobalt</span>
-                  </span>
-                </div>
-                <div class="rule-chip">
-                  <span class="rule-chip-label">Güvenli Alan</span>
-                  <span class="rule-chip-value" data-rule-safe>Kurumsal Logo Kilitli</span>
-                </div>
-              </div>
+        <!-- Kinetik Marka DNA Akış Şeridi (Scroll Velocity Ticker) -->
+        <div class="kinetic-ticker-band" aria-hidden="true">
+          <div class="ticker-track" id="kineticTicker">
+            <div class="ticker-group">
+              <span class="ticker-item"><i>◆</i> KURUMSAL RENK KİLİDİ (#HEX)</span>
+              <span class="ticker-item"><i>◆</i> 9:16 INSTAGRAM STORY</span>
+              <span class="ticker-item"><i>◆</i> 4:5 SOSYAL MEDYA POST</span>
+              <span class="ticker-item"><i>◆</i> 16:9 LINKEDIN & İŞ İLANI</span>
+              <span class="ticker-item"><i>◆</i> 16:6 GENİŞ WEB BANNER</span>
+              <span class="ticker-item"><i>◆</i> SIFIR HALÜSİNASYON GARANTİSİ</span>
+              <span class="ticker-item"><i>◆</i> TEK CÜMLEYLE ANINDA REVİZYON</span>
+            </div>
+            <div class="ticker-group" aria-hidden="true">
+              <span class="ticker-item"><i>◆</i> KURUMSAL RENK KİLİDİ (#HEX)</span>
+              <span class="ticker-item"><i>◆</i> 9:16 INSTAGRAM STORY</span>
+              <span class="ticker-item"><i>◆</i> 4:5 SOSYAL MEDYA POST</span>
+              <span class="ticker-item"><i>◆</i> 16:9 LINKEDIN & İŞ İLANI</span>
+              <span class="ticker-item"><i>◆</i> 16:6 GENİŞ WEB BANNER</span>
+              <span class="ticker-item"><i>◆</i> SIFIR HALÜSİNASYON GARANTİSİ</span>
+              <span class="ticker-item"><i>◆</i> TEK CÜMLEYLE ANINDA REVİZYON</span>
             </div>
           </div>
         </div>
       </section>
 
       <!-- ===================================================================
-           Bölüm 2: Çok Yönlü Kullanım Galerisi (Asymmetric Mosaic)
+           Bölüm 2: Çok Yönlü Kullanım Galerisi — Mimari Bento & X-Ray Vitrin
            =================================================================== -->
       <section class="showcase-section" id="vitrin" aria-labelledby="showcase-title">
         <div class="container">
-          <div class="section-head" data-reveal>
-            <h2 id="showcase-title">Her sektör ve her mecra için markanıza tam uyum.</h2>
-            <p class="lead">
-              Sadece e-ticaret değil; sosyal medya gönderisi, iş ilanı, etkinlik duyurusu veya reklam banner'ı... VitrinOS şirketinizin görsel kurallarını her boyuta kusursuz uyarlar.
-            </p>
+          <div class="showcase-top-bar" data-reveal>
+            <div class="section-head">
+              <div class="section-kicker">
+                <span class="kicker-num">01</span>
+                <span class="kicker-text">ÇOK YÖNLÜ FORMAT MİMARİSİ</span>
+              </div>
+              <h2 id="showcase-title">Her sektör ve her mecra için markanıza tam uyum.</h2>
+              <p class="lead">
+                Sadece e-ticaret değil; sosyal medya gönderisi, iş ilanı, etkinlik duyurusu veya reklam banner'ı... VitrinOS şirketinizin görsel kurallarını her boyuta kusursuz uyarlar.
+              </p>
+            </div>
+
+            <!-- Bölüm Özel Etkileşimi: Format Filtresi & Marka Izgarası X-Ray Anahtarı -->
+            <div class="showcase-inspector-controls">
+              <div class="format-filter-pills" role="group" aria-label="Format görünümü filtrele">
+                <button type="button" class="filter-pill is-active" data-mosaic-filter="all">Tümü (4)</button>
+                <button type="button" class="filter-pill" data-mosaic-filter="story">9:16 Story</button>
+                <button type="button" class="filter-pill" data-mosaic-filter="post">4:5 Post</button>
+                <button type="button" class="filter-pill" data-mosaic-filter="hiring">16:9 İlan</button>
+                <button type="button" class="filter-pill" data-mosaic-filter="banner">16:6 Banner</button>
+              </div>
+              <button type="button" class="xray-toggle-btn" id="xrayGridToggle" aria-pressed="false">
+                <span class="xray-led" aria-hidden="true"></span>
+                <span>Marka Kural Izgarası (X-Ray)</span>
+              </button>
+            </div>
           </div>
 
-          <div class="mosaic-grid">
-            <!-- 9:16 Instagram Story -->
-            <article class="mosaic-card card-story" data-reveal data-reveal-delay="100">
+          <!-- Asimetrik Mimari Bento Galerisi -->
+          <div class="mosaic-grid" id="mosaicGrid">
+            <!-- 9:16 Instagram Story (Dikey Kule Kartı) -->
+            <article class="mosaic-card card-story" data-format-cat="story" data-reveal data-reveal-delay="100" data-tilt-card>
+              <div class="mosaic-card-chrome" aria-hidden="true">
+                <span class="chrome-ratio">ASPECT // 9:16 VERTICAL</span>
+                <span class="chrome-lock">SAFE-ZONE ACTIVE</span>
+              </div>
               <div class="mosaic-media">
-                <img src="assets/showcase-coffee-story.jpg" alt="Instagram Story formatında butik kafe tasarımı" loading="lazy" decoding="async">
+                <img src="assets/showcase-coffee-story.jpg" alt="Instagram Story formatında butik kafe tasarımı" loading="lazy" decoding="async" width="720" height="1280">
                 <div class="mosaic-scrim" aria-hidden="true"></div>
+                <div class="xray-blueprint-overlay" aria-hidden="true">
+                  <div class="xray-safe-box">
+                    <span>ÜST STORY UI BOŞLUĞU (250px)</span>
+                    <span>LOGO & TİPOGRAFİ KİLİDİ</span>
+                    <span>ALT ETKİLEŞİM ALANI</span>
+                  </div>
+                </div>
                 <div class="mosaic-overlay">
                   <span class="mosaic-badge" style="background: rgba(212, 155, 106, 0.25); color: #f3c295;">INSTAGRAM STORY</span>
                   <h3 class="mosaic-title">Hafta Sonu Atölye Menüsü</h3>
@@ -217,10 +364,20 @@
             </article>
 
             <!-- 4:5 Instagram / LinkedIn Post -->
-            <article class="mosaic-card card-post" data-reveal data-reveal-delay="200">
+            <article class="mosaic-card card-post" data-format-cat="post" data-reveal data-reveal-delay="200" data-tilt-card>
+              <div class="mosaic-card-chrome" aria-hidden="true">
+                <span class="chrome-ratio">ASPECT // 4:5 FEED PORTRAIT</span>
+                <span class="chrome-lock">HIGH CONTRAST</span>
+              </div>
               <div class="mosaic-media">
-                <img src="assets/showcase-agency-post.jpg" alt="Sosyal medya akışı için ajans vaka tasarımı" loading="lazy" decoding="async">
+                <img src="assets/showcase-agency-post.jpg" alt="Sosyal medya akışı için ajans vaka tasarımı" loading="lazy" decoding="async" width="800" height="1000">
                 <div class="mosaic-scrim" aria-hidden="true"></div>
+                <div class="xray-blueprint-overlay" aria-hidden="true">
+                  <div class="xray-safe-box">
+                    <span>4:5 AKIŞ ODAK MERKEZİ</span>
+                    <span>#CCFF00 KONTRAST KİLİDİ</span>
+                  </div>
+                </div>
                 <div class="mosaic-overlay">
                   <span class="mosaic-badge" style="background: rgba(204, 255, 0, 0.2); color: #ccff00;">SOSYAL MEDYA POST</span>
                   <h3 class="mosaic-title">Yaratıcı Kampanya Analizi</h3>
@@ -237,10 +394,20 @@
             </article>
 
             <!-- 16:9 LinkedIn / İş İlanı -->
-            <article class="mosaic-card card-hiring" data-reveal data-reveal-delay="300">
+            <article class="mosaic-card card-hiring" data-format-cat="hiring" data-reveal data-reveal-delay="300" data-tilt-card>
+              <div class="mosaic-card-chrome" aria-hidden="true">
+                <span class="chrome-ratio">ASPECT // 16:9 LANDSCAPE</span>
+                <span class="chrome-lock">CORP GRID #2B66FF</span>
+              </div>
               <div class="mosaic-media">
-                <img src="assets/hero-tech-workspace.jpg" alt="Yazılım şirketi iş ilanı bannerı" loading="lazy" decoding="async">
+                <img src="assets/hero-tech-workspace.jpg" alt="Yazılım şirketi iş ilanı bannerı" loading="lazy" decoding="async" width="960" height="540">
                 <div class="mosaic-scrim" aria-hidden="true"></div>
+                <div class="xray-blueprint-overlay" aria-hidden="true">
+                  <div class="xray-safe-box">
+                    <span>SOL METİN HİYERARŞİSİ</span>
+                    <span>KURUMSAL ROZET ALANI</span>
+                  </div>
+                </div>
                 <div class="mosaic-overlay">
                   <span class="mosaic-badge" style="background: rgba(43, 102, 255, 0.25); color: #598bff;">KARİYER & İŞ İLANI</span>
                   <h3 class="mosaic-title">Yazılım Ekibimize Katılın</h3>
@@ -256,11 +423,21 @@
               </div>
             </article>
 
-            <!-- 16:6 Web & Tanıtım Bannerı -->
-            <article class="mosaic-card card-banner" data-reveal data-reveal-delay="200">
+            <!-- 16:6 Web & Tanıtım Bannerı (Panoramik Sinema Sahnesi) -->
+            <article class="mosaic-card card-banner" data-format-cat="banner" data-reveal data-reveal-delay="250" data-tilt-card>
+              <div class="mosaic-card-chrome" aria-hidden="true">
+                <span class="chrome-ratio">ASPECT // 16:6 ULTRA-WIDE HERO BANNER</span>
+                <span class="chrome-lock">RESPONSIVE CROP SAFE</span>
+              </div>
               <div class="mosaic-media">
-                <img src="assets/showcase-fashion-banner.jpg" alt="Geniş web sitesi lansman bannerı" loading="lazy" decoding="async">
+                <img src="assets/showcase-fashion-banner.jpg" alt="Geniş web sitesi lansman bannerı" loading="lazy" decoding="async" width="1440" height="540">
                 <div class="mosaic-scrim" aria-hidden="true"></div>
+                <div class="xray-blueprint-overlay" aria-hidden="true">
+                  <div class="xray-safe-box">
+                    <span>PANORAMİK NEGATİF ALAN DENGESİ (1600×600)</span>
+                    <span>MERKEZİ VİTRİN ODAK KORUMASI</span>
+                  </div>
+                </div>
                 <div class="mosaic-overlay">
                   <span class="mosaic-badge" style="background: rgba(255, 255, 255, 0.2); color: #ffffff;">WEB & KAMPANYA BANNER</span>
                   <h3 class="mosaic-title">Yeni Sezon Lansmanı & Dijital Vitrin</h3>
@@ -280,184 +457,207 @@
       </section>
 
       <!-- ===================================================================
-           Bölüm 3: 3 Adımda Nasıl Çalışır? (İnteraktif Süreç Sahnesi)
+           Bölüm 3: 3 Adımda Nasıl Çalışır? — Canlı Studio Engine Konsolu
            =================================================================== -->
       <section class="flow-section" id="nasil-calisir" aria-labelledby="flow-title">
-        <div class="container flow-grid">
-          <div class="flow-content" data-reveal>
-            <h2 id="flow-title">Ne istediğinizi söyleyin, markanıza özel tasarlansın.</h2>
-            <p class="lead" style="color: var(--text-muted); margin-bottom: 32px;">
-              Tasarımcı bekleme süreçlerini, karmaşık yazılımları ve saatler süren revizyon döngülerini unutun.
-            </p>
+        <div class="container">
+          <!-- Üst Başlık & Senaryo Frekans Seçici -->
+          <div class="flow-section-header" data-reveal>
+            <div class="flow-title-group">
+              <div class="section-kicker">
+                <span class="kicker-num">02</span>
+                <span class="kicker-text">OTONOM ÜRETİM HATTI</span>
+              </div>
+              <h2 id="flow-title">Ne istediğinizi söyleyin, markanıza özel tasarlansın.</h2>
+              <p class="lead">
+                Tasarımcı bekleme süreçlerini, karmaşık yazılımları ve saatler süren revizyon döngülerini unutun.
+              </p>
+            </div>
 
-            <div class="flow-steps" role="tablist" aria-label="Nasıl çalışır adımları">
-              <!-- Adım 1 -->
-              <button class="flow-step-btn is-active" type="button" data-flow-step="0" role="tab" aria-selected="true">
-                <div class="step-progress-track" aria-hidden="true"><div class="step-progress-fill"></div></div>
-                <div class="flow-step-header">
-                  <span class="step-num-pill">ADIM 1</span>
-                  <span class="step-status-tag">DOĞAL DİL İSTEĞİ</span>
-                </div>
-                <h3>İhtiyacınızı Yazın</h3>
-                <p>Teknik jargona gerek yok. Sohbet eder gibi istediğiniz görseli, mecrayı veya duyuruyu yazmanız yeterli.</p>
-              </button>
-
-              <!-- Adım 2 -->
-              <button class="flow-step-btn" type="button" data-flow-step="1" role="tab" aria-selected="false">
-                <div class="step-progress-track" aria-hidden="true"><div class="step-progress-fill"></div></div>
-                <div class="flow-step-header">
-                  <span class="step-num-pill">ADIM 2</span>
-                  <span class="step-status-tag">MARKA DNA KİLİDİ</span>
-                </div>
-                <h3>Markanız Şekillendirsin</h3>
-                <p>Kayıtlı kurumsal renkleriniz, logonuz, yazı tipiniz ve görsel kurallarınız yapay zekaya kılavuzluk eder.</p>
-              </button>
-
-              <!-- Adım 3 -->
-              <button class="flow-step-btn" type="button" data-flow-step="2" role="tab" aria-selected="false">
-                <div class="step-progress-track" aria-hidden="true"><div class="step-progress-fill"></div></div>
-                <div class="flow-step-header">
-                  <span class="step-num-pill">ADIM 3</span>
-                  <span class="step-status-tag">ANINDA ÇIKTI</span>
-                </div>
-                <h3>Onaylayın veya Tek Tıkla Revize Edin</h3>
-                <p>Story, Post veya Banner formatında anında indirin ya da tek bir cümleyle saniyeler içinde yenileyin.</p>
-              </button>
+            <!-- Simülasyon Senaryosu Hızlı Geçiş Tuşları -->
+            <div class="flow-scenario-switcher" aria-label="Simülasyon sektörü seçimi">
+              <span class="switcher-caption">Canlı Simülasyon Verisi:</span>
+              <div class="switcher-buttons">
+                <button type="button" class="sim-preset-btn is-active" data-sim-preset="0">Yazılım İlanı</button>
+                <button type="button" class="sim-preset-btn" data-sim-preset="1">Butik Kafe</button>
+                <button type="button" class="sim-preset-btn" data-sim-preset="2">Mimarlık Stüdyosu</button>
+              </div>
             </div>
           </div>
 
-          <!-- Sağ Taraf: Süreç Simülasyon Sahnesi -->
-          <div class="flow-visual-card" data-reveal>
-            <!-- macOS Pencere Başlığı -->
-            <div class="studio-window-header" aria-hidden="true">
-              <div class="window-dots">
-                <span class="dot-red"></span>
-                <span class="dot-yellow"></span>
-                <span class="dot-green"></span>
-              </div>
-              <span class="studio-window-title">VitrinOS Studio Engine v2.4 — Simülasyon</span>
-              <div class="studio-status-indicator">
-                <span class="pulse-beacon"></span>
-                <span class="status-text">CANLI</span>
-              </div>
-            </div>
+          <!-- Birleşik Studio IDE Konsol Mimarisi -->
+          <div class="flow-console-deck">
+            <!-- Sol: Fiber-Optik Akış Adımları -->
+            <div class="flow-content" data-reveal>
+              <div class="flow-steps" role="tablist" aria-label="Nasıl çalışır adımları">
+                <!-- Adım 1 -->
+                <button class="flow-step-btn is-active" type="button" data-flow-step="0" role="tab" aria-selected="true">
+                  <div class="step-progress-track" aria-hidden="true"><div class="step-progress-fill"></div></div>
+                  <div class="flow-step-header">
+                    <span class="step-num-pill">ADIM 1</span>
+                    <span class="step-status-tag">DOĞAL DİL İSTEĞİ</span>
+                  </div>
+                  <h3>İhtiyacınızı Yazın</h3>
+                  <p>Teknik jargona gerek yok. Sohbet eder gibi istediğiniz görseli, mecrayı veya duyuruyu yazmanız yeterli.</p>
+                </button>
 
-            <!-- Sahne 1: Yazma & Analiz -->
-            <div class="flow-scene is-active" data-flow-scene="0">
-              <div class="scene-prompt-box">
-                <div class="prompt-box-top">
-                  <span class="prompt-meta-label">SİSTEME İLETİLEN DOĞAL DİL İSTEĞİ</span>
-                  <span class="prompt-mode-tag" id="simSectorTag">Sektör Analizi</span>
-                </div>
-                <div class="prompt-typing-sim">
-                  <span id="simPromptText" class="sim-prompt-text">"..."</span>
-                  <span class="typing-cursor" aria-hidden="true"></span>
-                </div>
-              </div>
-              <div class="scene-preview-stage">
-                <div class="sim-analysis-header">
-                  <span class="analysis-indicator-icon">⚡</span>
-                  <h4>Otomatik Parametre Ayrıştırma</h4>
-                </div>
-                <div class="sim-analysis-grid">
-                  <div class="analysis-item">
-                    <span class="item-label">Sektör & Alan</span>
-                    <strong class="item-value" id="simMetaSector">-</strong>
+                <!-- Adım 2 -->
+                <button class="flow-step-btn" type="button" data-flow-step="1" role="tab" aria-selected="false">
+                  <div class="step-progress-track" aria-hidden="true"><div class="step-progress-fill"></div></div>
+                  <div class="flow-step-header">
+                    <span class="step-num-pill">ADIM 2</span>
+                    <span class="step-status-tag">MARKA DNA KİLİDİ</span>
                   </div>
-                  <div class="analysis-item">
-                    <span class="item-label">Hedef Format</span>
-                    <strong class="item-value" id="simMetaFormat">-</strong>
+                  <h3>Markanız Şekillendirsin</h3>
+                  <p>Kayıtlı kurumsal renkleriniz, logonuz, yazı tipiniz ve görsel kurallarınız yapay zekaya kılavuzluk eder.</p>
+                </button>
+
+                <!-- Adım 3 -->
+                <button class="flow-step-btn" type="button" data-flow-step="2" role="tab" aria-selected="false">
+                  <div class="step-progress-track" aria-hidden="true"><div class="step-progress-fill"></div></div>
+                  <div class="flow-step-header">
+                    <span class="step-num-pill">ADIM 3</span>
+                    <span class="step-status-tag">ANINDA ÇIKTI</span>
                   </div>
-                  <div class="analysis-item">
-                    <span class="item-label">Tasarım Amacı</span>
-                    <strong class="item-value" id="simMetaIntent">-</strong>
-                  </div>
-                  <div class="analysis-item">
-                    <span class="item-label">İletişim Tonu</span>
-                    <strong class="item-value" id="simMetaTone">-</strong>
-                  </div>
-                </div>
-                <div class="analysis-status-bar">
-                  <span class="spinner-line" aria-hidden="true"></span>
-                  <span id="simAnalysisStatusText">İstek çözümlendi. Kayıtlı marka profiline bağlanılıyor...</span>
-                </div>
+                  <h3>Onaylayın veya Tek Tıkla Revize Edin</h3>
+                  <p>Story, Post veya Banner formatında anında indirin ya da tek bir cümleyle saniyeler içinde yenileyin.</p>
+                </button>
               </div>
             </div>
 
-            <!-- Sahne 2: Marka Kuralı Uygulama -->
-            <div class="flow-scene" data-flow-scene="1">
-              <div class="scene-preview-stage brand-rules-stage">
-                <div class="rules-stage-top">
-                  <span class="rule-applied-toast" id="simRuleBadge">✓ MARKA DNA'SI KİLİTLENDİ</span>
-                  <span class="rule-profile-id" id="simProfileId">PROFİL: #VO-8421</span>
+            <!-- Sağ: Süreç Simülasyon Sahnesi (Studio Engine Viewport) -->
+            <div class="flow-visual-card" data-reveal data-tilt-card>
+              <!-- Studio Engine Pencere Başlığı -->
+              <div class="studio-window-header" aria-hidden="true">
+                <div class="window-dots">
+                  <span class="dot-red"></span>
+                  <span class="dot-yellow"></span>
+                  <span class="dot-green"></span>
                 </div>
-                <h4 class="brand-rules-heading" id="simBrandHeading">Kurumsal Kimlik Doğrulandı:</h4>
+                <span class="studio-window-title">VitrinOS Studio Engine v2.4 — Simülasyon</span>
+                <div class="studio-status-indicator">
+                  <span class="pulse-beacon"></span>
+                  <span class="status-text">CANLI</span>
+                </div>
+              </div>
 
-                <!-- Canlı Renk Paleti -->
-                <div class="sim-palette-block">
-                  <span class="palette-title">Aktif Renk Paleti:</span>
-                  <div class="palette-swatches" id="simPaletteSwatches">
-                    <!-- JS ile doldurulacak -->
+              <!-- Sahne 1: Yazma & Analiz -->
+              <div class="flow-scene is-active" data-flow-scene="0">
+                <div class="scene-prompt-box">
+                  <div class="prompt-box-top">
+                    <span class="prompt-meta-label">SİSTEME İLETİLEN DOĞAL DİL İSTEĞİ</span>
+                    <span class="prompt-mode-tag" id="simSectorTag">Sektör Analizi</span>
+                  </div>
+                  <div class="prompt-typing-sim">
+                    <span id="simPromptText" class="sim-prompt-text">"..."</span>
+                    <span class="typing-cursor" aria-hidden="true"></span>
                   </div>
                 </div>
-
-                <!-- Kurallar Listesi -->
-                <div class="rules-checklist">
-                  <div class="rule-item">
-                    <span class="rule-check">✓</span>
-                    <span>Tipografi: <strong id="simRuleFont">-</strong></span>
+                <div class="scene-preview-stage">
+                  <div class="sim-analysis-header">
+                    <span class="analysis-indicator-icon">⚡</span>
+                    <h4>Otomatik Parametre Ayrıştırma</h4>
                   </div>
-                  <div class="rule-item">
-                    <span class="rule-check">✓</span>
-                    <span>Logo Konumu: <strong id="simRuleLogo">-</strong></span>
+                  <div class="sim-analysis-grid">
+                    <div class="analysis-item">
+                      <span class="item-label">Sektör & Alan</span>
+                      <strong class="item-value" id="simMetaSector">-</strong>
+                    </div>
+                    <div class="analysis-item">
+                      <span class="item-label">Hedef Format</span>
+                      <strong class="item-value" id="simMetaFormat">-</strong>
+                    </div>
+                    <div class="analysis-item">
+                      <span class="item-label">Tasarım Amacı</span>
+                      <strong class="item-value" id="simMetaIntent">-</strong>
+                    </div>
+                    <div class="analysis-item">
+                      <span class="item-label">İletişim Tonu</span>
+                      <strong class="item-value" id="simMetaTone">-</strong>
+                    </div>
                   </div>
-                  <div class="rule-item">
-                    <span class="rule-check">✓</span>
-                    <span>Görsel Dili: <strong id="simRuleVisual">-</strong></span>
-                  </div>
-                  <div class="rule-item">
-                    <span class="rule-check">✓</span>
-                    <span>Halüsinasyon Kilidi: <strong>Aktif (Marka dışı renk & font engellendi)</strong></span>
+                  <div class="analysis-status-bar">
+                    <span class="spinner-line" aria-hidden="true"></span>
+                    <span id="simAnalysisStatusText">İstek çözümlendi. Kayıtlı marka profiline bağlanılıyor...</span>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Sahne 3: Onay & Revizyon -->
-            <div class="flow-scene" data-flow-scene="2">
-              <div class="scene-preview-stage result-output-stage">
-                <div class="result-stage-top">
-                  <span class="result-ready-badge" id="simReadyBadge">✓ 3 Formatında Tasarımlar Hazır!</span>
-                  <span class="render-speed-pill">⚡ 3.2 sn</span>
-                </div>
+              <!-- Sahne 2: Marka Kuralı Uygulama -->
+              <div class="flow-scene" data-flow-scene="1">
+                <div class="scene-preview-stage brand-rules-stage">
+                  <div class="rules-stage-top">
+                    <span class="rule-applied-toast" id="simRuleBadge">✓ MARKA DNA'SI KİLİTLENDİ</span>
+                    <span class="rule-profile-id" id="simProfileId">PROFİL: #VO-8421</span>
+                  </div>
+                  <h4 class="brand-rules-heading" id="simBrandHeading">Kurumsal Kimlik Doğrulandı:</h4>
 
-                <div class="sim-visual-viewport">
-                  <div class="sim-artwork-frame" id="simArtworkFrame">
-                    <img id="simArtworkImg" class="sim-artwork-img" src="assets/sim-coffee-workshop.jpg" alt="VitrinOS Canlı Simülasyon Çıktısı">
-                    <div class="sim-artwork-overlay">
-                      <span class="sim-format-tag" id="simFormatTag">Story 9:16</span>
-                      <span class="sim-watermark">VitrinOS Verified Output</span>
+                  <!-- Canlı Renk Paleti -->
+                  <div class="sim-palette-block">
+                    <span class="palette-title">Aktif Renk Paleti:</span>
+                    <div class="palette-swatches" id="simPaletteSwatches">
+                      <!-- JS ile doldurulacak -->
+                    </div>
+                  </div>
+
+                  <!-- Kurallar Listesi -->
+                  <div class="rules-checklist">
+                    <div class="rule-item">
+                      <span class="rule-check">✓</span>
+                      <span>Tipografi: <strong id="simRuleFont">-</strong></span>
+                    </div>
+                    <div class="rule-item">
+                      <span class="rule-check">✓</span>
+                      <span>Logo Konumu: <strong id="simRuleLogo">-</strong></span>
+                    </div>
+                    <div class="rule-item">
+                      <span class="rule-check">✓</span>
+                      <span>Görsel Dili: <strong id="simRuleVisual">-</strong></span>
+                    </div>
+                    <div class="rule-item">
+                      <span class="rule-check">✓</span>
+                      <span>Halüsinasyon Kilidi: <strong>Aktif (Marka dışı renk & font engellendi)</strong></span>
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <div class="sim-result-footer">
-                  <div class="sim-quick-revise">
-                    <span class="revise-label">Tek Cümleyle Revizyon:</span>
-                    <span class="revise-example" id="simReviseExample">"Yazıyı biraz daha büyüt ve rengi derinleştir"</span>
+              <!-- Sahne 3: Onay & Revizyon -->
+              <div class="flow-scene" data-flow-scene="2">
+                <div class="scene-preview-stage result-output-stage">
+                  <div class="result-stage-top">
+                    <span class="result-ready-badge" id="simReadyBadge">✓ 3 Formatında Tasarımlar Hazır!</span>
+                    <span class="render-speed-pill">⚡ 3.2 sn</span>
                   </div>
-                  <div class="result-actions">
-                    <span class="btn btn-primary sim-btn-dl">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                      </svg>
-                      <span>Görselleri İndir</span>
-                    </span>
-                    <span class="btn btn-secondary sim-btn-edit">
-                      <span>Revize İste</span>
-                    </span>
+
+                  <div class="sim-visual-viewport">
+                    <div class="sim-artwork-frame" id="simArtworkFrame">
+                      <img id="simArtworkImg" class="sim-artwork-img" src="assets/sim-coffee-workshop.jpg" alt="VitrinOS Canlı Simülasyon Çıktısı" width="760" height="520">
+                      <div class="sim-artwork-overlay">
+                        <span class="sim-format-tag" id="simFormatTag">Story 9:16</span>
+                        <span class="sim-watermark">VitrinOS Verified Output</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="sim-result-footer">
+                    <div class="sim-quick-revise">
+                      <span class="revise-label">Tek Cümleyle Revizyon:</span>
+                      <span class="revise-example" id="simReviseExample">"Yazıyı biraz daha büyüt ve rengi derinleştir"</span>
+                    </div>
+                    <div class="result-actions">
+                      <span class="btn btn-primary sim-btn-dl" role="button" tabindex="0">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="7 10 12 15 17 10"></polyline>
+                          <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>Görselleri İndir</span>
+                      </span>
+                      <span class="btn btn-secondary sim-btn-edit" role="button" tabindex="0">
+                        <span>Revize İste</span>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -467,104 +667,168 @@
       </section>
 
       <!-- ===================================================================
-           Bölüm 4: Neden VitrinOS? (Canlı Karşılaştırma)
+           Bölüm 4: Neden VitrinOS? — İnteraktif Kaos vs. Disiplin Arenası
            =================================================================== -->
       <section class="comparison-section" id="neden-vitrinos" aria-labelledby="comp-title">
         <div class="container">
-          <div class="section-head" data-reveal>
-            <h2 id="comp-title">Sıradan yapay zeka araçları ile VitrinOS arasındaki fark.</h2>
-            <p class="lead">
-              Piyasadaki genel AI araçları markanızı tanımaz. VitrinOS ise kurumsal kimliğinizi ezbere bilen kişisel tasarımcınız gibi çalışır.
-            </p>
+          <div class="comparison-top-deck" data-reveal>
+            <div class="section-head">
+              <div class="section-kicker">
+                <span class="kicker-num">03</span>
+                <span class="kicker-text">KONTROL & SADAKAT FARKI</span>
+              </div>
+              <h2 id="comp-title">Sıradan yapay zeka araçları ile VitrinOS arasındaki fark.</h2>
+              <p class="lead">
+                Piyasadaki genel AI araçları markanızı tanımaz. VitrinOS ise kurumsal kimliğinizi ezbere bilen kişisel tasarımcınız gibi çalışır.
+              </p>
+            </div>
+
+            <!-- Bölüm Özel Etkileşimi: Canlı Marka Disiplin Odak Kaydırıcısı -->
+            <div class="reality-duel-controller">
+              <span class="duel-label">Odak Modunu Test Edin:</span>
+              <div class="duel-switch-group" role="group" aria-label="Karşılaştırma odak modu">
+                <button type="button" class="duel-mode-btn" data-duel-focus="generic">Sıradan AI Kaosu</button>
+                <button type="button" class="duel-mode-btn is-active" data-duel-focus="balanced">Yan Yana Karşılaştır</button>
+                <button type="button" class="duel-mode-btn" data-duel-focus="vitrinos">VitrinOS Disiplini</button>
+              </div>
+            </div>
           </div>
 
-          <div class="comparison-grid">
+          <div class="comparison-grid" id="comparisonArena" data-duel-state="balanced">
             <!-- Sıradan AI Aracı -->
-            <article class="comparison-box is-generic" data-reveal data-reveal-delay="100">
-              <div>
+            <article class="comparison-box is-generic" data-reveal data-reveal-delay="100" data-tilt-card>
+              <div class="comp-card-inner">
                 <div class="comparison-header">
-                  <h3>Sıradan AI Araçları</h3>
+                  <div class="comp-title-wrap">
+                    <span class="comp-status-dot danger" aria-hidden="true"></span>
+                    <h3>Sıradan AI Araçları</h3>
+                  </div>
                   <span class="comp-badge danger">KURALSIZ & RASTGELE</span>
                 </div>
+
+                <!-- Görsel Sapma Telemetri Barı -->
+                <div class="comp-telemetry-strip danger" aria-hidden="true">
+                  <span>RENK SAPMASI: <strong>YÜKSEK</strong></span>
+                  <span>LOGO KORUMASI: <strong>YOK</strong></span>
+                  <span>BELLEK: <strong>SIFIR</strong></span>
+                </div>
+
                 <div class="comp-preview">
-                  <p style="font-size: 14px; color: #c97b83; margin: 0; line-height: 1.6;">
+                  <p>
                     Her komutta rastgele ve kontrolsüz renkler üretir. Logonuzu yanlış yerleştirir veya deforme eder. Markanızın ciddiyetine uymayan jenerik stok görseller verir.
                   </p>
                 </div>
-              </div>
 
-              <ul class="comp-points danger">
-                <li>Rastgele renkler ve tutarsız tasarım dili</li>
-                <li>Logoyu bozan veya yerleştiremeyen şablonlar</li>
-                <li>Her mecra için yeniden boyutlandırma zahmeti</li>
-                <li>Marka kurallarını ve ses tonunu hatırlamaz</li>
-              </ul>
+                <ul class="comp-points danger">
+                  <li>Rastgele renkler ve tutarsız tasarım dili</li>
+                  <li>Logoyu bozan veya yerleştiremeyen şablonlar</li>
+                  <li>Her mecra için yeniden boyutlandırma zahmeti</li>
+                  <li>Marka kurallarını ve ses tonunu hatırlamaz</li>
+                </ul>
+              </div>
             </article>
 
+            <!-- Merkez VS Dönüşüm Köprüsü -->
+            <div class="comparison-vs-bridge" aria-hidden="true">
+              <div class="vs-line"></div>
+              <div class="vs-orb">VS</div>
+              <div class="vs-line"></div>
+            </div>
+
             <!-- VitrinOS -->
-            <article class="comparison-box is-vitrinos" data-reveal data-reveal-delay="200">
-              <div>
+            <article class="comparison-box is-vitrinos" data-reveal data-reveal-delay="200" data-tilt-card>
+              <div class="comp-card-inner">
                 <div class="comparison-header">
-                  <h3>VitrinOS Akıllı Atölye</h3>
+                  <div class="comp-title-wrap">
+                    <span class="comp-status-dot success" aria-hidden="true"></span>
+                    <h3>VitrinOS Akıllı Atölye</h3>
+                  </div>
                   <span class="comp-badge success">MARKAYA %100 SADIK</span>
                 </div>
-                <div class="comp-preview" style="background: rgba(204, 255, 0, 0.05); border: 1px solid rgba(204, 255, 0, 0.2);">
-                  <p style="font-size: 14px; color: var(--text-main); margin: 0; line-height: 1.6;">
+
+                <!-- Görsel Disiplin Telemetri Barı -->
+                <div class="comp-telemetry-strip success" aria-hidden="true">
+                  <span>HEX KİLİDİ: <strong>%100 AKTİF</strong></span>
+                  <span>LOGO: <strong>GÜVENLİ ALANDA</strong></span>
+                  <span>BELLEK: <strong>KALICI DNA</strong></span>
+                </div>
+
+                <div class="comp-preview comp-preview-vitrinos">
+                  <p>
                     Şirketinizin renk kodunu (#HEX), kurumsal fontunu ve logosunu ezbere bilir. İster iş ilanı ister kampanya görseli olsun; her mecrada markanızın disiplinini korur.
                   </p>
                 </div>
-              </div>
 
-              <ul class="comp-points success">
-                <li>Kurumsal renkleriniz ve logonuz kilitli kalır</li>
-                <li>Tek tıkla tüm mecralara (Story, Post, Banner) uyarlanır</li>
-                <li>Yasaklı kelimeler ve marka ses tonu kontrol edilir</li>
-                <li>İnsan onayı ve sınırsız hızlı revizyon imkanı</li>
-              </ul>
+                <ul class="comp-points success">
+                  <li>Kurumsal renkleriniz ve logonuz kilitli kalır</li>
+                  <li>Tek tıkla tüm mecralara (Story, Post, Banner) uyarlanır</li>
+                  <li>Yasaklı kelimeler ve marka ses tonu kontrol edilir</li>
+                  <li>İnsan onayı ve sınırsız hızlı revizyon imkanı</li>
+                </ul>
+              </div>
             </article>
           </div>
         </div>
       </section>
 
       <!-- ===================================================================
-           Bölüm 5: Fiyatlandırma & Paketler
+           Bölüm 5: Fiyatlandırma & Paketler — Holografik Üretim Matrisi
            =================================================================== -->
       <section class="pricing-section" id="paketler" aria-labelledby="pricing-title">
         <div class="container">
-          <div class="section-head" style="text-align: center; margin-left: auto; margin-right: auto;" data-reveal>
-            <h2 id="pricing-title">Markanıza en uygun üretim planını belirleyin.</h2>
-            <p class="lead">
-              Tasarımcı maliyetlerini ve haftalar süren bekleme sürelerini bitirin. Kart bilgisi girmeden doğrudan WhatsApp üzerinden tanışalım.
-            </p>
+          <div class="pricing-header-deck" data-reveal>
+            <div class="section-head">
+              <div class="section-kicker">
+                <span class="kicker-num">04</span>
+                <span class="kicker-text">ÖLÇEKLENEBİLİR ÜRETİM PLANLARI</span>
+              </div>
+              <h2 id="pricing-title">Markanıza en uygun üretim planını belirleyin.</h2>
+              <p class="lead">
+                Tasarımcı maliyetlerini ve haftalar süren bekleme sürelerini bitirin. Kart bilgisi girmeden doğrudan WhatsApp üzerinden tanışalım.
+              </p>
+            </div>
+
+            <!-- Fatura Periyodu Seçici Kapsülü -->
+            <div class="billing-toggle-wrapper">
+              <span class="billing-label is-active" id="labelMonthly">Aylık Ödeme</span>
+              <button class="toggle-switch" id="billingToggle" type="button" role="switch" aria-checked="false" aria-label="Yıllık ödeme indirimini aç/kapat">
+                <span class="toggle-thumb" aria-hidden="true"></span>
+              </button>
+              <span class="billing-label" id="labelYearly">
+                Yıllık Ödeme
+                <span class="discount-pill">%20 İndirim</span>
+              </span>
+            </div>
           </div>
 
-          <!-- Fatura Periyodu Seçici -->
-          <div class="billing-toggle-wrapper" data-reveal>
-            <span class="billing-label is-active" id="labelMonthly">Aylık Ödeme</span>
-            <button class="toggle-switch" id="billingToggle" type="button" role="switch" aria-checked="false" aria-label="Yıllık ödeme indirimini aç/kapat">
-              <span class="toggle-thumb" aria-hidden="true"></span>
-            </button>
-            <span class="billing-label" id="labelYearly">
-              Yıllık Ödeme
-              <span class="discount-pill">%20 İndirim</span>
-            </span>
-          </div>
-
-          <!-- Fiyatlandırma Kartları -->
+          <!-- Fiyatlandırma Kartları (3D Tilt + Kapasite Barlı Monolitler) -->
           <div class="pricing-cards-grid">
             <!-- Başlangıç Planı -->
-            <article class="price-card" data-reveal data-reveal-delay="100">
-              <div>
+            <article class="price-card" data-reveal data-reveal-delay="100" data-tilt-card>
+              <div class="price-card-body">
+                <div class="price-tier-index" aria-hidden="true">TIER 01 // STARTER</div>
                 <div class="price-header">
                   <h3>Başlangıç</h3>
                   <p class="price-desc">Kendi markasını profesyonelce büyütmek isteyen butik işletmeler ve bireysel girişimciler için.</p>
                 </div>
-                <div class="price-figure">
-                  <span class="price-currency">$</span>
-                  <span class="price-number" data-price-starter>49</span>
-                  <span class="price-term">/ ay</span>
+
+                <div class="price-figure-box">
+                  <div class="price-figure">
+                    <span class="price-currency">$</span>
+                    <span class="price-number" data-price-starter>49</span>
+                    <span class="price-term">/ ay</span>
+                  </div>
+                  <div class="price-billing-note" data-note-starter>Aylık faturalandırılır, taahhüt yok</div>
                 </div>
-                <div class="price-billing-note" data-note-starter>Aylık faturalandırılır, taahhüt yok</div>
+
+                <!-- Görsel Kapasite Ölçer -->
+                <div class="capacity-meter" aria-hidden="true">
+                  <div class="capacity-meta">
+                    <span>Üretim Kapasitesi</span>
+                    <span>45 Çıktı / Ay</span>
+                  </div>
+                  <div class="capacity-bar"><span style="width: 32%;"></span></div>
+                </div>
 
                 <ul class="features-list">
                   <li><strong>1 Aktif</strong> Marka Profili</li>
@@ -575,25 +839,39 @@
                 </ul>
               </div>
 
-              <a class="btn btn-secondary" data-cta-starter href="https://wa.me/905510653051?text=Merhaba%2C%20VitrinOS%20Ba%C5%9Flang%C4%B1%C3%A7%20Plan%C4%B1%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener noreferrer">
+              <a class="btn btn-secondary btn-block" data-cta-starter href="https://wa.me/905510653051?text=Merhaba%2C%20VitrinOS%20Ba%C5%9Flang%C4%B1%C3%A7%20Plan%C4%B1%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener noreferrer">
                 <span>Başlangıç ile Başlayın</span>
               </a>
             </article>
 
             <!-- Büyüme Planı (Öne Çıkan) -->
-            <article class="price-card is-featured" data-reveal data-reveal-delay="200">
+            <article class="price-card is-featured" data-reveal data-reveal-delay="200" data-tilt-card>
+              <div class="featured-aura" aria-hidden="true"></div>
               <span class="featured-ribbon">En Popüler</span>
-              <div>
+              <div class="price-card-body">
+                <div class="price-tier-index" aria-hidden="true">TIER 02 // GROWTH ENGINE</div>
                 <div class="price-header">
                   <h3>Büyüme</h3>
                   <p class="price-desc">Düzenli içerik üreten şirketler, birden fazla hesabı yöneten ajanslar ve hızlı ekipler için.</p>
                 </div>
-                <div class="price-figure">
-                  <span class="price-currency">$</span>
-                  <span class="price-number" data-price-growth>149</span>
-                  <span class="price-term">/ ay</span>
+
+                <div class="price-figure-box">
+                  <div class="price-figure">
+                    <span class="price-currency">$</span>
+                    <span class="price-number" data-price-growth>149</span>
+                    <span class="price-term">/ ay</span>
+                  </div>
+                  <div class="price-billing-note" data-note-growth>Aylık faturalandırılır, taahhüt yok</div>
                 </div>
-                <div class="price-billing-note" data-note-growth>Aylık faturalandırılır, taahhüt yok</div>
+
+                <!-- Görsel Kapasite Ölçer -->
+                <div class="capacity-meter is-lime" aria-hidden="true">
+                  <div class="capacity-meta">
+                    <span>Üretim Kapasitesi</span>
+                    <span>180 Çıktı / Ay</span>
+                  </div>
+                  <div class="capacity-bar"><span style="width: 74%;"></span></div>
+                </div>
 
                 <ul class="features-list">
                   <li><strong>3 Farklı</strong> Marka Profili</li>
@@ -605,23 +883,36 @@
                 </ul>
               </div>
 
-              <a class="btn btn-primary" data-cta-growth href="https://wa.me/905510653051?text=Merhaba%2C%20VitrinOS%20B%C3%BCy%C3%BCme%20Plan%C4%B1%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener noreferrer">
+              <a class="btn btn-primary btn-block" data-cta-growth href="https://wa.me/905510653051?text=Merhaba%2C%20VitrinOS%20B%C3%BCy%C3%BCme%20Plan%C4%B1%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener noreferrer">
                 <span>Büyüme Planını Seçin</span>
               </a>
             </article>
 
             <!-- Kurumsal & Ajans Planı -->
-            <article class="price-card" data-reveal data-reveal-delay="300">
-              <div>
+            <article class="price-card" data-reveal data-reveal-delay="300" data-tilt-card>
+              <div class="price-card-body">
+                <div class="price-tier-index" aria-hidden="true">TIER 03 // ENTERPRISE</div>
                 <div class="price-header">
                   <h3>Kurumsal & Ajans</h3>
                   <p class="price-desc">Çok sayıda markayı yöneten reklam ajansları ve özel entegrasyon isteyen büyük kurumlar için.</p>
                 </div>
-                <div class="price-figure">
-                  <span class="price-number" style="font-size: 2.4rem;">Özel</span>
-                  <span class="price-term">Teklif</span>
+
+                <div class="price-figure-box">
+                  <div class="price-figure">
+                    <span class="price-number price-number-custom">Özel</span>
+                    <span class="price-term">Teklif</span>
+                  </div>
+                  <div class="price-billing-note">İhtiyacınıza göre esnek model</div>
                 </div>
-                <div class="price-billing-note">İhtiyacınıza göre esnek model</div>
+
+                <!-- Görsel Kapasite Ölçer -->
+                <div class="capacity-meter" aria-hidden="true">
+                  <div class="capacity-meta">
+                    <span>Üretim Kapasitesi</span>
+                    <span>Sınırsız Hacim</span>
+                  </div>
+                  <div class="capacity-bar"><span style="width: 100%;"></span></div>
+                </div>
 
                 <ul class="features-list">
                   <li><strong>Sınırsız</strong> Marka Profili</li>
@@ -632,7 +923,7 @@
                 </ul>
               </div>
 
-              <a class="btn btn-secondary" href="https://wa.me/905510653051?text=Merhaba%2C%20ajans%C4%B1m%C4%B1z%20%2F%20%C5%9Firketimiz%20i%C3%A7in%20VitrinOS%20kurumsal%20%C3%A7%C3%B6z%C3%BCm%C3%BC%20hakk%C4%B1nda%20g%C3%B6r%C3%BC%C5%9Fmek%20istiyorum." target="_blank" rel="noopener noreferrer">
+              <a class="btn btn-secondary btn-block" href="https://wa.me/905510653051?text=Merhaba%2C%20ajans%C4%B1m%C4%B1z%20%2F%20%C5%9Firketimiz%20i%C3%A7in%20VitrinOS%20kurumsal%20%C3%A7%C3%B6z%C3%BCm%C3%BC%20hakk%C4%B1nda%20g%C3%B6r%C3%BC%C5%9Fmek%20istiyorum." target="_blank" rel="noopener noreferrer">
                 <span>WhatsApp ile Özel Teklif Alın</span>
               </a>
             </article>
@@ -642,37 +933,48 @@
     </main>
 
     <!-- =====================================================================
-         Site Kapanışı (Footer)
+         Site Kapanışı — Anıtsal Stüdyo Portalı (Footer)
          ===================================================================== -->
     <footer class="site-footer">
+      <div class="footer-giant-watermark" aria-hidden="true">VITRINOS®</div>
       <div class="container">
-        <div class="footer-top" data-reveal>
-          <a class="footer-brand" href="#top" aria-label="VitrinOS ana sayfaya dön">
-            Vitrin<span>OS</span>®
-          </a>
-          <p class="footer-statement">
-            Markanızın kurallarıyla çalışan akıllı görsel tasarım atölyeniz. Sosyal medya, iş ilanları ve reklam kampanyalarınız için saniyeler içinde hazır.
-          </p>
-          <a class="btn btn-primary" href="https://wa.me/905510653051?text=Merhaba%2C%20VitrinOS%20hakk%C4%B1nda%20bilgi%20almak%20ve%20tan%C4%B1%C5%9Fmak%20istiyorum." target="_blank" rel="noopener noreferrer">
-            <span>WhatsApp: 0551 065 30 51</span>
-          </a>
-        </div>
-
-        <div class="footer-bottom">
-          <div class="footer-links">
-            <a href="#vitrin">Kullanım Alanları</a>
-            <a href="#nasil-calisir">Nasıl Çalışır?</a>
-            <a href="#neden-vitrinos">Neden VitrinOS?</a>
-            <a href="#paketler">Paketler</a>
-            <a href="login.html">Müşteri Girişi</a>
+        <div class="footer-portal-card" data-reveal data-tilt-card>
+          <div class="footer-top">
+            <div class="footer-brand-col">
+              <a class="footer-brand" href="#top" aria-label="VitrinOS ana sayfaya dön">
+                Vitrin<span>OS</span>®
+              </a>
+              <p class="footer-statement">
+                Markanızın kurallarıyla çalışan akıllı görsel tasarım atölyeniz. Sosyal medya, iş ilanları ve reklam kampanyalarınız için saniyeler içinde hazır.
+              </p>
+            </div>
+            <div class="footer-cta-col">
+              <span class="footer-cta-eyebrow">DOĞRUDAN STÜDYO HATTI</span>
+              <a class="btn btn-primary btn-lg" href="https://wa.me/905510653051?text=Merhaba%2C%20VitrinOS%20hakk%C4%B1nda%20bilgi%20almak%20ve%20tan%C4%B1%C5%9Fmak%20istiyorum." target="_blank" rel="noopener noreferrer">
+                <span>WhatsApp: 0551 065 30 51</span>
+                <svg class="btn-icon" aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                </svg>
+              </a>
+            </div>
           </div>
-          <span class="footer-copy">© 2026 VitrinOS. Tüm hakları saklıdır.</span>
+
+          <div class="footer-bottom">
+            <div class="footer-links">
+              <a href="#vitrin">Kullanım Alanları</a>
+              <a href="#nasil-calisir">Nasıl Çalışır?</a>
+              <a href="#neden-vitrinos">Neden VitrinOS?</a>
+              <a href="#paketler">Paketler</a>
+              <a href="login.html">Müşteri Girişi</a>
+            </div>
+            <span class="footer-copy">© 2026 VitrinOS. Tüm hakları saklıdır.</span>
+          </div>
         </div>
       </div>
     </footer>
 
     <!-- =====================================================================
-         Stüdyo Tarzı Yüzen WhatsApp Düğmesi
+         Stüdyo Tarzı Yüzen WhatsApp Kapsülü
          ===================================================================== -->
     <a class="whatsapp-float" href="https://wa.me/905510653051?text=Merhaba%2C%20VitrinOS%20hakk%C4%B1nda%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener noreferrer" aria-label="WhatsApp üzerinden doğrudan iletişime geçin">
       <span class="whatsapp-icon-circle" aria-hidden="true">

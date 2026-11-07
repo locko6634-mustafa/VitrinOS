@@ -1,24 +1,27 @@
 /**
- * VitrinOS — Awwwards Seviyesi Ultra Optimize Motion & Etkileşim Motoru
- * Performans Odaklı: 60 FPS Sıfır Kasıntı (Zero Jank)
+ * VitrinOS — Awwwards Seviyesi Spatial Motion & Etkileşim Motoru
+ * Performans Odaklı: 60 FPS Sıfır Kasıntı (Zero Jank), Özel Mouse İmleci Yok
  * 1. FOUT & Layout Shift Önleyici Preloader
  * 2. Donanım İvmeli Akıcı Scroll Reveal Sistemi (IntersectionObserver)
- * 3. Header Scroll Durumu & Neon İlerleme Çubuğu
+ * 3. Header Scroll Durumu, Lazer İlerleme Çubuğu & Bölüm Scroll-Spy
  * 4. Kartlara Fareye Duyarlı 3D Tilt ve Dinamik Spotlight (RAF Senkronize)
  * 5. Butonlara Manyetik Çekim Fiziği (Magnetic Hover Pull)
  * 6. Hero Çok Katmanlı Paralaks Derinliği (Multi-plane Parallax)
- * 7. Ultra Optimize Parçacık Zemin Motoru (Zero shadowBlur Canvas)
+ * 7. Kaos vs. Disiplin Karşılaştırma Arenası Odak Kontrolü
+ * 8. İnteraktif Takımyıldız & Parçacık Zemin Motoru (Canvas)
  */
 
 export function initMotion() {
   initPreloader();
   initScrollReveal();
-  initHeaderScroll();
+  initHeaderScrollAndSpy();
+  initRealityDuelArena();
   initAmbientParticles();
 
-  // Yalnızca mouse ve hassas işaretçiye sahip cihazlarda 3D tilt, manyetik ve paralaks çalıştır
   const isFinePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-  if (isFinePointer) {
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (isFinePointer && !prefersReducedMotion) {
     init3DTiltAndSpotlight();
     initMagneticButtons();
     initHeroParallax();
@@ -38,10 +41,14 @@ function initPreloader() {
   }
 
   const startTime = Date.now();
-  const MIN_DISPLAY_TIME = 280;
-  const MAX_FALLBACK_TIME = 1200;
+  const MIN_DISPLAY_TIME = 240;
+  const MAX_FALLBACK_TIME = 1100;
+  let dismissed = false;
 
   function dismiss() {
+    if (dismissed) return;
+    dismissed = true;
+
     const elapsed = Date.now() - startTime;
     const remaining = Math.max(0, MIN_DISPLAY_TIME - elapsed);
 
@@ -50,11 +57,11 @@ function initPreloader() {
 
       setTimeout(() => {
         heroReveals.forEach((el) => el.classList.add("is-visible"));
-      }, 100);
+      }, 80);
 
       setTimeout(() => {
         preloader.hidden = true;
-      }, 600);
+      }, 560);
     }, remaining);
   }
 
@@ -72,7 +79,7 @@ function initPreloader() {
 }
 
 /**
- * 2. Kademeli Scroll Reveal
+ * 2. Kademeli Scroll Reveal (IntersectionObserver)
  */
 function initScrollReveal() {
   const scrollElements = document.querySelectorAll(
@@ -95,7 +102,7 @@ function initScrollReveal() {
       });
     },
     {
-      rootMargin: "0px 0px -30px 0px",
+      rootMargin: "0px 0px -32px 0px",
       threshold: 0.08,
     }
   );
@@ -104,13 +111,12 @@ function initScrollReveal() {
 }
 
 /**
- * 3. Header Scroll Durumu
+ * 3. Header Scroll Durumu, Lazer İlerleme Çubuğu & Bölüm Scroll-Spy
  */
-function initHeaderScroll() {
+function initHeaderScrollAndSpy() {
   const header = document.querySelector(".site-header");
   const scrollBar = document.getElementById("headerScrollBar");
-
-  if (!header && !scrollBar) return;
+  const navLinks = document.querySelectorAll(".nav-link[data-nav-section]");
 
   let ticking = false;
 
@@ -119,11 +125,7 @@ function initHeaderScroll() {
       requestAnimationFrame(() => {
         const scrollY = window.scrollY || window.pageYOffset || 0;
         if (header) {
-          if (scrollY > 20) {
-            header.classList.add("is-scrolled");
-          } else {
-            header.classList.remove("is-scrolled");
-          }
+          header.classList.toggle("is-scrolled", scrollY > 20);
         }
 
         if (scrollBar) {
@@ -139,6 +141,28 @@ function initHeaderScroll() {
 
   window.addEventListener("scroll", handleScroll, { passive: true });
   handleScroll();
+
+  if (navLinks.length && "IntersectionObserver" in window) {
+    const sections = ["vitrin", "nasil-calisir", "neden-vitrinos", "paketler"]
+      .map((id) => document.getElementById(id))
+      .filter(Boolean);
+
+    const spyObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const activeId = entry.target.id;
+            navLinks.forEach((link) => {
+              link.classList.toggle("is-active", link.dataset.navSection === activeId);
+            });
+          }
+        });
+      },
+      { rootMargin: "-30% 0px -55% 0px", threshold: 0 }
+    );
+
+    sections.forEach((sec) => spyObserver.observe(sec));
+  }
 }
 
 /**
@@ -146,11 +170,13 @@ function initHeaderScroll() {
  */
 function init3DTiltAndSpotlight() {
   const tiltSelectors = [
+    "[data-tilt-card]",
     ".stage-card",
     ".mosaic-card",
     ".flow-visual-card",
     ".comparison-box",
     ".price-card",
+    ".footer-portal-card",
   ];
   const cards = document.querySelectorAll(tiltSelectors.join(", "));
   if (!cards.length) return;
@@ -166,7 +192,7 @@ function init3DTiltAndSpotlight() {
     let targetPctY = "50%";
     let rafId = null;
 
-    const maxTilt = 7;
+    const maxTilt = card.classList.contains("footer-portal-card") ? 3.5 : 6.5;
 
     function updateBounds() {
       bounds = card.getBoundingClientRect();
@@ -212,7 +238,7 @@ function init3DTiltAndSpotlight() {
       }
 
       if (isHovered || Math.abs(currentX) > 0.05 || Math.abs(currentY) > 0.05) {
-        card.style.transform = `perspective(1000px) rotateX(${currentX.toFixed(2)}deg) rotateY(${currentY.toFixed(2)}deg) scale3d(1.01, 1.01, 1.01)`;
+        card.style.transform = `perspective(1100px) rotateX(${currentX.toFixed(2)}deg) rotateY(${currentY.toFixed(2)}deg) scale3d(1.008, 1.008, 1.008)`;
         rafId = requestAnimationFrame(render);
       } else {
         card.style.transform = "";
@@ -236,6 +262,7 @@ function initMagneticButtons() {
     ".whatsapp-float",
     ".scenario-btn",
     ".btn-nav-login",
+    ".xray-toggle-btn",
   ];
   const buttons = document.querySelectorAll(magneticSelectors.join(", "));
   if (!buttons.length) return;
@@ -249,8 +276,8 @@ function initMagneticButtons() {
     let targetY = 0;
     let rafId = null;
 
-    const pullStrength = btn.classList.contains("whatsapp-float") ? 0.2 : 0.3;
-    const maxPull = 10;
+    const pullStrength = btn.classList.contains("whatsapp-float") ? 0.22 : 0.28;
+    const maxPull = 9;
 
     function updateBounds() {
       bounds = btn.getBoundingClientRect();
@@ -288,7 +315,7 @@ function initMagneticButtons() {
 
         const child = btn.querySelector("span, .btn-icon, .whatsapp-icon-circle");
         if (child) {
-          child.style.transform = `translate3d(${(currentX * 0.25).toFixed(1)}px, ${(currentY * 0.25).toFixed(1)}px, 0)`;
+          child.style.transform = `translate3d(${(currentX * 0.22).toFixed(1)}px, ${(currentY * 0.22).toFixed(1)}px, 0)`;
         }
         rafId = requestAnimationFrame(render);
       } else {
@@ -306,12 +333,13 @@ function initMagneticButtons() {
 }
 
 /**
- * 6. Hero Çok Katmanlı Paralaks
+ * 6. Hero Çok Katmanlı Paralaks Derinliği
  */
 function initHeroParallax() {
   const heroSection = document.querySelector(".hero-section");
   const heroStatement = document.querySelector(".hero-statement");
   const heroStage = document.querySelector(".hero-stage-wrapper");
+  const heroHud = document.querySelector(".stage-rules-bar");
 
   if (!heroSection || !heroStatement || !heroStage) return;
 
@@ -321,6 +349,8 @@ function initHeroParallax() {
   let currentStatementY = 0;
   let currentStageX = 0;
   let currentStageY = 0;
+  let currentHudX = 0;
+  let currentHudY = 0;
   let rafId = null;
 
   function onMouseMove(e) {
@@ -334,18 +364,25 @@ function initHeroParallax() {
   }
 
   function render() {
-    const targetStatX = mouseX * -10;
-    const targetStatY = mouseY * -6;
+    const targetStatX = mouseX * -8;
+    const targetStatY = mouseY * -5;
     const targetStageX = mouseX * 12;
     const targetStageY = mouseY * 8;
+    const targetHudX = mouseX * -6;
+    const targetHudY = mouseY * -4;
 
     currentStatementX += (targetStatX - currentStatementX) * 0.08;
     currentStatementY += (targetStatY - currentStatementY) * 0.08;
     currentStageX += (targetStageX - currentStageX) * 0.08;
     currentStageY += (targetStageY - currentStageY) * 0.08;
+    currentHudX += (targetHudX - currentHudX) * 0.1;
+    currentHudY += (targetHudY - currentHudY) * 0.1;
 
     heroStatement.style.transform = `translate3d(${currentStatementX.toFixed(1)}px, ${currentStatementY.toFixed(1)}px, 0)`;
     heroStage.style.transform = `translate3d(${currentStageX.toFixed(1)}px, ${currentStageY.toFixed(1)}px, 0)`;
+    if (heroHud) {
+      heroHud.style.transform = `translate3d(${currentHudX.toFixed(1)}px, ${currentHudY.toFixed(1)}px, 0)`;
+    }
 
     if (
       Math.abs(targetStatX - currentStatementX) > 0.05 ||
@@ -361,8 +398,24 @@ function initHeroParallax() {
 }
 
 /**
- * 7. Ultra Optimize Parçacık Zemin Motoru (Zero shadowBlur Canvas)
- * shadowBlur rasterization tamamen kaldırıldı; 0.2ms GPU render süresi ile tereyağı gibi akıcı 60 FPS.
+ * 7. Kaos vs. Disiplin Karşılaştırma Arenası Odak Kontrolü
+ */
+function initRealityDuelArena() {
+  const modeBtns = document.querySelectorAll("[data-duel-focus]");
+  const arena = document.getElementById("comparisonArena");
+  if (!modeBtns.length || !arena) return;
+
+  modeBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const mode = btn.dataset.duelFocus;
+      modeBtns.forEach((b) => b.classList.toggle("is-active", b === btn));
+      arena.dataset.duelState = mode;
+    });
+  });
+}
+
+/**
+ * 8. Ultra Optimize Takımyıldız & Parçacık Zemin Motoru (Zero shadowBlur Canvas)
  */
 function initAmbientParticles() {
   let canvas = document.getElementById("ambientCanvas");
@@ -383,7 +436,7 @@ function initAmbientParticles() {
   let rafId = null;
 
   const isMobile = window.innerWidth < 768;
-  const particleCount = isMobile ? 12 : 24;
+  const particleCount = isMobile ? 14 : 28;
 
   function resize() {
     width = canvas.width = window.innerWidth;
@@ -398,14 +451,13 @@ function initAmbientParticles() {
     reset(initial = false) {
       this.x = Math.random() * width;
       this.y = initial ? Math.random() * height : height + 10;
-      this.size = Math.random() * 2 + 0.8;
-      this.speedY = Math.random() * 0.4 + 0.15;
-      this.speedX = (Math.random() - 0.5) * 0.25;
-      this.alpha = Math.random() * 0.4 + 0.15;
+      this.size = Math.random() * 1.9 + 0.7;
+      this.speedY = Math.random() * 0.35 + 0.12;
+      this.speedX = (Math.random() - 0.5) * 0.22;
+      this.alpha = Math.random() * 0.38 + 0.14;
       this.pulseSpeed = Math.random() * 0.02 + 0.008;
       this.pulse = Math.random() * Math.PI;
-
-      this.isLime = Math.random() > 0.35;
+      this.isLime = Math.random() > 0.38;
       this.color = this.isLime ? "204, 255, 0" : "43, 102, 255";
     }
 
@@ -420,18 +472,13 @@ function initAmbientParticles() {
     }
 
     draw() {
-      const currentAlpha = Math.max(
-        0.05,
-        this.alpha + Math.sin(this.pulse) * 0.12
-      );
+      const currentAlpha = Math.max(0.05, this.alpha + Math.sin(this.pulse) * 0.12);
 
-      // 1. Dış yumuşak hare (shadowBlur yerine GPU dostu hafif geniş daire)
       ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size * 2.2, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${this.color}, ${(currentAlpha * 0.25).toFixed(3)})`;
+      ctx.arc(this.x, this.y, this.size * 2.3, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${this.color}, ${(currentAlpha * 0.22).toFixed(3)})`;
       ctx.fill();
 
-      // 2. İç parlak çekirdek
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(${this.color}, ${currentAlpha.toFixed(2)})`;
@@ -456,22 +503,36 @@ function initAmbientParticles() {
       particles[i].draw();
     }
 
+    // Yakın parçacıklar arasında ince takımyıldız bağları
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const distSq = dx * dx + dy * dy;
+        if (distSq < 16000) {
+          const lineAlpha = (1 - distSq / 16000) * 0.07;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(204, 255, 0, ${lineAlpha.toFixed(3)})`;
+          ctx.lineWidth = 0.6;
+          ctx.stroke();
+        }
+      }
+    }
+
     rafId = requestAnimationFrame(loop);
   }
 
-  window.addEventListener("resize", () => {
-    resize();
-  }, { passive: true });
+  window.addEventListener("resize", resize, { passive: true });
 
   document.addEventListener("visibilitychange", () => {
     isTabActive = !document.hidden;
     if (isTabActive) {
       if (!rafId) rafId = requestAnimationFrame(loop);
-    } else {
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-        rafId = null;
-      }
+    } else if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
     }
   });
 

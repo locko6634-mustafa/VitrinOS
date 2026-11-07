@@ -1,7 +1,7 @@
 /**
- * VitrinOS — Hero Canlı Marka & Senaryo Seçicisi (Interactive Showcase)
- * Ziyaretçinin tek tıkla farklı sektörler için marka kurallarını ve
- * tasarım çıktılarını anında önizlemesini sağlar.
+ * VitrinOS — Hero Canlı Marka & Senaryo Seçicisi + Bento X-Ray Vitrin Denetleyicisi
+ * Ziyaretçinin tek tıkla farklı sektörler için marka kurallarını, atmosferik
+ * ışıklandırmayı ve format X-Ray kılavuzlarını deneyimlemesini sağlar.
  */
 
 export const SCENARIOS = {
@@ -13,8 +13,8 @@ export const SCENARIOS = {
     brandType: "Yazılım & B2B SaaS",
     format: "16:9 LinkedIn / Kariyer İlanı",
     tag: "İŞ İLANI",
-    tagBg: "rgba(43, 102, 255, 0.2)",
-    tagColor: "#598bff",
+    tagBg: "rgba(43, 102, 255, 0.24)",
+    tagColor: "#75a2ff",
     headline: "Kıdemli Frontend Mühendisi Aranıyor",
     subtext: "Tam zamanlı uzaktan çalışma, modern web teknolojileri ve global projeler.",
     ctaText: "Pozisyona Başvur",
@@ -36,7 +36,7 @@ export const SCENARIOS = {
     brandType: "Butik Kafe & Atölye",
     format: "9:16 Instagram Story",
     tag: "HAFTA SONU ÖZEL",
-    tagBg: "rgba(212, 155, 106, 0.2)",
+    tagBg: "rgba(212, 155, 106, 0.24)",
     tagColor: "#f3c295",
     headline: "Soğuk Demleme & Yeni Tatlılar",
     subtext: "Cumartesi ve Pazar gün boyu taze kavrulmuş çekirdekler ve atölye tadımı.",
@@ -59,7 +59,7 @@ export const SCENARIOS = {
     brandType: "Kreatif & Dijital Ajans",
     format: "4:5 Instagram Postu",
     tag: "BAŞARI HİKAYESİ",
-    tagBg: "rgba(204, 255, 0, 0.2)",
+    tagBg: "rgba(204, 255, 0, 0.22)",
     tagColor: "#ccff00",
     headline: "3 Günde 120.000 Etkileşim",
     subtext: "Marka kurallarına sadık kalarak hazırlanan tutarlı kreatif serinin sonuçları.",
@@ -82,7 +82,7 @@ export const SCENARIOS = {
     brandType: "Minimal Tasarım & Perakende",
     format: "16:6 Web Banner",
     tag: "YENİ SEZON",
-    tagBg: "rgba(229, 229, 229, 0.2)",
+    tagBg: "rgba(229, 229, 229, 0.22)",
     tagColor: "#f5f5f5",
     headline: "Zamansız Çizgiler, Saf Doku",
     subtext: "Yeni sezon koleksiyonumuz seçili mağazalarda ve dijital vitrinde yayında.",
@@ -100,6 +100,11 @@ export const SCENARIOS = {
 };
 
 export function initShowcase() {
+  initHeroScenarioSwitcher();
+  initBentoInspector();
+}
+
+function initHeroScenarioSwitcher() {
   const buttons = document.querySelectorAll("[data-scenario-btn]");
   const stageMockup = document.querySelector("[data-stage-mockup]");
   if (!buttons.length || !stageMockup) return;
@@ -122,27 +127,29 @@ export function initShowcase() {
     const data = SCENARIOS[key];
     if (!data) return;
 
-    // Buton aktiflik durumu
-    buttons.forEach(btn => {
-      btn.classList.toggle("is-active", btn.dataset.scenarioBtn === key);
+    // Gövde atmosfer temasını senaryoya göre güncelle
+    if (document.body) {
+      document.body.dataset.activeTheme = key;
+    }
+
+    // Buton aktiflik ve erişilebilirlik durumu
+    buttons.forEach((btn) => {
+      const isActive = btn.dataset.scenarioBtn === key;
+      btn.classList.toggle("is-active", isActive);
+      btn.setAttribute("aria-selected", isActive ? "true" : "false");
     });
 
-    // Format modu ile dinamik boyutlandırma (Dikey görsel dikey görünsün)
     stageMockup.dataset.formatMode = data.formatMode;
-
-    // Sektör rengine göre dinamik kart spotlight ve parlama rengi
     stageMockup.style.setProperty("--spotlight-border", data.paletteColor);
     stageMockup.style.setProperty("--spotlight-color", data.tagBg);
 
-    // Sinematik geçiş efekti
     stageMockup.classList.add("is-switching");
 
     setTimeout(() => {
-      // Sahne içerik güncellemesi
       if (brandBadge) {
         brandBadge.textContent = data.badgeLetter;
         brandBadge.style.backgroundColor = data.paletteColor;
-        brandBadge.style.color = data.id === "agency" || data.id === "cafe" ? "#0d0e12" : "#ffffff";
+        brandBadge.style.color = data.id === "agency" || data.id === "cafe" || data.id === "fashion" ? "#06070b" : "#ffffff";
       }
       if (brandName) brandName.textContent = data.brandName;
       if (brandType) brandType.textContent = data.brandType;
@@ -174,16 +181,49 @@ export function initShowcase() {
       setTimeout(() => {
         stageMockup.classList.remove("is-switching");
       }, 80);
-    }, 180);
+    }, 150);
   }
 
-  // Tıklama dinleyicileri
-  buttons.forEach(btn => {
+  buttons.forEach((btn) => {
     btn.addEventListener("click", () => {
       applyScenario(btn.dataset.scenarioBtn);
     });
   });
 
-  // Varsayılan senaryo
   applyScenario("tech");
+}
+
+function initBentoInspector() {
+  const filterBtns = document.querySelectorAll("[data-mosaic-filter]");
+  const cards = document.querySelectorAll(".mosaic-card[data-format-cat]");
+  const xrayBtn = document.getElementById("xrayGridToggle");
+  const mosaicGrid = document.getElementById("mosaicGrid");
+
+  if (filterBtns.length && cards.length) {
+    filterBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const target = btn.dataset.mosaicFilter;
+        filterBtns.forEach((b) => b.classList.toggle("is-active", b === btn));
+
+        cards.forEach((card) => {
+          if (target === "all") {
+            card.classList.remove("is-dimmed", "is-highlighted");
+          } else {
+            const isMatch = card.dataset.formatCat === target;
+            card.classList.toggle("is-highlighted", isMatch);
+            card.classList.toggle("is-dimmed", !isMatch);
+          }
+        });
+      });
+    });
+  }
+
+  if (xrayBtn && mosaicGrid) {
+    xrayBtn.addEventListener("click", () => {
+      const isPressed = xrayBtn.getAttribute("aria-pressed") === "true";
+      const nextState = !isPressed;
+      xrayBtn.setAttribute("aria-pressed", nextState ? "true" : "false");
+      mosaicGrid.classList.toggle("is-xray-active", nextState);
+    });
+  }
 }

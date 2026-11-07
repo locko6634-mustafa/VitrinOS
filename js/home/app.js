@@ -19,6 +19,14 @@ async function initAuthNavigation() {
 
   if (!loginLink || !dashboardLink) return;
 
+  // Yerel statik önizleme sunucusunda oturum çerezi yoksa 404 konsol gürültüsü üretme
+  const isLocalStatic =
+    typeof window !== "undefined" &&
+    (window.location.port === "8000" || window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost") &&
+    !document.cookie.includes("vitrinos") &&
+    !document.cookie.includes("session");
+  if (isLocalStatic) return;
+
   try {
     const user = await authStore.fetchSession();
     if (!user) return;
