@@ -1,27 +1,129 @@
 /**
- * VitrinOS — Sadeleştirilmiş Etkileşim Motoru (Wireframe / İskelet Modu)
- * Yalnızca işlevsel davranışlar korunur:
- * 1. Tüm [data-reveal] elemanlarının baştan görünür yapılması
- * 2. Header scroll durumu & bölüm scroll-spy
- * 3. #neden-vitrinos karşılaştırma arenası sekme geçişi
+ * VitrinOS — Hareket ve Etkileşim Denetleyicisi
+ * 1. Hero settle açılış animasyonu (reduced-motion uyumlu)
+ * 2. Görünüm dışı duraklayan Marquee gözlemcisi
+ * 3. Sticky Header daralma (is-scrolled), mobil çekmece & bölüm scroll-spy
+ * 4. Progressive [data-reveal] görünürlük gözlemcisi (vo-motion-ready güvenlik ağı ile)
  */
 
 export function initMotion() {
-  initRevealImmediate();
+  initHeroSettle();
+  initRevealObserver();
+  initMarqueeObserver();
   initHeaderScrollAndSpy();
-  initRealityDuelArena();
+  initMobileNavDrawer();
 }
 
 /**
- * 1. Tüm [data-reveal] elemanlarını animasyonsuz olarak hemen görünür yap
+ * 1. Hero settle ölçekleme yerleşimi
  */
-function initRevealImmediate() {
-  const revealElements = document.querySelectorAll("[data-reveal]");
-  revealElements.forEach((el) => el.classList.add("is-visible"));
+function initHeroSettle() {
+  const heroFrame = document.querySelector("[data-hero-frame]");
+  if (!heroFrame) return;
+
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduced) {
+    heroFrame.classList.add("is-settled");
+    return;
+  }
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      heroFrame.classList.add("is-settled");
+    });
+  });
 }
 
 /**
- * 2. Header Scroll Durumu & Bölüm Scroll-Spy
+ * 2. Progressive [data-reveal] (vo-motion-ready güvenlik ağı ile)
+ */
+function initRevealObserver() {
+  const revealElements = Array.from(document.querySelectorAll("[data-reveal]"));
+  if (!revealElements.length) {
+    document.documentElement.classList.add("vo-motion-ready");
+    return;
+  }
+
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduced || !("IntersectionObserver" in window)) {
+    revealElements.forEach((el) => el.classList.add("is-visible"));
+    document.documentElement.classList.add("vo-motion-ready");
+    return;
+  }
+
+  const viewportBottom = window.innerHeight || 900;
+  const pending = [];
+
+  revealElements.forEach((el) => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top <= viewportBottom * 0.98) {
+      el.classList.add("is-visible");
+    } else {
+      pending.push(el);
+    }
+  });
+
+  document.documentElement.classList.add("vo-motion-ready");
+
+  if (!pending.length) return;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { rootMargin: "0px 0px -4% 0px", threshold: 0.01 }
+  );
+
+  pending.forEach((el) => observer.observe(el));
+
+  // Hızlı kaydırmada atlanan veya görünüm yukarısında kalan ögeler için pasif güvenlik ağı
+  const revealPassedElements = () => {
+    const vh = window.innerHeight || 900;
+    let remaining = 0;
+    pending.forEach((el) => {
+      if (el.classList.contains("is-visible")) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.top <= vh * 0.96) {
+        el.classList.add("is-visible");
+        observer.unobserve(el);
+      } else {
+        remaining += 1;
+      }
+    });
+    if (remaining === 0) {
+      window.removeEventListener("scroll", revealPassedElements);
+    }
+  };
+
+  window.addEventListener("scroll", revealPassedElements, { passive: true });
+}
+
+/**
+ * 3. Marquee şeridini görünüm dışındayken duraklat
+ */
+function initMarqueeObserver() {
+  const bands = document.querySelectorAll("[data-marquee-band]");
+  if (!bands.length || !("IntersectionObserver" in window)) return;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        entry.target.classList.toggle("is-paused", !entry.isIntersecting);
+      });
+    },
+    { threshold: 0 }
+  );
+
+  bands.forEach((band) => observer.observe(band));
+}
+
+/**
+ * 4. Header Scroll Durumu & Bölüm Scroll-Spy
  */
 function initHeaderScrollAndSpy() {
   const header = document.querySelector(".site-header");
@@ -35,7 +137,7 @@ function initHeaderScrollAndSpy() {
       requestAnimationFrame(() => {
         const scrollY = window.scrollY || window.pageYOffset || 0;
         if (header) {
-          header.classList.toggle("is-scrolled", scrollY > 20);
+          header.classList.toggle("is-scrolled", scrollY > 40);
         }
 
         if (scrollBar) {
@@ -53,15 +155,20 @@ function initHeaderScrollAndSpy() {
   handleScroll();
 
   if (navLinks.length && "IntersectionObserver" in window) {
-    const sections = ["vitrin", "nasil-calisir", "neden-vitrinos", "paketler"]
-      .map((id) => document.getElementById(id))
-      .filter(Boolean);
+    const phaseIdMap = ["vitrin", "nasil-calisir", "neden-vitrinos"];
+    const sections = [
+      ...phaseIdMap.map((id) => document.getElementById(id)).filter(Boolean),
+      ...document.querySelectorAll("[data-phase-stage]"),
+      document.getElementById("paketler")
+    ].filter(Boolean);
 
     const spyObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const activeId = entry.target.id;
+            const phaseIdx = entry.target.dataset.phaseStage;
+            const activeId = phaseIdx !== undefined ? phaseIdMap[Number(phaseIdx)] : entry.target.id;
+            if (!activeId) return;
             navLinks.forEach((link) => {
               link.classList.toggle("is-active", link.dataset.navSection === activeId);
             });
@@ -76,18 +183,31 @@ function initHeaderScrollAndSpy() {
 }
 
 /**
- * 3. Kaos vs. Disiplin Karşılaştırma Arenası Odak Kontrolü
+ * 5. Mobil Navigasyon Çekmecesi (#navMenu)
  */
-function initRealityDuelArena() {
-  const modeBtns = document.querySelectorAll("[data-duel-focus]");
-  const arena = document.getElementById("comparisonArena");
-  if (!modeBtns.length || !arena) return;
+function initMobileNavDrawer() {
+  const btn = document.querySelector("[data-mobile-nav-btn]");
+  const drawer = document.getElementById("navMenu");
+  if (!btn || !drawer) return;
 
-  modeBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const mode = btn.dataset.duelFocus;
-      modeBtns.forEach((b) => b.classList.toggle("is-active", b === btn));
-      arena.dataset.duelState = mode;
-    });
+  const setOpen = (open) => {
+    drawer.classList.toggle("is-open", open);
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+  };
+
+  btn.addEventListener("click", () => {
+    const next = !drawer.classList.contains("is-open");
+    setOpen(next);
+  });
+
+  drawer.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => setOpen(false));
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && drawer.classList.contains("is-open")) {
+      setOpen(false);
+      btn.focus();
+    }
   });
 }

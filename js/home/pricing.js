@@ -25,6 +25,11 @@ export function initPricing() {
     const currentVal = parseInt(el.textContent, 10);
     if (currentVal === targetVal) return;
 
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.textContent = String(targetVal);
+      return;
+    }
+
     el.style.transition = "transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease";
     el.style.transform = "translateY(-6px) scale(0.95)";
     el.style.opacity = "0.3";
@@ -46,9 +51,9 @@ export function initPricing() {
 
     const discountPill = document.querySelector(".discount-pill");
     if (discountPill) {
-      discountPill.style.transform = isYearly ? "scale(1.1)" : "scale(1)";
-      discountPill.style.boxShadow = isYearly ? "0 0 12px rgba(204, 255, 0, 0.6)" : "";
-      discountPill.style.transition = "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease";
+      discountPill.style.transform = isYearly ? "scale(1.06)" : "scale(1)";
+      discountPill.style.boxShadow = isYearly ? "0 0 0 3px rgba(26, 127, 58, 0.22)" : "";
+      discountPill.style.transition = "transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease";
     }
 
     if (isYearly) {
