@@ -565,42 +565,6 @@ main {
   gap: clamp(28px, 4.5vw, 56px);
 }
 
-.hero-meta-strip {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px 18px;
-  padding-bottom: 16px;
-  border-bottom: 1px dashed rgba(252, 251, 248, 0.22);
-}
-
-.hero-eyebrow-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--vo-font-mono);
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  color: rgba(252, 251, 248, 0.92);
-}
-
-.pulse-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #6ee7b7;
-  box-shadow: 0 0 0 4px rgba(110, 231, 183, 0.2);
-}
-
-.hero-meta-specs {
-  font-family: var(--vo-font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  color: rgba(252, 251, 248, 0.72);
-}
-
 .hero-editorial-center {
   max-width: 860px;
   margin-inline: auto;
