@@ -1,673 +1,1009 @@
 @layer pages {
-/* ==========================================================================
-   VitrinOS — Modern Creative Studio Müşteri Giriş Sayfası (Login Styles)
-   Art Direction: Dark Graphite (#0d0e12) + Cyber Lime (#ccff00)
-   ========================================================================== */
-
-body[data-surface="auth"] {
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-  background-color: #0d0e12;
-  color: #f4f5f8;
-  font-family: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  color-scheme: dark;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow-x: hidden;
-}
-
-body[data-surface="auth"]::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(circle at 15% 20%, rgba(204, 255, 0, 0.04) 0%, transparent 45%),
-    radial-gradient(circle at 85% 80%, rgba(43, 102, 255, 0.04) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(25, 28, 36, 0.4) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.skip-link {
-  position: absolute;
-  top: -60px;
-  left: 20px;
-  background: #ccff00;
-  color: #0d0e12;
-  padding: 10px 18px;
-  font-weight: 700;
-  font-size: 14px;
-  border-radius: 8px;
-  z-index: 10000;
-  transition: top 180ms ease;
-  text-decoration: none;
-}
-.skip-link:focus {
-  top: 20px;
-}
-
-/* ==========================================================================
-   Split-Screen Ana Yerleşim
-   ========================================================================== */
-.auth-layout {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: 1fr 1.1fr;
-  gap: clamp(32px, 5vw, 64px);
-  max-width: 1140px;
-  width: 100%;
-  padding: clamp(16px, 3vw, 36px);
-  align-items: center;
-  margin: auto;
-}
-
-/* ==========================================================================
-   Sol Panel: Giriş Formu Kartı
-   ========================================================================== */
-.auth-card-panel {
-  background: #13151b;
-  border: 1px solid #242936;
-  border-radius: 24px;
-  padding: clamp(28px, 4vw, 42px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-  display: flex;
-  flex-direction: column;
-}
-
-.auth-top-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 28px;
-}
-
-.brand {
-  display: inline-flex;
-  align-items: center;
-  text-decoration: none;
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  color: #ffffff;
-}
-
-.brand-vitrin {
-  color: #ffffff;
-}
-
-.brand-os {
-  color: #ccff00;
-  margin-left: 1px;
-}
-
-.brand sup {
-  font-size: 11px;
-  color: #8e95a8;
-  margin-left: 2px;
-  font-weight: 600;
-}
-
-.auth-back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #8e95a8;
-  text-decoration: none;
-  transition: color 180ms ease, transform 180ms ease;
-}
-
-.auth-back-link:hover {
-  color: #ccff00;
-  transform: translateX(-2px);
-}
-
-.auth-intro {
-  margin-bottom: 24px;
-}
-
-.auth-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #ccff00;
-  background: rgba(204, 255, 0, 0.1);
-  border: 1px solid rgba(204, 255, 0, 0.25);
-  padding: 4px 10px;
-  border-radius: 9999px;
-  margin-bottom: 14px;
-}
-
-.auth-badge-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #ccff00;
-  box-shadow: 0 0 6px #ccff00;
-}
-
-.auth-intro h1 {
-  font-size: clamp(1.6rem, 2.3vw, 2.1rem);
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: -0.035em;
-  line-height: 1.2;
-  margin: 0 0 10px 0;
-}
-
-.auth-desc {
-  font-size: 14px;
-  color: #8e95a8;
-  line-height: 1.55;
-  margin: 0;
-}
-
-/* ==========================================================================
-   Form Elemanları
-   ========================================================================== */
-.auth-form {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  margin-bottom: 18px;
-}
-
-.form-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #f4f5f8;
-}
-
-.label-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.forgot-link {
-  font-size: 12.5px;
-  color: #8e95a8;
-  text-decoration: none;
-  transition: color 180ms ease;
-}
-
-.forgot-link:hover {
-  color: #ccff00;
-  text-decoration: underline;
-}
-
-.input-shell {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.input-icon {
-  position: absolute;
-  left: 14px;
-  color: #5d6375;
-  pointer-events: none;
-  transition: color 180ms ease;
-}
-
-.form-input {
-  width: 100%;
-  background: #191c24;
-  border: 1px solid #242936;
-  border-radius: 12px;
-  padding: 13px 14px 13px 42px;
-  color: #ffffff;
-  font-size: 14.5px;
-  font-family: inherit;
-  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
-  box-sizing: border-box;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #ccff00;
-  box-shadow: 0 0 0 3px rgba(204, 255, 0, 0.2);
-  background: #1e222d;
-}
-
-.form-input:focus + .input-icon,
-.input-shell:focus-within .input-icon {
-  color: #ccff00;
-}
-
-.form-input[aria-invalid="true"] {
-  border-color: #ff4757;
-  box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.2);
-}
-
-.password-toggle-btn {
-  position: absolute;
-  right: 12px;
-  background: none;
-  border: none;
-  color: #8e95a8;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 6px 8px;
-  border-radius: 6px;
-  transition: color 180ms ease;
-}
-
-.password-toggle-btn:hover {
-  color: #ccff00;
-}
-
-.form-aux-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 22px;
-}
-
-.remember-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  user-select: none;
-  font-size: 13px;
-  color: #9da6b9;
-  font-weight: 500;
-  transition: color 150ms ease;
-}
-
-.remember-label span {
-  color: inherit;
-}
-
-.remember-label:hover {
-  color: #ffffff;
-}
-
-.remember-checkbox {
-  appearance: none;
-  -webkit-appearance: none;
-  padding: 0;
-  margin: 0;
-  width: 14px;
-  height: 14px;
-  min-width: 14px;
-  min-height: 14px;
-  max-width: 14px;
-  max-height: 14px;
-  box-sizing: border-box;
-  border: 1px solid #303746;
-  border-radius: 3.5px;
-  background: #191c24;
-  cursor: pointer;
-  display: inline-grid;
-  place-content: center;
-  vertical-align: middle;
-  flex-shrink: 0;
-  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.remember-checkbox:hover {
-  border-color: #4a546c;
-  background: #20242f;
-}
-
-.remember-checkbox::before {
-  content: "";
-  width: 7.5px;
-  height: 7.5px;
-  clip-path: polygon(14% 44%, 0 60%, 40% 100%, 100% 20%, 82% 4%, 38% 70%);
-  transform: scale(0);
-  transform-origin: center;
-  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
-  background-color: #0d0e12;
-}
-
-.remember-checkbox:checked {
-  background: #ccff00;
-  border-color: #ccff00;
-  box-shadow: 0 0 6px rgba(204, 255, 0, 0.35);
-}
-
-.remember-checkbox:checked::before {
-  transform: scale(1);
-}
-
-.remember-checkbox:focus-visible {
-  outline: 2px solid #ccff00;
-  outline-offset: 2px;
-}
-
-.auth-submit-btn {
-  width: 100%;
-  background: #ccff00;
-  color: #0d0e12;
-  border: none;
-  border-radius: 12px;
-  padding: 14px 20px;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 20px rgba(204, 255, 0, 0.25);
-  font-family: inherit;
-}
-
-.auth-submit-btn:hover {
-  background: #d8ff33;
-  transform: translateY(-1px);
-  box-shadow: 0 8px 28px rgba(204, 255, 0, 0.35);
-}
-
-.auth-submit-btn:active {
-  transform: translateY(0);
-}
-
-.auth-submit-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.btn-arrow {
-  transition: transform 180ms ease;
-}
-
-.auth-submit-btn:hover .btn-arrow {
-  transform: translateX(3px);
-}
-
-.form-status {
-  margin-top: 14px;
-  font-size: 13px;
-  font-weight: 600;
-  text-align: center;
-  min-height: 20px;
-}
-
-.form-status[data-kind="error"] {
-  color: #ff4757;
-}
-
-.form-status[data-kind="loading"] {
-  color: #ccff00;
-}
-
-.form-status[data-kind="mfa"] {
-  color: #598bff;
-}
-
-/* Form Altı */
-.auth-card-footer {
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid #242936;
-  text-align: center;
-}
-
-.no-account-text {
-  font-size: 13.5px;
-  color: #8e95a8;
-  margin: 0;
-}
-
-.cta-link {
-  color: #ccff00;
-  font-weight: 600;
-  text-decoration: none;
-  margin-left: 4px;
-  transition: color 180ms ease;
-}
-
-.cta-link:hover {
-  text-decoration: underline;
-}
-
-/* ==========================================================================
-   Sağ Panel: Dinamik Dönen Stüdyo Vitrini
-   ========================================================================== */
-.auth-showcase-panel {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-.showcase-glow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 380px;
-  height: 380px;
-  background: radial-gradient(circle, rgba(204, 255, 0, 0.08) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.showcase-terminal-card {
-  position: relative;
-  z-index: 1;
-  background: #13151b;
-  border: 1px solid #242936;
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.7);
-  transition: border-color 200ms ease;
-}
-
-.showcase-terminal-card:hover {
-  border-color: #32384a;
-}
-
-.showcase-top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #141720;
-  padding: 12px 18px;
-  border-bottom: 1px solid #242936;
-}
-
-.window-dots {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.window-dots span {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.dot-red { background: #ff5f56; }
-.dot-yellow { background: #ffbd2e; }
-.dot-green { background: #27c93f; }
-
-.terminal-title {
-  font-family: var(--vo-font-mono, monospace);
-  font-size: 11px;
-  color: #5d6375;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-
-.terminal-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 10px;
-  font-weight: 800;
-  color: #ccff00;
-  letter-spacing: 0.06em;
-}
-
-.terminal-beacon {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #ccff00;
-  box-shadow: 0 0 8px #ccff00;
-  animation: pulseBeacon 1.8s infinite ease-in-out;
-}
-
-@keyframes pulseBeacon {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
-}
-
-.showcase-media-frame {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  background: #000000;
-}
-
-.showcase-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: opacity 350ms cubic-bezier(0.16, 1, 0.3, 1), transform 350ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.showcase-scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(13,14,18,0.15) 0%, rgba(13,14,18,0.92) 80%);
-  pointer-events: none;
-}
-
-.showcase-meta-overlay {
-  position: absolute;
-  bottom: 16px;
-  left: 18px;
-  right: 18px;
-  z-index: 2;
-}
-
-.showcase-tag {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 700;
-  color: #ccff00;
-  background: rgba(204, 255, 0, 0.12);
-  border: 1px solid rgba(204, 255, 0, 0.25);
-  padding: 3px 8px;
-  border-radius: 9999px;
-  margin-bottom: 6px;
-}
-
-.showcase-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0 0 4px 0;
-  line-height: 1.2;
-}
-
-.showcase-sub {
-  font-size: 12.5px;
-  color: rgba(255, 255, 255, 0.72);
-  margin: 0;
-  line-height: 1.4;
-}
-
-.showcase-footer-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 18px;
-  background: #191c24;
-  border-top: 1px solid #242936;
-}
-
-.showcase-chips {
-  display: flex;
-  gap: 8px;
-}
-
-.showcase-chip {
-  font-size: 11px;
-  color: #8e95a8;
-  background: #13151b;
-  padding: 4px 8px;
-  border-radius: 6px;
-  border: 1px solid #242936;
-  font-weight: 600;
-}
-
-.showcase-chip.accent {
-  color: #ccff00;
-  border-color: rgba(204, 255, 0, 0.3);
-}
-
-.showcase-dots-nav {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.nav-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #32384a;
-  transition: all 250ms ease;
-}
-
-.nav-dot.is-active {
-  background: #ccff00;
-  width: 18px;
-  border-radius: 4px;
-}
-
-.showcase-hint {
-  font-size: 12.5px;
-  color: #5d6375;
-  line-height: 1.5;
-  margin-top: 14px;
-  text-align: center;
-}
-
-/* ==========================================================================
-   Responsive Uyarlamalar (Mobil / 840px Altı)
-   ========================================================================== */
-@media (max-width: 840px) {
-  .auth-layout {
-    grid-template-columns: 1fr;
-    max-width: 480px;
-    padding: 16px;
+  /* ==========================================================================
+     VitrinOS — Minimal Editöryal Auth Yüzeyleri (Login & MFA)
+     Palet: Sıcak Kâğıt (#f6f3ea) + Kart (#fcfbf8) + Orman Yeşili (#0b3527)
+     Tipografi: Newsreader (başlık) + Instrument Sans (gövde) + IBM Plex Mono
+     ========================================================================== */
+
+  body[data-surface="auth"] {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-color: var(--vo-porcelain, #f6f3ea);
+    color: var(--vo-graphite, #0e0f0d);
+    font-family: var(--vo-font-sans, "Instrument Sans", system-ui, sans-serif);
+    color-scheme: light;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow-x: hidden;
   }
 
-  .auth-showcase-panel {
+  body[data-surface="auth"]::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.28;
+    background-image:
+      linear-gradient(var(--vo-line, rgba(14, 15, 13, 0.14)) 1px, transparent 1px),
+      linear-gradient(90deg, var(--vo-line, rgba(14, 15, 13, 0.14)) 1px, transparent 1px);
+    background-size: 72px 72px;
+    mask-image: linear-gradient(180deg, #000 0%, transparent 78%);
+  }
+
+  /* ==========================================================================
+     Split-Screen Ana Yerleşim (login.html + MFA / set-password)
+     ========================================================================== */
+  .auth-layout,
+  .auth-screen {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.06fr);
+    gap: clamp(24px, 4vw, 56px);
+    max-width: 1120px;
+    width: 100%;
+    padding: clamp(16px, 3vw, 36px);
+    align-items: center;
+    margin: auto;
+    min-width: 0;
+  }
+
+  /* ==========================================================================
+     Sol Panel: Giriş / MFA / Şifre Form Kartı
+     ========================================================================== */
+  .auth-card-panel,
+  .auth-panel {
+    background: var(--vo-paper, #fcfbf8);
+    border: 1px solid var(--vo-line, rgba(14, 15, 13, 0.14));
+    border-radius: 22px;
+    padding: clamp(24px, 3.6vw, 40px);
+    box-shadow: 0 20px 50px -28px rgba(14, 15, 13, 0.16);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .auth-top-nav,
+  .auth-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 18px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--vo-line, rgba(14, 15, 13, 0.14));
+  }
+
+  .brand,
+  .auth-brand {
+    display: inline-flex;
+    align-items: baseline;
+    text-decoration: none;
+    font-family: var(--vo-font-sans, "Instrument Sans", sans-serif);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: var(--vo-graphite, #0e0f0d);
+  }
+
+  .brand-vitrin,
+  .brand-word {
+    color: var(--vo-graphite, #0e0f0d);
+  }
+
+  .brand-os {
+    color: var(--vo-orange, #0b3527);
+    font-family: var(--vo-font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.82em;
+    font-weight: 600;
+    margin-left: 2px;
+  }
+
+  .brand sup,
+  .brand-reg {
+    font-size: 0.62rem;
+    color: var(--vo-ink-muted, rgba(14, 15, 13, 0.62));
+    margin-left: 2px;
+    font-weight: 500;
+  }
+
+  .auth-back-link,
+  .auth-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--vo-font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--vo-ink-muted, rgba(14, 15, 13, 0.62));
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    padding: 6px 2px;
+    cursor: pointer;
+    transition: color 180ms ease, transform 180ms ease;
+  }
+
+  .auth-back-link:hover,
+  .auth-back:hover {
+    color: var(--vo-orange, #0b3527);
+    transform: translateX(-2px);
+  }
+
+  .auth-intro,
+  .auth-copy {
+    margin-bottom: 24px;
+  }
+
+  .auth-badge,
+  .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--vo-font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--vo-orange, #0b3527);
+    background: var(--vo-paper-warm, #f4f0e7);
+    border: 1px solid var(--vo-line, rgba(14, 15, 13, 0.14));
+    padding: 5px 11px;
+    border-radius: 9999px;
+    margin: 0 0 14px 0;
+  }
+
+  .auth-badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--vo-orange, #0b3527);
+  }
+
+  .auth-intro h1,
+  .auth-copy h1 {
+    font-family: var(--vo-font-serif, "Newsreader", Georgia, serif);
+    font-size: clamp(1.75rem, 2.8vw, 2.35rem);
+    font-weight: 500;
+    color: var(--vo-graphite, #0e0f0d);
+    letter-spacing: -0.025em;
+    line-height: 1.12;
+    margin: 0 0 12px 0;
+  }
+
+  .auth-desc,
+  .auth-copy p:not(.kicker) {
+    font-size: 0.9375rem;
+    color: var(--vo-ink-muted, rgba(14, 15, 13, 0.62));
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ==========================================================================
+     Form Elemanları
+     ========================================================================== */
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .form-group,
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 0;
+  }
+
+  .form-label,
+  .form-row label,
+  .mfa-code-label {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--vo-graphite, #0e0f0d);
+  }
+
+  .label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .forgot-link {
+    font-size: 0.8rem;
+    color: var(--vo-ink-muted, rgba(14, 15, 13, 0.62));
+    text-decoration: none;
+    transition: color 180ms ease;
+  }
+
+  .forgot-link:hover {
+    color: var(--vo-orange, #0b3527);
+    text-decoration: underline;
+  }
+
+  .input-shell,
+  .password-control {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 14px;
+    color: rgba(14, 15, 13, 0.45);
+    pointer-events: none;
+    transition: color 180ms ease;
+  }
+
+  .form-input,
+  .password-control input,
+  .mfa-code-input {
+    width: 100%;
+    background: var(--vo-paper, #fcfbf8);
+    border: 1px solid var(--vo-line-strong, rgba(14, 15, 13, 0.24));
+    border-radius: 12px;
+    padding: 12px 14px;
+    color: var(--vo-graphite, #0e0f0d);
+    font-size: 0.9375rem;
+    font-family: inherit;
+    transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+    box-sizing: border-box;
+  }
+
+  .input-shell .form-input {
+    padding-left: 42px;
+    padding-right: 68px;
+  }
+
+  .password-control input {
+    padding-right: 72px;
+  }
+
+  .form-input:focus,
+  .password-control input:focus,
+  .mfa-code-input:focus {
+    outline: none;
+    border-color: var(--vo-orange, #0b3527);
+    box-shadow: 0 0 0 3px rgba(11, 53, 39, 0.12);
+    background: #ffffff;
+  }
+
+  .input-shell:focus-within .input-icon {
+    color: var(--vo-orange, #0b3527);
+  }
+
+  .form-input[aria-invalid="true"],
+  .password-control input[aria-invalid="true"],
+  .mfa-code-input[aria-invalid="true"] {
+    border-color: var(--vo-danger, #9e2a2b);
+    box-shadow: 0 0 0 3px rgba(158, 42, 43, 0.12);
+  }
+
+  .password-toggle-btn,
+  .password-toggle {
+    position: absolute;
+    right: 10px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--vo-ink-muted, rgba(14, 15, 13, 0.62));
+    font-family: var(--vo-font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 8px;
+    transition: color 180ms ease, background-color 180ms ease;
+  }
+
+  .password-toggle-btn:hover,
+  .password-toggle:hover {
+    color: var(--vo-orange, #0b3527);
+    background: var(--vo-paper-warm, #f4f0e7);
+  }
+
+  .form-aux-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 2px 0 4px;
+  }
+
+  .remember-label,
+  .remember-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 0.84rem;
+    color: var(--vo-ink-muted, rgba(14, 15, 13, 0.68));
+    font-weight: 500;
+    transition: color 150ms ease;
+  }
+
+  .remember-label span,
+  .remember-option span {
+    color: inherit;
+  }
+
+  .remember-label:hover,
+  .remember-option:hover {
+    color: var(--vo-graphite, #0e0f0d);
+  }
+
+  .remember-checkbox,
+  .remember-option input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 0;
+    margin: 0;
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+    max-width: 16px;
+    max-height: 16px;
+    box-sizing: border-box;
+    border: 1px solid var(--vo-line-strong, rgba(14, 15, 13, 0.28));
+    border-radius: 4px;
+    background: var(--vo-paper, #fcfbf8);
+    cursor: pointer;
+    display: inline-grid;
+    place-content: center;
+    vertical-align: middle;
+    flex-shrink: 0;
+    transition: all 160ms ease;
+  }
+
+  .remember-checkbox::before,
+  .remember-option input[type="checkbox"]::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    clip-path: polygon(14% 44%, 0 60%, 40% 100%, 100% 20%, 82% 4%, 38% 70%);
+    transform: scale(0);
+    transform-origin: center;
+    transition: transform 140ms ease;
+    background-color: var(--vo-paper, #fcfbf8);
+  }
+
+  .remember-checkbox:checked,
+  .remember-option input[type="checkbox"]:checked {
+    background: var(--vo-orange, #0b3527);
+    border-color: var(--vo-orange, #0b3527);
+  }
+
+  .remember-checkbox:checked::before,
+  .remember-option input[type="checkbox"]:checked::before {
+    transform: scale(1);
+  }
+
+  .auth-submit-btn,
+  .auth-submit {
+    width: 100%;
+    min-height: 48px;
+    background: var(--vo-orange, #0b3527);
+    color: var(--vo-paper, #fcfbf8);
+    border: 1px solid var(--vo-orange, #0b3527);
+    border-radius: 9999px;
+    padding: 13px 22px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+    box-shadow: 0 10px 24px rgba(11, 53, 39, 0.16);
+    font-family: inherit;
+  }
+
+  .auth-submit-btn:hover,
+  .auth-submit:hover {
+    background: var(--vo-accent-strong, #124735);
+    border-color: var(--vo-accent-strong, #124735);
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgba(11, 53, 39, 0.22);
+  }
+
+  .auth-submit-btn:active,
+  .auth-submit:active {
+    transform: translateY(0);
+  }
+
+  .auth-submit-btn:disabled,
+  .auth-submit:disabled {
+    opacity: 0.56;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-arrow {
+    transition: transform 180ms ease;
+  }
+
+  .auth-submit-btn:hover .btn-arrow {
+    transform: translateX(3px);
+  }
+
+  .form-status {
+    margin: 2px 0 0;
+    font-size: 0.84rem;
+    font-weight: 600;
+    text-align: center;
+    min-height: 20px;
+    color: var(--vo-success, #14533d);
+  }
+
+  .form-status[data-kind="error"] {
+    color: var(--vo-danger, #9e2a2b);
+  }
+
+  .form-status[data-kind="loading"] {
+    color: var(--vo-orange, #0b3527);
+  }
+
+  .form-status[data-kind="mfa"] {
+    color: var(--vo-info, #1d4e4f);
+  }
+
+  .auth-card-footer {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--vo-line, rgba(14, 15, 13, 0.14));
+    text-align: center;
+  }
+
+  .no-account-text,
+  .auth-footnote {
+    font-size: 0.84rem;
+    color: var(--vo-ink-muted, rgba(14, 15, 13, 0.62));
+    margin: 0;
+  }
+
+  .auth-footnote {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--vo-line, rgba(14, 15, 13, 0.14));
+    font-size: 0.78rem;
+  }
+
+  .cta-link {
+    color: var(--vo-orange, #0b3527);
+    font-weight: 650;
+    text-decoration: none;
+    margin-left: 4px;
+  }
+
+  .cta-link:hover {
+    text-decoration: underline;
+  }
+
+  /* ==========================================================================
+     MFA Ekranı Bileşenleri (mfa-setup.html & mfa-challenge.html)
+     ========================================================================== */
+  .security-level {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--vo-line, rgba(14, 15, 13, 0.14));
+    border-radius: 12px;
+    background: var(--vo-paper-warm, #f4f0e7);
+  }
+
+  .security-level-mark {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--vo-orange, #0b3527);
+    box-shadow: 0 0 0 4px rgba(11, 53, 39, 0.14);
+    flex-shrink: 0;
+  }
+
+  .security-level strong {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--vo-graphite, #0e0f0d);
+  }
+
+  .security-level small {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--vo-ink-muted, rgba(14, 15, 13, 0.62));
+  }
+
+  .mfa-enroll-panel {
+    display: grid;
+    gap: 16px;
+  }
+
+  .mfa-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 8px;
+  }
+
+  .mfa-steps li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--vo-line, rgba(14, 15, 13, 0.14));
+    border-radius: 10px;
+    background: var(--vo-paper-warm, #f4f0e7);
+  }
+
+  .mfa-steps li span {
+    font-family: var(--vo-font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--vo-orange, #0b3527);
+  }
+
+  .mfa-steps li p {
+    margin: 0;
+    font-size: 0.84rem;
+    color: var(--vo-graphite, #0e0f0d);
+  }
+
+  .mfa-qr-stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    border: 1px solid var(--vo-line, rgba(14, 15, 13, 0.14));
+    border-radius: 14px;
+    background: #ffffff;
+  }
+
+  .mfa-qr-code {
+    width: 196px;
+    height: 196px;
+    object-fit: contain;
+  }
+
+  .mfa-secret-details {
+    border: 1px solid var(--vo-line, rgba(14, 15, 13, 0.14));
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: var(--vo-paper-warm, #f4f0e7);
+    font-size: 0.82rem;
+  }
+
+  .mfa-secret-details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--vo-graphite, #0e0f0d);
+  }
+
+  .mfa-secret {
+    margin: 8px 0 0;
+    font-family: var(--vo-font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.78rem;
+    color: var(--vo-orange, #0b3527);
+    word-break: break-all;
+  }
+
+  .mfa-code-form {
+    display: grid;
+    gap: 14px;
+  }
+
+  .mfa-code-input {
+    font-family: var(--vo-font-mono, "IBM Plex Mono", monospace);
+    font-size: 1.2rem;
+    letter-spacing: 0.24em;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .field-hint {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--vo-ink-muted, rgba(14, 15, 13, 0.62));
+  }
+
+  .mfa-actions {
+    display: grid;
+    gap: 10px;
+  }
+
+  .mfa-actions .button.secondary {
+    border-radius: 9999px;
+  }
+
+  /* ==========================================================================
+     Sağ Panel: Editöryal Stüdyo Vitrini (login.html) & Güvenlik Sahnesi
+     ========================================================================== */
+  .auth-showcase-panel,
+  .auth-visual {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .showcase-glow {
     display: none;
   }
 
-  .auth-card-panel {
-    padding: 28px 20px;
-    border-radius: 18px;
+  .showcase-terminal-card,
+  .auth-studio-scene {
+    position: relative;
+    z-index: 1;
+    background: var(--vo-paper, #fcfbf8);
+    border: 1px solid var(--vo-line, rgba(14, 15, 13, 0.14));
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px -28px rgba(14, 15, 13, 0.14);
   }
-}
+
+  .auth-studio-scene {
+    padding: clamp(24px, 3.2vw, 34px);
+    display: grid;
+    gap: 20px;
+    background: var(--vo-paper-warm, #f4f0e7);
+  }
+
+  .showcase-top-bar,
+  .studio-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--vo-paper-warm, #f4f0e7);
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--vo-line, rgba(14, 15, 13, 0.14));
+  }
+
+  .studio-header {
+    padding: 0 0 14px;
+    background: transparent;
+  }
+
+  .window-dots {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .window-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    background: rgba(14, 15, 13, 0.18);
+  }
+
+  .dot-red,
+  .dot-yellow,
+  .dot-green {
+    background: rgba(14, 15, 13, 0.2);
+  }
+
+  .terminal-title,
+  .scene-index {
+    font-family: var(--vo-font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.6875rem;
+    color: var(--vo-ink-muted, rgba(14, 15, 13, 0.62));
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  .terminal-badge,
+  .scene-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--vo-font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--vo-orange, #0b3527);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .terminal-beacon,
+  .scene-live i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--vo-orange, #0b3527);
+    display: inline-block;
+    animation: pulseBeacon 2s infinite ease-in-out;
+  }
+
+  @keyframes pulseBeacon {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+  }
+
+  .showcase-media-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--vo-paper-warm, #f4f0e7);
+  }
+
+  .showcase-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 350ms ease, transform 350ms ease;
+  }
+
+  .showcase-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(14, 15, 13, 0.08) 0%, rgba(14, 15, 13, 0.84) 84%);
+    pointer-events: none;
+  }
+
+  .showcase-meta-overlay {
+    position: absolute;
+    bottom: 18px;
+    left: 20px;
+    right: 20px;
+    z-index: 2;
+  }
+
+  .showcase-tag {
+    display: inline-block;
+    font-family: var(--vo-font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #fcfbf8;
+    background: rgba(11, 53, 39, 0.88);
+    border: 1px solid rgba(252, 251, 248, 0.22);
+    padding: 4px 10px;
+    border-radius: 9999px;
+    margin-bottom: 8px;
+  }
+
+  .showcase-title {
+    font-family: var(--vo-font-serif, "Newsreader", Georgia, serif);
+    font-size: 1.45rem;
+    font-weight: 500;
+    color: #fcfbf8;
+    margin: 0 0 4px 0;
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+  }
+
+  .showcase-sub {
+    font-size: 0.82rem;
+    color: rgba(252, 251, 248, 0.82);
+    margin: 0;
+    line-height: 1.45;
+  }
+
+  .showcase-footer-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 18px;
+    background: var(--vo-paper, #fcfbf8);
+    border-top: 1px solid var(--vo-line, rgba(14, 15, 13, 0.14));
+  }
+
+  .showcase-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .showcase-chip {
+    font-family: var(--vo-font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.6875rem;
+    color: var(--vo-ink-muted, rgba(14, 15, 13, 0.68));
+    background: var(--vo-paper-warm, #f4f0e7);
+    padding: 4px 9px;
+    border-radius: 9999px;
+    border: 1px solid var(--vo-line, rgba(14, 15, 13, 0.14));
+    font-weight: 500;
+  }
+
+  .showcase-chip.accent {
+    color: var(--vo-orange, #0b3527);
+    border-color: rgba(11, 53, 39, 0.28);
+    font-weight: 600;
+  }
+
+  .showcase-dots-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .nav-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(14, 15, 13, 0.2);
+    transition: all 250ms ease;
+  }
+
+  .nav-dot.is-active {
+    background: var(--vo-orange, #0b3527);
+    width: 18px;
+    border-radius: 4px;
+  }
+
+  .showcase-hint {
+    font-size: 0.8125rem;
+    color: var(--vo-ink-muted, rgba(14, 15, 13, 0.62));
+    line-height: 1.55;
+    margin: 14px 0 0;
+    text-align: center;
+  }
+
+  /* MFA & Set-Password Sağ Sahne */
+  .security-orbit {
+    position: relative;
+    min-height: 190px;
+    display: grid;
+    place-items: center;
+  }
+
+  .security-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid var(--vo-line-strong, rgba(14, 15, 13, 0.2));
+  }
+
+  .security-ring-one {
+    width: 168px;
+    height: 168px;
+  }
+
+  .security-ring-two {
+    width: 118px;
+    height: 118px;
+    border-style: dashed;
+    border-color: rgba(11, 53, 39, 0.35);
+  }
+
+  .security-core {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: var(--vo-paper, #fcfbf8);
+    border: 1px solid var(--vo-orange, #0b3527);
+    display: grid;
+    place-items: center;
+    align-content: center;
+    text-align: center;
+    color: var(--vo-orange, #0b3527);
+    font-family: var(--vo-font-mono, "IBM Plex Mono", monospace);
+  }
+
+  .security-core b {
+    font-size: 1rem;
+    line-height: 1.1;
+  }
+
+  .security-core small {
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+  }
+
+  .scene-label {
+    font-family: var(--vo-font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--vo-orange, #0b3527);
+    margin: 0 0 8px;
+  }
+
+  .studio-caption h2 {
+    font-family: var(--vo-font-serif, "Newsreader", Georgia, serif);
+    font-size: clamp(1.35rem, 2.2vw, 1.7rem);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--vo-graphite, #0e0f0d);
+    margin: 0;
+  }
+
+  .studio-flow {
+    list-style: none;
+    padding: 14px 0 0;
+    margin: 0;
+    border-top: 1px solid var(--vo-line, rgba(14, 15, 13, 0.14));
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .studio-flow li {
+    display: grid;
+    gap: 4px;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid var(--vo-line, rgba(14, 15, 13, 0.14));
+    background: var(--vo-paper, #fcfbf8);
+  }
+
+  .studio-flow li.is-current {
+    border-color: var(--vo-orange, #0b3527);
+  }
+
+  .studio-flow li span {
+    font-family: var(--vo-font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--vo-orange, #0b3527);
+  }
+
+  .studio-flow li strong {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--vo-graphite, #0e0f0d);
+  }
+
+  .studio-flow li small {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--vo-ink-muted, rgba(14, 15, 13, 0.62));
+  }
+
+  /* ==========================================================================
+     Responsive Uyarlamalar (320px / 375px / 768px / 1440px)
+     ========================================================================== */
+  @media (max-width: 860px) {
+    .auth-layout,
+    .auth-screen {
+      grid-template-columns: 1fr;
+      max-width: 480px;
+      padding: 16px;
+    }
+
+    .auth-showcase-panel,
+    .auth-visual {
+      display: none;
+    }
+
+    .auth-card-panel,
+    .auth-panel {
+      padding: 24px 18px;
+      border-radius: 18px;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .auth-layout,
+    .auth-screen {
+      padding: 12px;
+    }
+
+    .auth-card-panel,
+    .auth-panel {
+      padding: 20px 14px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .terminal-beacon,
+    .scene-live i {
+      animation: none;
+    }
+  }
 }

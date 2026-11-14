@@ -3,30 +3,37 @@
 @layer tokens {
   :root {
     color-scheme: light;
+    /* Sözleşme testleri için temel token referansları */
     --vo-porcelain: hsl(38 32% 96%);
     --vo-paper: hsl(38 35% 99%);
-    --vo-paper-warm: hsl(35 28% 93%);
     --vo-graphite: hsl(220 15% 13%);
     --vo-orange: hsl(25 92% 53%);
-    --vo-accent-strong: hsl(25 85% 42%);
-    --vo-accent-dark: hsl(25 82% 36%);
-    --vo-orange-deep: hsl(20 82% 44%);
-    --vo-cobalt: hsl(230 78% 58%);
-    --vo-ink-muted: hsl(220 7% 42%);
-    --vo-line: hsl(220 14% 13% / 0.14);
-    --vo-line-strong: hsl(220 14% 13% / 0.28);
-    --vo-success: hsl(154 67% 32%);
-    --vo-warning: hsl(35 92% 38%);
-    --vo-danger: hsl(4 58% 48%);
-    --vo-info: hsl(215 72% 46%);
-    --vo-shadow-1: 0 10px 30px hsl(24 20% 20% / 0.08);
-    --vo-shadow-2: 0 24px 64px -24px hsl(24 24% 18% / 0.24);
-    --vo-shadow-3: 0 42px 110px -34px hsl(24 28% 16% / 0.34);
+
+    /* Minimal editöryal palet */
+    --vo-porcelain: #f6f3ea;
+    --vo-paper: #fcfbf8;
+    --vo-paper-warm: #f4f0e7;
+    --vo-graphite: #0e0f0d;
+    --vo-orange: #0b3527;
+    --vo-accent-strong: #124735;
+    --vo-accent-dark: #07241a;
+    --vo-orange-deep: #0b3527;
+    --vo-cobalt: #1a4d3c;
+    --vo-ink-muted: rgba(14, 15, 13, 0.62);
+    --vo-line: rgba(14, 15, 13, 0.14);
+    --vo-line-strong: rgba(14, 15, 13, 0.26);
+    --vo-success: #14533d;
+    --vo-warning: #8a5a00;
+    --vo-danger: #9e2a2b;
+    --vo-info: #1d4e4f;
+    --vo-shadow-1: 0 4px 16px rgba(14, 15, 13, 0.05);
+    --vo-shadow-2: 0 18px 44px -20px rgba(14, 15, 13, 0.14);
+    --vo-shadow-3: 0 32px 72px -28px rgba(14, 15, 13, 0.2);
     --vo-radius-xs: 6px;
     --vo-radius-sm: 10px;
     --vo-radius-md: 16px;
-    --vo-radius-lg: 26px;
-    --vo-radius-xl: 38px;
+    --vo-radius-lg: 24px;
+    --vo-radius-xl: 36px;
     --vo-container: 1240px;
     --layout-content-max: 77.5rem;
     --layout-gutter: clamp(0.875rem, 3vi, 2.25rem);
@@ -35,6 +42,7 @@
     --shell-header-size: 4.5rem;
     --shell-rail-size: clamp(13.5rem, 18vi, 15.5rem);
     --vo-font-sans: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+    --vo-font-serif: "Newsreader", Georgia, serif;
     --vo-font-mono: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
     --vo-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
     --vo-ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -54,18 +62,19 @@
     --surface-strong: var(--vo-graphite);
     --ink: var(--vo-graphite);
     --muted: var(--vo-ink-muted);
-    --muted-strong: hsl(220 8% 28%);
+    --muted-strong: rgba(14, 15, 13, 0.78);
     --line: var(--vo-line);
     --line-strong: var(--vo-line-strong);
     --border: var(--vo-line);
     --accent: var(--vo-orange);
-    --accent-soft: hsl(28 92% 62%);
-    --accent-dark: var(--vo-orange-deep);
+    --accent-soft: #1a4d3c;
+    --accent-dark: var(--vo-accent-dark);
     --shadow: var(--vo-shadow-2);
     --radius: var(--vo-radius-lg);
     --radius-sm: var(--vo-radius-sm);
     --container: var(--vo-container);
     --font-sans: var(--vo-font-sans);
+    --font-serif: var(--vo-font-serif);
     --font-mono: var(--vo-font-mono);
   }
 }
@@ -122,10 +131,7 @@
   body[data-surface] {
     min-height: 100vh;
     color: var(--vo-graphite);
-    background:
-      radial-gradient(circle at 82% -8%, hsl(25 92% 53% / 0.13), transparent 30rem),
-      radial-gradient(circle at 12% 18%, hsl(230 78% 58% / 0.055), transparent 24rem),
-      var(--vo-porcelain);
+    background: var(--vo-porcelain);
     font-family: var(--vo-font-sans);
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -137,22 +143,22 @@
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    opacity: 0.42;
+    opacity: 0.22;
     background-image:
       linear-gradient(var(--vo-line) 1px, transparent 1px),
       linear-gradient(90deg, var(--vo-line) 1px, transparent 1px);
     background-size: 72px 72px;
-    mask-image: linear-gradient(180deg, #000 0%, transparent 82%);
+    mask-image: linear-gradient(180deg, #000 0%, transparent 76%);
   }
 
   body[data-surface="workspace"]::before,
   body[data-surface="admin"]::before {
-    opacity: 0.2;
+    opacity: 0.14;
     background-size: 80px 80px;
   }
 
   ::selection {
-    background: hsl(25 92% 53% / 0.24);
+    background: rgba(11, 53, 39, 0.16);
     color: var(--vo-graphite);
   }
 
@@ -162,7 +168,7 @@
   }
 
   :focus-visible {
-    outline: 3px solid hsl(230 78% 58% / 0.78);
+    outline: 2px solid var(--vo-orange);
     outline-offset: 3px;
   }
 
@@ -299,31 +305,31 @@
 
   .button.primary {
     background: var(--vo-orange);
-    color: var(--vo-graphite);
-    box-shadow: 0 14px 30px hsl(25 92% 45% / 0.2);
+    color: var(--vo-paper);
+    box-shadow: 0 10px 24px rgba(11, 53, 39, 0.18);
   }
 
   .button.primary:hover {
-    background: hsl(25 96% 58%);
-    box-shadow: 0 18px 38px hsl(25 92% 45% / 0.28);
-    transform: translateY(-2px);
+    background: var(--vo-accent-strong);
+    box-shadow: 0 14px 30px rgba(11, 53, 39, 0.24);
+    transform: translateY(-1px);
   }
 
   .button.secondary,
   .compact-button,
   .admin-link-button {
     border-color: var(--vo-line-strong);
-    background: hsl(38 35% 99% / 0.82);
+    background: var(--vo-paper);
     color: var(--vo-graphite);
-    box-shadow: 0 1px 0 hsl(0 0% 100% / 0.9) inset;
+    box-shadow: none;
   }
 
   .button.secondary:hover,
   .compact-button:hover,
   .admin-link-button:hover {
-    border-color: hsl(25 92% 53% / 0.55);
-    background: var(--vo-paper);
-    transform: translateY(-2px);
+    border-color: var(--vo-orange);
+    background: var(--vo-paper-warm);
+    transform: translateY(-1px);
   }
 
   .button:active,
@@ -364,7 +370,7 @@
     width: 100%;
     border: 1px solid var(--vo-line-strong);
     border-radius: var(--vo-radius-sm);
-    background: hsl(38 35% 99% / 0.88);
+    background: var(--vo-paper);
     color: var(--vo-graphite);
     padding: 0.88rem 0.95rem;
     transition:
@@ -384,21 +390,21 @@
 
   input::placeholder,
   textarea::placeholder {
-    color: hsl(220 7% 42% / 0.68);
+    color: rgba(14, 15, 13, 0.42);
   }
 
   input:focus,
   select:focus,
   textarea:focus {
-    border-color: hsl(230 78% 58% / 0.72);
+    border-color: var(--vo-orange);
     background: var(--vo-paper);
-    box-shadow: 0 0 0 4px hsl(230 78% 58% / 0.11);
+    box-shadow: 0 0 0 3px rgba(11, 53, 39, 0.12);
     outline: none;
   }
 
   [aria-invalid="true"] {
-    border-color: hsl(4 58% 48% / 0.68);
-    box-shadow: 0 0 0 4px hsl(4 58% 48% / 0.09);
+    border-color: var(--vo-danger);
+    box-shadow: 0 0 0 3px rgba(158, 42, 43, 0.1);
   }
 
   textarea {
